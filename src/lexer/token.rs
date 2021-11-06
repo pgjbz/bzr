@@ -2,8 +2,8 @@
 pub enum Token {
 	Illegal,
     EOF,
-    Ident(Vec<char>),
-    Number(Vec<char>),
+    Ident(String),
+    Number(String),
     Assign(char),
     Plus(char),
     Comma(char),
@@ -12,7 +12,7 @@ pub enum Token {
     Rparen(char),
     Lbrace(char),
     Rbrace(char),
-	String(Vec<char>),
+	String(String),
     Function,
     Let,
 	Var,
@@ -31,8 +31,8 @@ pub enum Token {
     Gt(char)
 }
 
-pub fn get_keyword_token(ident: &Vec<char>) -> Result<Token, String> {
-	let identifier: String = ident.into_iter().collect();
+pub fn get_keyword_token(ident: &str) -> Result<Token, String> {
+	let identifier: String = String::from(ident);
 	match &identifier[..] {
 		"if" => Ok(Token::If),
 		"else" => Ok(Token::Else),

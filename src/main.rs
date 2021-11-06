@@ -9,7 +9,7 @@ fn main() {
 			var st str = \"sera?\";
 		}
 	");
-	let mut lexer = Lexer::new(input.chars().collect());
+	let mut lexer = Lexer::new(&input);
 	// lexer.read_char();
 	loop {
 		let token = lexer.next_token();
