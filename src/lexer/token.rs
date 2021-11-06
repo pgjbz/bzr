@@ -23,6 +23,7 @@ pub enum Token {
     Return(usize),
 	Int(usize),
 	Str(usize),
+	Bool(usize),
     Minus(char, usize),
     Bang(char, usize),
     Asterisk(char, usize),
@@ -40,10 +41,11 @@ pub fn get_keyword_token(ident: &str, position: usize) -> Result<Token, String> 
 		"let" => Ok(Token::Let(position)),
 		"var" => Ok(Token::Var(position)),
 		"ret" => Ok(Token::Return(position)),
-		"true" => Ok(Token::Return(position)),
+		"true" => Ok(Token::True(position)),
 		"false" => Ok(Token::False(position)),
 		"int" => Ok(Token::Int(position)),
 		"str" => Ok(Token::Str(position)),
+		"bool" => Ok(Token::Bool(position)),
 		_ => Err(String::from("Not a keyword"))
 	}
 }
