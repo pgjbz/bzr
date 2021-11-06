@@ -61,19 +61,15 @@ impl<'a> Lexer<'a> {
 						}
 					} else if is_number(Some(*ch)) {
 						let ident: &str = Self::read_number(self);
-						if read_position >= content.len() {
-							token::Token::Illegal(read_position)
-						} else {
-							if let Some(ch) = content.chars().nth(read_position + 1) {
-								if is_math_simbol(ch) || is_whitespace(Some(ch)) || ch == ';' {
-									token::Token::Number(String::from(ident), read_position)
-								} else {
-									self.read_char();
-									token::Token::Illegal(read_position)
-								}
+						if let Some(ch) = content.chars().nth(read_position + 1) {
+							if is_math_simbol(ch) || is_whitespace(Some(ch)) || ch == ';' {
+								token::Token::Number(String::from(ident), read_position)
 							} else {
+								self.read_char();
 								token::Token::Illegal(read_position)
 							}
+						} else {
+							token::Token::Illegal(read_position)
 						}
 					} else {
 						token::Token::Illegal(read_position)

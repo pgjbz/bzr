@@ -8,7 +8,7 @@ fn main() {
 		} else {
 			var st str = \"sera?\";
 		} 
-		let number = 45;
+		let number = 34+35;
 	");
 	let mut lexer = Lexer::new(&input);
 	// lexer.read_char();
