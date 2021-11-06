@@ -3,7 +3,7 @@ pub enum Token {
 	Illegal,
     EOF,
     Ident(Vec<char>),
-    Int(Vec<char>),
+    Number(Vec<char>),
     Assign(char),
     Plus(char),
     Comma(char),
@@ -12,6 +12,7 @@ pub enum Token {
     Rparen(char),
     Lbrace(char),
     Rbrace(char),
+	String(Vec<char>),
     Function,
     Let,
 	Var,
@@ -20,6 +21,8 @@ pub enum Token {
     If,
     Else,
     Return,
+	Int,
+	Str,
     Minus(char),
     Bang(char),
     Asterisk(char),
@@ -36,9 +39,11 @@ pub fn get_keyword_token(ident: &Vec<char>) -> Result<Token, String> {
 		"fn" => Ok(Token::Function),
 		"let" => Ok(Token::Let),
 		"var" => Ok(Token::Var),
-		"return" => Ok(Token::Return),
+		"ret" => Ok(Token::Return),
 		"true" => Ok(Token::Return),
 		"false" => Ok(Token::False),
+		"int" => Ok(Token::Int),
+		"str" => Ok(Token::Str),
 		_ => Err(String::from("Not a keyword"))
 	}
 }

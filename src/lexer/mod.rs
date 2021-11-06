@@ -35,17 +35,31 @@ impl Lexer {
 			',' => token::Token::Comma(self.ch),
 			'{' => token::Token::Lbrace(self.ch),
 			'}' => token::Token::Rbrace(self.ch),
+			'\"' => {
+				let mut string = Self::read_string(self);
+				match string.last() {
+					Some(ch) => {
+						if *ch != '\"' {
+							token::Token::Illegal
+						} else {
+							string.pop();
+							token::Token::String(string)
+						}
+					},
+					None => token::Token::Illegal
+				}
+			},
 			'\0' => token::Token::EOF,
 			_ => 
 			if is_letter(self.ch) {
-				let ident: Vec<char> = Lexer::read_identifier(self);
+				let ident: Vec<char> = Self::read_identifier(self);
 				match token::get_keyword_token(&ident) {
 					Ok(keyword_token) => keyword_token,
 					Err(_) => token::Token::Ident(ident)
 				}
 			} else if is_number(self.ch) {
-				let ident: Vec<char> = Lexer::read_number(self);
-				token::Token::Int(ident)
+				let ident: Vec<char> = Self::read_number(self);
+				token::Token::Number(ident)
 			} else {
 				token::Token::Illegal
 			}
@@ -94,6 +108,15 @@ impl Lexer {
 		input.position -= 1;
 		input.read_position -= 1;
 		ret
+	}
+
+	fn read_string(input: &mut Self) -> Vec<char> {
+		let position= input.position + 1;
+		input.read_char();
+		while input.position < input.input.len() && input.ch != '\"' || input.ch == '\0' {
+			input.read_char();
+		}
+		input.input[position..input.position+1].to_vec()
 	}
 
 }
