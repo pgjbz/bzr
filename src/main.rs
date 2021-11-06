@@ -7,13 +7,13 @@ fn main() {
 			var st str = \"manipulado\";
 		} else {
 			var st str = \"sera?\";
-		}
+		} [
 	");
 	let mut lexer = Lexer::new(&input);
 	// lexer.read_char();
 	loop {
 		let token = lexer.next_token();
-		if token == Token::EOF {
+		if let Token::EOF(_) = token {
             break;
         } else {
             println!("{:?}", token);

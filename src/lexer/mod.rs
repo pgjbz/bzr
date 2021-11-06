@@ -21,46 +21,49 @@ impl<'a> Lexer<'a> {
 		self.read_char();
 		self.skip_whitespace();
 		let token = match &self.ch {
-			'=' => token::Token::Assign(self.ch),
-			'+' => token::Token::Plus(self.ch),
-			'-' => token::Token::Minus(self.ch),
-			'!' => token::Token::Bang(self.ch),
-			'/' => token::Token::Slash(self.ch),
-			'*' => token::Token::Asterisk(self.ch),
-			'<' => token::Token::Lt(self.ch),
-			'>' => token::Token::Gt(self.ch),
-			';' => token::Token::Semicolon(self.ch),
-			'(' => token::Token::Lparen(self.ch),
-			')' => token::Token::Rparen(self.ch),
-			',' => token::Token::Comma(self.ch),
-			'{' => token::Token::Lbrace(self.ch),
-			'}' => token::Token::Rbrace(self.ch),
+			'=' => token::Token::Assign(self.ch, self.position),
+			'+' => token::Token::Plus(self.ch, self.position),
+			'-' => token::Token::Minus(self.ch, self.position),
+			'!' => token::Token::Bang(self.ch, self.position),
+			'/' => token::Token::Slash(self.ch, self.position),
+			'*' => token::Token::Asterisk(self.ch, self.position),
+			'<' => token::Token::Lt(self.ch, self.position),
+			'>' => token::Token::Gt(self.ch, self.position),
+			';' => token::Token::Semicolon(self.ch, self.position),
+			'(' => token::Token::Lparen(self.ch, self.position),
+			')' => token::Token::Rparen(self.ch, self.position),
+			',' => token::Token::Comma(self.ch, self.position),
+			'{' => token::Token::Lbrace(self.ch, self.position),
+			'}' => token::Token::Rbrace(self.ch, self.position),
 			'\"' => {
+				let position = self.position;
 				let string = Self::read_string(self);
 				match string.chars().last() {
 					Some(ch) => {
 						if ch != '\"' {
-							token::Token::Illegal
+							token::Token::Illegal(position)
 						} else {
-							token::Token::String(String::from(&string[0..string.len() - 1]))
+							token::Token::String(String::from(&string[0..string.len() - 1]), position)
 						}
 					},
-					None => token::Token::Illegal
+					None => token::Token::Illegal(position)
 				}
 			},
-			'\0' => token::Token::EOF,
-			_ => 
-			if is_letter(self.ch) {
-				let ident: &str = Self::read_identifier(self);
-				match token::get_keyword_token(&ident) {
-					Ok(keyword_token) => keyword_token,
-					Err(_) => token::Token::Ident(String::from(ident))
+			'\0' => token::Token::EOF(self.position),
+			_ => { 
+				let position = self.position;
+				if is_letter(self.ch) {
+					let ident: &str = Self::read_identifier(self);
+					match token::get_keyword_token(&ident,position) {
+						Ok(keyword_token) => keyword_token,
+						Err(_) => token::Token::Ident(String::from(ident), position)
+					}
+				} else if is_number(self.ch) {
+					let ident: &str = Self::read_number(self);
+					token::Token::Number(String::from(ident), position)
+				} else {
+					token::Token::Illegal(position)
 				}
-			} else if is_number(self.ch) {
-				let ident: &str = Self::read_number(self);
-				token::Token::Number(String::from(ident))
-			} else {
-				token::Token::Illegal
 			}
 		};
 
