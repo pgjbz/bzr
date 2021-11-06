@@ -7,7 +7,8 @@ fn main() {
 			var st str = \"manipulado\";
 		} else {
 			var st str = \"sera?\";
-		} [
+		} 
+		let number = 45;
 	");
 	let mut lexer = Lexer::new(&input);
 	// lexer.read_char();

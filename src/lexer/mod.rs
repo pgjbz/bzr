@@ -51,18 +51,32 @@ impl<'a> Lexer<'a> {
 					}
 				},
 				_ => { 
-					let position = self.position;
+					let read_position = self.read_position;
+					let content = self.input;
 					if is_letter(Some(*ch)) {
 						let ident: &str = Self::read_identifier(self);
-						match token::get_keyword_token(&ident,position) {
+						match token::get_keyword_token(&ident,read_position) {
 							Ok(keyword_token) => keyword_token,
-							Err(_) => token::Token::Ident(String::from(ident), position)
+							Err(_) => token::Token::Ident(String::from(ident), read_position)
 						}
 					} else if is_number(Some(*ch)) {
 						let ident: &str = Self::read_number(self);
-						token::Token::Number(String::from(ident), position)
+						if read_position >= content.len() {
+							token::Token::Illegal(read_position)
+						} else {
+							if let Some(ch) = content.chars().nth(read_position + 1) {
+								if is_math_simbol(ch) || is_whitespace(Some(ch)) || ch == ';' {
+									token::Token::Number(String::from(ident), read_position)
+								} else {
+									self.read_char();
+									token::Token::Illegal(read_position)
+								}
+							} else {
+								token::Token::Illegal(read_position)
+							}
+						}
 					} else {
-						token::Token::Illegal(position)
+						token::Token::Illegal(read_position)
 					}
 				} 
 			} 
@@ -152,4 +166,8 @@ fn is_whitespace(ch: Option<char>) -> bool {
 	} else {
 		false
 	}
+}
+
+fn is_math_simbol(ch: char) -> bool {
+	ch == '*' || ch == '/' || ch == '+' || ch == '-'
 }

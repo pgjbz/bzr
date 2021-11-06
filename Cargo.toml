@@ -8,3 +8,9 @@ authors = ["Paulo Gabriel Justino Bezerra <pgjbzr@gmail.com>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
