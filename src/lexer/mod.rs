@@ -1,3 +1,5 @@
+use self::token::Token;
+
 pub mod token;
 
 pub struct Lexer<'a> {
@@ -82,7 +84,7 @@ impl<'a> Lexer<'a> {
 		token
 	}
 
-	pub fn skip_whitespace(&mut self) {
+	fn skip_whitespace(&mut self) {
 		loop {
 			if is_whitespace(self.ch) {
 				self.read_char();
@@ -92,7 +94,7 @@ impl<'a> Lexer<'a> {
 		}
 	}
 
-	pub fn read_char(&mut self) {
+	fn read_char(&mut self) {
 		if self.read_position >= self.input.len() {
 			self.ch = None
 		} else {
@@ -138,6 +140,19 @@ impl<'a> Lexer<'a> {
 		&input.input[position..input.position+1]
 	}
 
+}
+
+impl<'a> Iterator for Lexer<'a> {
+    type Item = Token;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let next = self.next_token();
+		if let  token::Token::EOF(_)  = next {
+			None
+		} else {
+			Some(next)
+		}
+    }
 }
 
 fn is_letter(ch: Option<char>) -> bool {

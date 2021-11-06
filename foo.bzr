@@ -1,7 +1,7 @@
 let numero int = 5;
 if(numero > 4) {
-	var st str = \"manipulado\";
+	var st str = "manipulado";
 } else {
-	var st str = \"sera?\";
+	var st str = "sera?";
 } 
 let number = 34+35;
