@@ -1,15 +1,9 @@
+use std::fs;
+
 use bzr::lexer::{Lexer, token::Token};
 
 fn main() {
-	let input = String::from("
-		let numero int = 5;
-		if(numero > 4) {
-			var st str = \"manipulado\";
-		} else {
-			var st str = \"sera?\";
-		} 
-		let number = 34+35;
-	");
+	let input = fs::read_to_string("foo.bzr").unwrap();
 	let mut lexer = Lexer::new(&input);
 	// lexer.read_char();
 	loop {
