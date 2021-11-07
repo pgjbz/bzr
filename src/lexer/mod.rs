@@ -1,12 +1,14 @@
-use self::token::Token;
+use self::token::{Location, Token};
 
 pub mod token;
 
 pub struct Lexer<'a> {
 	input: &'a str, //Source code
-	pub position: usize,
-	pub read_position: usize,
-	pub ch: Option<char>
+	position: usize,
+	read_position: usize,
+	ch: Option<char>,
+	line: usize,
+	line_position: usize,
 }
 
 impl<'a> Lexer<'a> {
@@ -15,41 +17,43 @@ impl<'a> Lexer<'a> {
 			input,
 			position: 0,
 			read_position: 0,
-			ch: None
+			ch: None,
+			line: 0,
+			line_position: 0
 		}
 	}
 
-	pub fn next_token(&mut self) -> token::Token {
+	pub fn next_token(&mut self) -> Token {
 		self.read_char();
 		self.skip_whitespace();
+		let location = Location::new(self.line_position, self.line);
 		let token = if let Some(ch) = &self.ch {
 			match ch {
-				'=' => token::Token::Assign(*ch, self.position),
-				'+' => token::Token::Plus(*ch, self.position),
-				'-' => token::Token::Minus(*ch, self.position),
-				'!' => token::Token::Bang(*ch, self.position),
-				'/' => token::Token::Slash(*ch, self.position),
-				'*' => token::Token::Asterisk(*ch, self.position),
-				'<' => token::Token::Lt(*ch, self.position),
-				'>' => token::Token::Gt(*ch, self.position),
-				';' => token::Token::Semicolon(*ch, self.position),
-				'(' => token::Token::Lparen(*ch, self.position),
-				')' => token::Token::Rparen(*ch, self.position),
-				',' => token::Token::Comma(*ch, self.position),
-				'{' => token::Token::Lbrace(*ch, self.position),
-				'}' => token::Token::Rbrace(*ch, self.position),
+				'=' => Token::Assign(location),
+				'+' => Token::Plus(location),
+				'-' => Token::Minus(location),
+				'!' => Token::Bang(location),
+				'/' => Token::Slash(location),
+				'*' => Token::Asterisk(location),
+				'<' => Token::Lt(location),
+				'>' => Token::Gt(location),
+				';' => Token::Semicolon(location),
+				'(' => Token::Lparen(location),
+				')' => Token::Rparen(location),
+				',' => Token::Comma(location),
+				'{' => Token::Lbrace(location),
+				'}' => Token::Rbrace(location),
 				'\"' => {
-					let position = self.position;
 					let string = Self::read_string(self);
 					match string.chars().last() {
 						Some(ch) => {
 							if ch != '\"' {
-								token::Token::Illegal(position)
+								Token::Illegal(location)
 							} else {
-								token::Token::String(String::from(&string[0..string.len() - 1]), position)
+								Token::String(String::from(&string[0..string.len() - 1]), location)
 							}
 						},
-						None => token::Token::Illegal(position)
+						None => Token::Illegal(location)
 					}
 				},
 				_ => { 
@@ -57,29 +61,32 @@ impl<'a> Lexer<'a> {
 					let content = self.input;
 					if is_letter(Some(*ch)) {
 						let ident: &str = Self::read_identifier(self);
-						match token::get_keyword_token(&ident,read_position) {
+						match Token::get_keyword_token(&ident, location.clone()) {
 							Ok(keyword_token) => keyword_token,
-							Err(_) => token::Token::Ident(String::from(ident), read_position)
+							Err(_) => Token::Ident(String::from(ident), location)
 						}
 					} else if is_number(Some(*ch)) {
 						let ident: &str = Self::read_number(self);
 						if let Some(ch) = content.chars().nth(read_position + 1) {
-							if is_math_simbol(ch) || is_whitespace(Some(ch)) || ch == ';' {
-								token::Token::Number(String::from(ident), read_position)
+							if is_math_simbol(ch)
+							|| is_whitespace(Some(ch)) 
+							|| ch == ';'
+							|| ch == '{' {
+								Token::Number(String::from(ident), location)
 							} else {
 								self.read_char();
-								token::Token::Illegal(read_position)
+								Token::Illegal(location)
 							}
 						} else {
-							token::Token::Illegal(read_position)
+							Token::Illegal(location)
 						}
 					} else {
-						token::Token::Illegal(read_position)
+						Token::Illegal(location)
 					}
 				} 
 			} 
 		} else {
-			token::Token::EOF(self.position)
+			Token::EOF(location)
 		};
 		token
 	}
@@ -103,6 +110,14 @@ impl<'a> Lexer<'a> {
 				Some(ch)
 			} else {
 				None
+			}
+		}
+		if let Some(ch) = self.ch {
+			if ch == '\n' {
+				self.line += 1;
+				self.line_position = 0;
+			} else {
+				self.line_position += 1;
 			}
 		}
 		self.position = self.read_position;
@@ -180,5 +195,10 @@ fn is_whitespace(ch: Option<char>) -> bool {
 }
 
 fn is_math_simbol(ch: char) -> bool {
-	ch == '*' || ch == '/' || ch == '+' || ch == '-'
+	ch == '*' 
+	|| ch == '/' 
+	|| ch == '+' 
+	|| ch == '-' 
+	|| ch == ')' 
+	|| ch == '(' 
 }
