@@ -102,16 +102,8 @@ impl<'a> Lexer<'a> {
 	}
 
 	fn read_char(&mut self) {
-		if self.read_position >= self.input.len() {
-			self.ch = None
-		} else {
-			// self.ch = self.input[self.read_position];
-			self.ch = if let Some(ch) = self.input.chars().nth(self.read_position) {
-				Some(ch)
-			} else {
-				None
-			}
-		}
+		self.ch =self.input.chars().nth(self.read_position);
+		
 		if let Some(ch) = self.ch {
 			if ch == '\n' {
 				self.line += 1;
@@ -130,8 +122,7 @@ impl<'a> Lexer<'a> {
 			input.read_char();
 		}
 		let ret = &input.input[position..input.position];
-		input.position -= 1;
-		input.read_position -= 1;
+		Self::back_position(input);
 		ret
 	}
 
@@ -141,9 +132,14 @@ impl<'a> Lexer<'a> {
 			input.read_char();
 		}
 		let ret = &input.input[position..input.position];
+		Self::back_position(input);
+		ret
+	}
+
+	fn back_position(input: &mut Self) {
+		input.line_position -= 1;
 		input.position -= 1;
 		input.read_position -= 1;
-		ret
 	}
 
 	fn read_string(input: &mut Self) -> &str {
