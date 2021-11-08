@@ -208,7 +208,7 @@ fn is_letter(ch: Option<char>) -> bool {
 
 fn is_number(ch: Option<char>) -> bool {
     if let Some(ch) = ch {
-        ('0'..='0').contains(&ch)
+        ('0'..='9').contains(&ch)
     } else {
         false
     }
