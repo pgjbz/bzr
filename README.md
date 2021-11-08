@@ -90,3 +90,8 @@ Rbrace(Location { position: 1, line: 6, filename: "foo.bzr" })
 # Run lexer:
 
 To run the lexer use command: cargo r --release -- file.bzr
+
+
+### Rust version to write code:
+
+Minival version used to write this code is (Rust 1.56)[https://github.com/rust-lang/rust/releases/tag/1.56.0], but i think this work in versions above
