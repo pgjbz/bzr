@@ -60,7 +60,6 @@ fn test_identifier_with_number_token() {
     );
 }
 
-
 #[test]
 fn test_invalid_token() {
     let source = "$";
@@ -135,7 +134,10 @@ fn test_gte_illegal_order() {
 
 #[test]
 fn test_and_operator() {
-	let source = "&&";
-	let mut lexer = Lexer::new(source, FILENAME);
-	assert_eq!(Token::And(Location::new(1, 1, FILENAME)), *lexer.next_token());
+    let source = "&&";
+    let mut lexer = Lexer::new(source, FILENAME);
+    assert_eq!(
+        Token::And(Location::new(1, 1, FILENAME)),
+        *lexer.next_token()
+    );
 }

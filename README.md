@@ -44,7 +44,7 @@ struct Location {
 }
 ```
 
-For now only get the tokens, on input with the code above:
+For now only get the tokens, on input with the code below:
 
 ```
 let numero int = 5;
@@ -55,7 +55,7 @@ if numero >= 4 {
 } 
 ```
 
-Result in:
+Result is:
 
 ```
 Let(Location { position: 1, line: 1, filename: "foo.bzr" })
@@ -94,4 +94,4 @@ To run the lexer use command: cargo r --release -- file.bzr
 
 ### Rust version to write code:
 
-Minival version used to write this code is [Rust 1.56](https://github.com/rust-lang/rust/releases/tag/1.56.0), but i think this work in versions above
+Minival version used to write this code is [Rust 1.56](https://github.com/rust-lang/rust/releases/tag/1.56.0), but i think this work in others versions
