@@ -89,4 +89,4 @@ Rbrace(Location { position: 1, line: 6, filename: "foo.bzr" })
 
 # Run lexer:
 
-To run the lexer
+To run the lexer use command: cargo r --release -- file.bzr
