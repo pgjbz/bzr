@@ -19,7 +19,7 @@ impl<'a> Lexer<'a> {
 			position: 0,
 			read_position: 0,
 			ch: None,
-			line: 0,
+			line: 1,
 			line_position: 0,
 			filename
 		}

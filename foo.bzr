@@ -13,7 +13,7 @@ if is_true {
 
 is_true = !is_true;
 
-fn hello(param bool) bool {
+fn hello(param bool) str {
 	if param {
 		ret "abc";
 	}
