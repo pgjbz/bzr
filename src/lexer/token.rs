@@ -1,49 +1,49 @@
 #[derive(PartialEq, Debug)]
-pub enum Token {
-	Illegal(String, Location),
-    EOF(Location),
-    Ident(String, Location),
-    Number(String, Location),
-    Assign(Location),
-    Plus(Location),
-    Comma(Location),
-    Semicolon(Location),
-    Lparen(Location),
-    Rparen(Location),
-    Lbrace(Location),
-    Rbrace(Location),
-	String(String, Location),
-    Function(Location),
-    Let(Location),
-	Var(Location),
-    True(Location),
-    False(Location),
-    If(Location),
-    Else(Location),
-    Return(Location),
-	Int(Location),
-	Str(Location),
-	Bool(Location),
-    Minus(Location),
-    Bang(Location),
-    Asterisk(Location),
-    Slash(Location),
-    Lt(Location),
-    Gt(Location),
-	Eq(Location),
-	Lte(Location),
-	Gte(Location),
+pub enum Token<'a> {
+	Illegal(String, Location<'a>),
+    EOF(Location<'a>),
+    Ident(String, Location<'a>),
+    Number(String, Location<'a>),
+    Assign(Location<'a>),
+    Plus(Location<'a>),
+    Comma(Location<'a>),
+    Semicolon(Location<'a>),
+    Lparen(Location<'a>),
+    Rparen(Location<'a>),
+    Lbrace(Location<'a>),
+    Rbrace(Location<'a>),
+	String(String, Location<'a>),
+    Function(Location<'a>),
+    Let(Location<'a>),
+	Var(Location<'a>),
+    True(Location<'a>),
+    False(Location<'a>),
+    If(Location<'a>),
+    Else(Location<'a>),
+    Return(Location<'a>),
+	Int(Location<'a>),
+	Str(Location<'a>),
+	Bool(Location<'a>),
+    Minus(Location<'a>),
+    Bang(Location<'a>),
+    Asterisk(Location<'a>),
+    Slash(Location<'a>),
+    Lt(Location<'a>),
+    Gt(Location<'a>),
+	Eq(Location<'a>),
+	Lte(Location<'a>),
+	Gte(Location<'a>),
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]
-pub struct Location {
+pub struct Location<'a> {
 	position: usize,
 	line: usize,
-	filename: &'static str
+	filename: &'a str
 } 
 
-impl Location {
-	pub fn new(position: usize, line: usize, filename: &'static str) -> Self {
+impl<'a> Location<'a> {
+	pub fn new(position: usize, line: usize, filename: &'a str) -> Self {
 		Self {
 			position,
 			line,
@@ -52,8 +52,8 @@ impl Location {
 	}
 }
 
-impl Token {
-	pub fn get_keyword_token(ident: &str, location: Location) -> Result<Token, String> {
+impl<'a> Token<'a> {
+	pub fn get_keyword_token(ident: &str, location: Location<'a>) -> Result<Token<'a>, String> {
 		let identifier: String = String::from(ident);
 		match &identifier[..] {
 			"if" => Ok(Token::If(location)),

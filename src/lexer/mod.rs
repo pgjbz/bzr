@@ -9,11 +9,11 @@ pub struct Lexer<'a> {
 	ch: Option<char>,
 	line: usize,
 	line_position: usize,
-	filename: &'static str
+	filename: &'a str
 }
 
 impl<'a> Lexer<'a> {
-	pub fn new(input: &'a str, filename: &'static str) -> Self {
+	pub fn new(input: &'a str, filename: &'a str) -> Self {
 		Self {
 			input,
 			position: 0,
@@ -25,7 +25,7 @@ impl<'a> Lexer<'a> {
 		}
 	}
 
-	pub fn next_token(&mut self) -> Box<Token> {
+	pub fn next_token(&mut self) -> Box<Token<'a>> {
 		self.read_char();
 		self.skip_whitespace();
 		let location = Location::new(self.line_position, self.line, self.filename);
@@ -188,7 +188,7 @@ impl<'a> Lexer<'a> {
 }
 
 impl<'a> Iterator for Lexer<'a> {
-    type Item = Box<Token>;
+    type Item = Box<Token<'a>>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let next = self.next_token();
