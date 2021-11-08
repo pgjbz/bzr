@@ -1,4 +1,4 @@
-let numero int = 5;
+let numero int = 55;
 if numero > 4 {
 	var st str = "manipulado";
 } else {
@@ -24,4 +24,8 @@ if 10 >= 1 {
 	if 1 <= 10 {
 		if 10 == 10 {}
 	}
+}
+
+if numero == 5 && 10 == 10 {
+	
 }

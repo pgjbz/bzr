@@ -68,7 +68,17 @@ impl<'a> Lexer<'a> {
                         }
                     }
                     token
-                }
+                },
+				'&' => {
+					let mut token = Token::Illegal(String::from(self.ch.unwrap()), location);
+					if let Some(ch) = self.input.chars().nth(self.read_position) {
+						if ch == '&' {
+							self.read_char();
+							token = Token::And(location);
+						}
+					}
+					token
+				},
                 ';' => Token::Semicolon(location),
                 '(' => Token::Lparen(location),
                 ')' => Token::Rparen(location),
@@ -106,6 +116,7 @@ impl<'a> Lexer<'a> {
                                 || is_whitespace(Some(ch))
                                 || ch == ';'
                                 || ch == '{'
+								|| ch == '&'
                             {
                                 token = Token::Number(String::from(ident), location)
                             } else {
@@ -150,9 +161,9 @@ impl<'a> Lexer<'a> {
     }
 
     fn read_number(input: &mut Self) -> &str {
-        let position = input.position;
+		let position = input.position;
         while input.position < input.input.len() && is_number(input.ch) {
-            input.read_char();
+			input.read_char();
         }
         let ret = &input.input[position..input.position];
         Self::back_position(input);
@@ -161,7 +172,7 @@ impl<'a> Lexer<'a> {
 
     fn read_identifier(input: &mut Self) -> &str {
         let position = input.position;
-        while input.position < input.input.len() && is_letter(input.ch) {
+        while input.position < input.input.len() && is_letter(input.ch) || is_number(input.ch) {
             input.read_char();
         }
         let ret = &input.input[position..input.position];

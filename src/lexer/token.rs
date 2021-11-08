@@ -1,5 +1,6 @@
 #[derive(PartialEq, Debug)]
 pub enum Token<'a> {
+	STF,
     Illegal(String, Location<'a>),
     EOF(Location<'a>),
     Ident(String, Location<'a>),
@@ -33,6 +34,7 @@ pub enum Token<'a> {
     Eq(Location<'a>),
     Lte(Location<'a>),
     Gte(Location<'a>),
+	And(Location<'a>),
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]

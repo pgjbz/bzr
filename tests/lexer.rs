@@ -51,6 +51,17 @@ fn test_identifier_token() {
 }
 
 #[test]
+fn test_identifier_with_number_token() {
+    let source = "abc123";
+    let mut lexer = Lexer::new(source, FILENAME);
+    assert_eq!(
+        Token::Ident("abc123".to_string(), Location::new(1, 1, FILENAME)),
+        *lexer.next_token()
+    );
+}
+
+
+#[test]
 fn test_invalid_token() {
     let source = "$";
 
@@ -120,4 +131,11 @@ fn test_gte_illegal_order() {
         Token::Illegal(source.to_string(), Location::new(1, 1, FILENAME)),
         *lexer.next_token()
     );
+}
+
+#[test]
+fn test_and_operator() {
+	let source = "&&";
+	let mut lexer = Lexer::new(source, FILENAME);
+	assert_eq!(Token::And(Location::new(1, 1, FILENAME)), *lexer.next_token());
 }
