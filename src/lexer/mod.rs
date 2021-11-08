@@ -94,7 +94,7 @@ impl<'a> Lexer<'a> {
 					let content = self.input;
 					if is_letter(Some(*ch)) {
 						let ident: &str = Self::read_identifier(self);
-						match Token::get_keyword_token(&ident, location.clone()) {
+						match Token::get_keyword_token(ident, location) {
 							Ok(keyword_token) => keyword_token,
 							Err(_) => Token::Ident(String::from(ident), location)
 						}
@@ -145,7 +145,7 @@ impl<'a> Lexer<'a> {
 			}
 		}
 		self.position = self.read_position;
-		self.read_position = self.read_position + 1;
+		self.read_position += 1;
 	}
 
 	fn read_number(input: &mut Self)  -> &str {
@@ -200,7 +200,7 @@ impl<'a> Iterator for Lexer<'a> {
 
 fn is_letter(ch: Option<char>) -> bool {
 	if let Some(ch) = ch {
-		ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z' || ch == '_'
+		('a'..='z').contains(&ch) || ('A'..='Z').contains(&ch) || ch == '_'
 	} else {
 		false
 	}
@@ -208,7 +208,7 @@ fn is_letter(ch: Option<char>) -> bool {
 
 fn is_number(ch: Option<char>) -> bool {
 	if let Some(ch) = ch {
-		ch >= '0' && ch <= '9'
+		('0'..='0').contains(&ch)
 	} else {
 		false
 	}
