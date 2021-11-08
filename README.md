@@ -43,3 +43,50 @@ struct Location {
     filename: &'static str
 }
 ```
+
+For now only get the tokens, on input with the code above:
+
+```
+let numero int = 5;
+if numero >= 4 {
+	var st str = "manipulado";
+} else {
+	var st str = "sera?";
+} 
+```
+
+Result in:
+
+```
+Let(Location { position: 1, line: 1, filename: "foo.bzr" })
+Ident("numero", Location { position: 5, line: 1, filename: "foo.bzr" })
+Int(Location { position: 12, line: 1, filename: "foo.bzr" })
+Assign(Location { position: 16, line: 1, filename: "foo.bzr" })
+Number("5", Location { position: 18, line: 1, filename: "foo.bzr" })
+Semicolon(Location { position: 19, line: 1, filename: "foo.bzr" })
+If(Location { position: 1, line: 2, filename: "foo.bzr" })
+Ident("numero", Location { position: 4, line: 2, filename: "foo.bzr" })
+Gte(Location { position: 11, line: 2, filename: "foo.bzr" })
+Number("4", Location { position: 14, line: 2, filename: "foo.bzr" })
+Lbrace(Location { position: 16, line: 2, filename: "foo.bzr" })
+Var(Location { position: 2, line: 3, filename: "foo.bzr" })
+Ident("st", Location { position: 6, line: 3, filename: "foo.bzr" })
+Str(Location { position: 9, line: 3, filename: "foo.bzr" })
+Assign(Location { position: 13, line: 3, filename: "foo.bzr" })
+String("manipulado", Location { position: 15, line: 3, filename: "foo.bzr" })
+Semicolon(Location { position: 27, line: 3, filename: "foo.bzr" })
+Rbrace(Location { position: 1, line: 4, filename: "foo.bzr" })
+Else(Location { position: 3, line: 4, filename: "foo.bzr" })
+Lbrace(Location { position: 8, line: 4, filename: "foo.bzr" })
+Var(Location { position: 2, line: 5, filename: "foo.bzr" })
+Ident("st", Location { position: 6, line: 5, filename: "foo.bzr" })
+Str(Location { position: 9, line: 5, filename: "foo.bzr" })
+Assign(Location { position: 13, line: 5, filename: "foo.bzr" })
+String("sera?", Location { position: 15, line: 5, filename: "foo.bzr" })
+Semicolon(Location { position: 22, line: 5, filename: "foo.bzr" })
+Rbrace(Location { position: 1, line: 6, filename: "foo.bzr" })
+```
+
+# Run lexer:
+
+To run the lexer
