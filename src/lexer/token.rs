@@ -36,13 +36,15 @@ pub enum Token {
 pub struct Location {
 	position: usize,
 	line: usize,
+	filename: &'static str
 } 
 
 impl Location {
-	pub fn new(position: usize, line: usize) -> Self {
+	pub fn new(position: usize, line: usize, filename: &'static str) -> Self {
 		Self {
 			position,
-			line
+			line,
+			filename
 		}
 	}
 }

@@ -9,24 +9,26 @@ pub struct Lexer<'a> {
 	ch: Option<char>,
 	line: usize,
 	line_position: usize,
+	filename: &'static str
 }
 
 impl<'a> Lexer<'a> {
-	pub fn new(input: &'a str) -> Self {
+	pub fn new(input: &'a str, filename: &'static str) -> Self {
 		Self {
 			input,
 			position: 0,
 			read_position: 0,
 			ch: None,
 			line: 0,
-			line_position: 0
+			line_position: 0,
+			filename
 		}
 	}
 
 	pub fn next_token(&mut self) -> Token {
 		self.read_char();
 		self.skip_whitespace();
-		let location = Location::new(self.line_position, self.line);
+		let location = Location::new(self.line_position, self.line, self.filename);
 		let token = if let Some(ch) = &self.ch {
 			match ch {
 				'=' => Token::Assign(location),
