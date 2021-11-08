@@ -25,7 +25,7 @@ impl<'a> Lexer<'a> {
 		}
 	}
 
-	pub fn next_token(&mut self) -> Token {
+	pub fn next_token(&mut self) -> Box<Token> {
 		self.read_char();
 		self.skip_whitespace();
 		let location = Location::new(self.line_position, self.line, self.filename);
@@ -122,7 +122,7 @@ impl<'a> Lexer<'a> {
 		} else {
 			Token::EOF(location)
 		};
-		token
+		Box::new(token)
 	}
 
 	fn skip_whitespace(&mut self) {
@@ -188,11 +188,11 @@ impl<'a> Lexer<'a> {
 }
 
 impl<'a> Iterator for Lexer<'a> {
-    type Item = Token;
+    type Item = Box<Token>;
 
     fn next(&mut self) -> Option<Self::Item> {
         let next = self.next_token();
-		if let  token::Token::EOF(_)  = next {
+		if let token::Token::EOF(_) = *next {
 			None
 		} else {
 			Some(next)

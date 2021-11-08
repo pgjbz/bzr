@@ -56,7 +56,7 @@ impl Token {
 	pub fn get_keyword_token(ident: &str, location: Location) -> Result<Token, String> {
 		let identifier: String = String::from(ident);
 		match &identifier[..] {
-			"if" => Ok(Token::If(location),),
+			"if" => Ok(Token::If(location)),
 			"else" => Ok(Token::Else(location)),
 			"fn" => Ok(Token::Function(location)),
 			"let" => Ok(Token::Let(location)),
