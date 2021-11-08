@@ -100,20 +100,18 @@ impl<'a> Lexer<'a> {
 						}
 					} else if is_number(Some(*ch)) {
 						let ident: &str = Self::read_number(self);
-						let value = String::from(ident);
+						let mut token: Token = Token::Illegal(String::from(ident), location);
 						if let Some(ch) = content.chars().nth(read_position + 1) {
 							if is_math_simbol(ch)
 							|| is_whitespace(Some(ch)) 
 							|| ch == ';'
 							|| ch == '{' {
-								Token::Number(value, location)
+								token = Token::Number(String::from(ident), location)
 							} else {
 								self.read_char();
-								Token::Illegal(value, location)
 							}
-						} else {
-							Token::Illegal(value, location)
-						}
+						} 
+						token
 					} else {
 						Token::Illegal(String::from(self.ch.unwrap()), location)
 					}
