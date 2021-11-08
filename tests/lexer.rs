@@ -62,3 +62,32 @@ fn test_number_token() {
 	//TODO: check why is illegal
 	assert_eq!(Token::Illegal("457".to_string(), Location::new(1, 1, FILENAME)), lexer.next_token());
 }
+
+#[test]
+fn test_eq_token() {
+	let source = "==";
+	let mut lexer = Lexer::new(source, FILENAME);
+	assert_eq!(Token::Eq(Location::new(1, 1, FILENAME)), lexer.next_token());
+}
+
+
+#[test]
+fn test_lte_token() {
+	let source = "<=";
+	let mut lexer = Lexer::new(source, FILENAME);
+	assert_eq!(Token::Lte(Location::new(1, 1, FILENAME)), lexer.next_token());
+}
+
+#[test]
+fn test_gte_token() {
+	let source = ">=";
+	let mut lexer = Lexer::new(source, FILENAME);
+	assert_eq!(Token::Gte(Location::new(1, 1, FILENAME)), lexer.next_token());
+}
+
+#[test]
+fn test_gte_illegal_order() {
+	let source = "=>";
+	let mut lexer = Lexer::new(source, FILENAME);
+	assert_eq!(Token::Illegal(source.to_string(), Location::new(1, 1, FILENAME)), lexer.next_token());
+}

@@ -31,14 +31,44 @@ impl<'a> Lexer<'a> {
 		let location = Location::new(self.line_position, self.line, self.filename);
 		let token = if let Some(ch) = &self.ch {
 			match ch {
-				'=' => Token::Assign(location),
+				'=' => {
+					let mut token: Token =  Token::Assign(location);
+					if let Some(nch) = self.input.chars().nth(self.read_position) {
+						if nch == '=' { 
+							self.read_char();
+							token = Token::Eq(location)
+						} else if nch == '>' || nch == '<' {
+							token = Token::Illegal(format!("{}{}", ch, nch), location);
+							self.read_char();
+						}
+					} 
+					token
+				},
 				'+' => Token::Plus(location),
 				'-' => Token::Minus(location),
 				'!' => Token::Bang(location),
 				'/' => Token::Slash(location),
 				'*' => Token::Asterisk(location),
-				'<' => Token::Lt(location),
-				'>' => Token::Gt(location),
+				'<' => {
+					let mut token = Token::Lt(location);
+					if let Some(ch) = self.input.chars().nth(self.read_position){
+						if ch == '=' {
+							self.read_char();
+							token = Token::Lte(location)
+						}
+					}
+					token
+				},
+				'>' => {
+					let mut token = Token::Gt(location);
+					if let Some(ch) = self.input.chars().nth(self.read_position) {
+						if ch == '=' {
+							self.read_char();
+							token = Token::Gte(location);
+						}
+					}
+					token
+				},
 				';' => Token::Semicolon(location),
 				'(' => Token::Lparen(location),
 				')' => Token::Rparen(location),
@@ -85,11 +115,7 @@ impl<'a> Lexer<'a> {
 							Token::Illegal(value, location)
 						}
 					} else {
-						if let Some(ch) = self.ch {
-							Token::Illegal(String::from(ch), location)
-						} else {
-							Token::Illegal("unknown".to_string(), location)
-						}
+						Token::Illegal(String::from(self.ch.unwrap()), location)
 					}
 				} 
 			} 
@@ -205,4 +231,7 @@ fn is_math_simbol(ch: char) -> bool {
 	|| ch == '-' 
 	|| ch == ')' 
 	|| ch == '(' 
+	|| ch == '>'
+	|| ch == '<'
+	|| ch == '='
 }

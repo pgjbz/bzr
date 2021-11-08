@@ -19,3 +19,9 @@ fn hello(param bool) str {
 	}
 	ret "def";
 }
+
+if 10 >= 1 {
+	if 1 <= 10 {
+		if 10 == 10 {}
+	}
+}

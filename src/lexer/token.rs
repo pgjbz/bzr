@@ -29,7 +29,10 @@ pub enum Token {
     Asterisk(Location),
     Slash(Location),
     Lt(Location),
-    Gt(Location)
+    Gt(Location),
+	Eq(Location),
+	Lte(Location),
+	Gte(Location),
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]
