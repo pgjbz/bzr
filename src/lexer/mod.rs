@@ -47,15 +47,16 @@ impl<'a> Lexer<'a> {
 				'}' => Token::Rbrace(location),
 				'\"' => {
 					let string = Self::read_string(self);
+					let value = String::from(string);
 					match string.chars().last() {
 						Some(ch) => {
 							if ch != '\"' {
-								Token::Illegal(location)
+								Token::Illegal(value, location)
 							} else {
 								Token::String(String::from(&string[0..string.len() - 1]), location)
 							}
 						},
-						None => Token::Illegal(location)
+						None => Token::Illegal(value, location)
 					}
 				},
 				_ => { 
@@ -69,21 +70,26 @@ impl<'a> Lexer<'a> {
 						}
 					} else if is_number(Some(*ch)) {
 						let ident: &str = Self::read_number(self);
+						let value = String::from(ident);
 						if let Some(ch) = content.chars().nth(read_position + 1) {
 							if is_math_simbol(ch)
 							|| is_whitespace(Some(ch)) 
 							|| ch == ';'
 							|| ch == '{' {
-								Token::Number(String::from(ident), location)
+								Token::Number(value, location)
 							} else {
 								self.read_char();
-								Token::Illegal(location)
+								Token::Illegal(value, location)
 							}
 						} else {
-							Token::Illegal(location)
+							Token::Illegal(value, location)
 						}
 					} else {
-						Token::Illegal(location)
+						if let Some(ch) = self.ch {
+							Token::Illegal(String::from(ch), location)
+						} else {
+							Token::Illegal("unknown".to_string(), location)
+						}
 					}
 				} 
 			} 
