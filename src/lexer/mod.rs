@@ -2,6 +2,7 @@ use self::token::{Location, Token};
 
 pub mod token;
 
+#[derive(Debug)]
 pub struct Lexer<'a> {
     input: &'a str, //Source code
     position: usize,
@@ -152,10 +153,9 @@ impl<'a> Lexer<'a> {
             if ch == '\n' {
                 self.line += 1;
                 self.line_position = 0;
-            } else {
-                self.line_position += 1;
-            }
+            }     
         }
+		self.line_position += 1;
         self.position = self.read_position;
         self.read_position += 1;
     }

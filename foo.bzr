@@ -1,4 +1,5 @@
-let numero int = 55;
+let numero int = 55
+;
 if numero > 4 {
 	var st str = "manipulado";
 } else {
