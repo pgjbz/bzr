@@ -32,3 +32,7 @@ if numero == 5 && 10 == 10 {
 }
 
 let a bool = 1 != 2;
+
+while a {
+    a = !a;
+}

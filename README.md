@@ -10,8 +10,6 @@ Tokens:
 - EOF(Location) => End of lile 
 - Ident(String, Location) => Identifier like`variable_name` 
 - Number(String, Location) => Number value like> 12 345 
-- Assign(Location) => `=` 
-- Plus(Location) => `+` 
 - Comma(Location) => `,` 
 - Semicolon(Location) => `;` 
 - Lparen(Location) => `(` 
@@ -20,19 +18,23 @@ Tokens:
 - Rbrace(Location) => `}` 
 - String(String, Location) = "like> this" 
 - Function(Location) =>  `fn` 
+- Return(Location) => `ret` 
 - Let(Location) = `let` (i will make this variable> immutable) 
-- Var(Location) = `var` (i will make this variable> mutable) 
+- Var(Location) = `var` (i will make this variable> mutable)
+- Bool(Location) = `bool` 
+- Int(Location) => `int`  
+- Str(Location) => `str` 
 - True(Location) = boolean value: `true` 
 - False(Location) = boolean value: `false` 
+- While(Location) = `while`
 - If(Location) => `if` 
 - Else(Location) => `else` 
-- Return(Location) => `ret` 
-- Int(Location) => `int` 
-- Str(Location) => `str` 
 - Minus(Location) => `-` 
-- Bang(Location) => `!` 
+- Plus(Location) => `+` 
 - Asterisk(Location) => `*` 
 - Slash(Location) => `/` 
+- Bang(Location) => `!` 
+- Assign(Location) => `=` 
 - Lt(Location) => `<` 
 - Gt(Location) => `<` 
 - Gte(Location) => `>=`

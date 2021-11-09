@@ -171,3 +171,13 @@ fn test_diff_illegal_order() {
         *lexer.next_token()
     );
 }
+
+#[test]
+fn test_while_token() {
+    let source = "while";
+    let mut lexer = Lexer::new(source, FILENAME);
+    assert_eq!(
+        Token::While(Location::new(1, 1, FILENAME)),
+        *lexer.next_token()
+    );
+}
