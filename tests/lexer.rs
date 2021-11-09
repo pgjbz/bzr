@@ -14,13 +14,13 @@ fn assert_true() {
 fn test_tokens() {
     let source = "{}(),; ,";
     let tokens = vec![
-        Token::Lbrace(Location::new(1, 1, FILENAME)),
-        Token::Rbrace(Location::new(2, 1, FILENAME)),
-        Token::Lparen(Location::new(3, 1, FILENAME)),
-        Token::Rparen(Location::new(4, 1, FILENAME)),
-        Token::Comma(Location::new(5, 1, FILENAME)),
-        Token::Semicolon(Location::new(6, 1, FILENAME)),
-        Token::Comma(Location::new(8, 1, FILENAME)),
+        Token::Lbrace(Some(Location::new(1, 1, FILENAME))),
+        Token::Rbrace(Some(Location::new(2, 1, FILENAME))),
+        Token::Lparen(Some(Location::new(3, 1, FILENAME))),
+        Token::Rparen(Some(Location::new(4, 1, FILENAME))),
+        Token::Comma(Some(Location::new(5, 1, FILENAME))),
+        Token::Semicolon(Some(Location::new(6, 1, FILENAME))),
+        Token::Comma(Some(Location::new(8, 1, FILENAME))),
     ];
     let lexer = Lexer::new(source, FILENAME);
 
@@ -45,7 +45,7 @@ fn test_identifier_token() {
     let source = "abc";
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::Ident("abc".to_string(), Location::new(1, 1, FILENAME)),
+        Token::Ident(Some("abc".to_string()), Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -55,7 +55,7 @@ fn test_identifier_with_number_token() {
     let source = "abc123";
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::Ident("abc123".to_string(), Location::new(1, 1, FILENAME)),
+        Token::Ident(Some("abc123".to_string()), Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -66,7 +66,7 @@ fn test_invalid_token() {
 
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::Illegal("$".to_string(), Location::new(1, 1, FILENAME)),
+        Token::Illegal(Some("$".to_string()), Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -76,7 +76,7 @@ fn test_string_token() {
     let source = "\"abc\"";
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::String("abc".to_string(), Location::new(1, 1, FILENAME)),
+        Token::String(Some("abc".to_string()), Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -87,7 +87,7 @@ fn test_number_token() {
     let mut lexer = Lexer::new(source, FILENAME);
     //TODO: check why is illegal
     assert_eq!(
-        Token::Illegal("457".to_string(), Location::new(1, 1, FILENAME)),
+        Token::Number(Some("457".to_string()), Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -97,7 +97,7 @@ fn test_eq_token() {
     let source = "==";
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::Eq(Location::new(1, 1, FILENAME)),
+        Token::Eq(Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -107,7 +107,7 @@ fn test_lte_token() {
     let source = "<=";
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::Lte(Location::new(1, 1, FILENAME)),
+        Token::Lte(Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -117,7 +117,7 @@ fn test_gte_token() {
     let source = ">=";
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::Gte(Location::new(1, 1, FILENAME)),
+        Token::Gte(Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -127,7 +127,7 @@ fn test_gte_illegal_order() {
     let source = "=>";
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::Illegal(source.to_string(), Location::new(1, 1, FILENAME)),
+        Token::Illegal(Some(source.to_string()), Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -137,7 +137,7 @@ fn test_and_operator() {
     let source = "&&";
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::And(Location::new(1, 1, FILENAME)),
+        Token::And(Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -147,7 +147,7 @@ fn test_or_operator() {
     let source = "||";
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::Or(Location::new(1, 1, FILENAME)),
+        Token::Or(Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -157,7 +157,7 @@ fn test_diff_token() {
     let source = "!=";
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::Diff(Location::new(1, 1, FILENAME)),
+        Token::Diff(Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -167,7 +167,7 @@ fn test_diff_illegal_order() {
     let source = "=!";
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::Illegal(source.to_string(), Location::new(1, 1, FILENAME)),
+        Token::Illegal(Some(source.to_string()), Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }
@@ -177,7 +177,7 @@ fn test_while_token() {
     let source = "while";
     let mut lexer = Lexer::new(source, FILENAME);
     assert_eq!(
-        Token::While(Location::new(1, 1, FILENAME)),
+        Token::While(Some(Location::new(1, 1, FILENAME))),
         *lexer.next_token()
     );
 }

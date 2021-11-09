@@ -29,7 +29,7 @@ impl<'a> Lexer<'a> {
     pub fn next_token(&mut self) -> Box<Token<'a>> {
         self.read_char();
         self.skip_whitespace();
-        let location = Location::new(self.line_position, self.line, self.filename);
+        let location = Some(Location::new(self.line_position, self.line, self.filename));
         let token = if let Some(ch) = &self.ch {
             match ch {
                 '=' => {
@@ -37,12 +37,12 @@ impl<'a> Lexer<'a> {
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '=' {
                         token = Token::Eq(location)
-                    } else if !Self::is_whitespace(Some(next_char)) 
-                        && !(next_char == '\"' || next_char == '(')
-                        && !Self::is_number(Some(next_char))
-                        && !Self::is_letter(Some(next_char))
+                    } else if !(Self::is_whitespace(Some(next_char)) 
+                        && (next_char == '\"' || next_char == '(')
+                        && Self::is_number(Some(next_char))
+                        && Self::is_letter(Some(next_char)))
                     {
-                        token = Token::Illegal(format!("{}{}", ch, next_char), location);
+                        token = Token::Illegal(Some(format!("{}{}", ch, next_char)), location);
                     }
                     self.read_char();
                     token
@@ -79,7 +79,7 @@ impl<'a> Lexer<'a> {
                     token
                 }
                 '&' => {
-                    let mut token = Token::Illegal(String::from(self.ch.unwrap()), location);
+                    let mut token = Token::Illegal(Some(String::from(self.ch.unwrap())), location);
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '&' {
                         self.read_char();
@@ -97,20 +97,20 @@ impl<'a> Lexer<'a> {
                 '}' => Token::Rbrace(location),
                 '\"' => {
                     let string = Self::read_string(self);
-                    let value = String::from(string);
+                    let value = Some(String::from(string));
                     match string.chars().last() {
                         Some(ch) => {
                             if ch != '\"' {
                                 Token::Illegal(value, location)
                             } else {
-                                Token::String(String::from(&string[0..string.len() - 1]), location)
+                                Token::String(Some(String::from(&string[0..string.len() - 1])), location)
                             }
                         }
                         None => Token::Illegal(value, location),
                     }
                 },
                 '|' => {
-                    let mut token = Token::Illegal(String::from(self.ch.unwrap()), location);
+                    let mut token = Token::Illegal(Some(String::from(self.ch.unwrap())), location);
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '|' {
                         self.read_char();
@@ -123,13 +123,13 @@ impl<'a> Lexer<'a> {
                         let ident: &str = Self::read_identifier(self);
                         match Token::get_keyword_token(ident, location) {
                             Ok(keyword_token) => keyword_token,
-                            Err(_) => Token::Ident(String::from(ident), location),
+                            Err(_) => Token::Ident(Some(String::from(ident)), location),
                         }
                     } else if Self::is_number(Some(*ch)) {
                         //TODO: improve this
                         let next_char = Self::peek_next_char(self, Some(1));
                         let ident: &str = Self::read_number(self);
-                        let mut token: Token = Token::Illegal(String::from(ident), location);
+                        let mut token: Token = Token::Illegal(Some(String::from(ident)), location);
                         if Self::is_math_simbol(next_char)
                             || Self::is_whitespace(Some(next_char))
                             || next_char == ';'
@@ -141,13 +141,13 @@ impl<'a> Lexer<'a> {
                             || next_char == ']'
                             || Self::is_number(Some(next_char))
                         {
-                            token = Token::Number(String::from(ident), location)
+                            token = Token::Number(Some(String::from(ident)), location)
                         } else {
                             self.read_char();
                         }
                         token
                     } else {
-                        Token::Illegal(String::from(self.ch.unwrap()), location)
+                        Token::Illegal(Some(String::from(self.ch.unwrap())), location)
                     }
                 }
             }
