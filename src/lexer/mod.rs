@@ -36,12 +36,15 @@ impl<'a> Lexer<'a> {
                     let mut token: Token = Token::Assign(location);
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '=' {
-                        self.read_char();
                         token = Token::Eq(location)
-                    } else if next_char == '>' || next_char == '<' || next_char == '!' {
+                    } else if !Self::is_whitespace(Some(next_char)) 
+                        && !(next_char == '\"' || next_char == '(')
+                        && !Self::is_number(Some(next_char))
+                        && !Self::is_letter(Some(next_char))
+                     {
                         token = Token::Illegal(format!("{}{}", ch, next_char), location);
-                        self.read_char();
                     }
+                    self.read_char();
                     token
                 }
                 '+' => Token::Plus(location),
@@ -50,9 +53,9 @@ impl<'a> Lexer<'a> {
                     let mut token: Token = Token::Bang(location);
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '=' {
-                        self.read_char();
                         token = Token::Diff(location);
                     }
+                    self.read_char();
                     token
                 }
                 '/' => Token::Slash(location),
@@ -61,27 +64,27 @@ impl<'a> Lexer<'a> {
                     let mut token = Token::Lt(location);
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '=' {
-                        self.read_char();
                         token = Token::Lte(location)
                     }
+                    self.read_char();
                     token
                 }
                 '>' => {
                     let mut token = Token::Gt(location);
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '=' {
-                        self.read_char();
                         token = Token::Gte(location);
                     }
+                    self.read_char();
                     token
                 }
                 '&' => {
                     let mut token = Token::Illegal(String::from(self.ch.unwrap()), location);
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '&' {
-                        self.read_char();
                         token = Token::And(location);
                     }
+                    self.read_char();
                     token
                 }
                 ';' => Token::Semicolon(location),
@@ -103,6 +106,15 @@ impl<'a> Lexer<'a> {
                         }
                         None => Token::Illegal(value, location),
                     }
+                },
+                '|' => {
+                    let mut token = Token::Illegal(String::from(self.ch.unwrap()), location);
+                    let next_char = Self::peek_next_char(self, None);
+                    if next_char == '|' {
+                        token = Token::Or(location);
+                    }
+                    self.read_char();
+                    token
                 }
                 _ => {
                     if Self::is_letter(Some(*ch)) {
@@ -121,6 +133,7 @@ impl<'a> Lexer<'a> {
                             || next_char == '{'
                             || next_char == '&'
                             || next_char == '\0' //TODO: check if this is necessary
+                            || next_char == '!'
                         {
                             token = Token::Number(String::from(ident), location)
                         } else {

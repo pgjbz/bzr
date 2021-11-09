@@ -143,6 +143,16 @@ fn test_and_operator() {
 }
 
 #[test]
+fn test_or_operator() {
+    let source = "||";
+    let mut lexer = Lexer::new(source, FILENAME);
+    assert_eq!(
+        Token::Or(Location::new(1, 1, FILENAME)),
+        *lexer.next_token()
+    );
+}
+
+#[test]
 fn test_diff_token() {
     let source = "!=";
     let mut lexer = Lexer::new(source, FILENAME);

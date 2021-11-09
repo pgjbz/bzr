@@ -25,16 +25,23 @@ Tokens:
 - True(Location) = boolean value: `true` 
 - False(Location) = boolean value: `false` 
 - If(Location) => `if` 
-- Else(Location) =>  `else` 
-- Return(Location) =>  `ret` 
-- Int(Location) =>  `int` 
-- Str(Location) =>  `str` 
+- Else(Location) => `else` 
+- Return(Location) => `ret` 
+- Int(Location) => `int` 
+- Str(Location) => `str` 
 - Minus(Location) => `-` 
 - Bang(Location) => `!` 
 - Asterisk(Location) => `*` 
 - Slash(Location) => `/` 
 - Lt(Location) => `<` 
 - Gt(Location) => `<` 
+- Gte(Location) => `>=`
+- Lte(Location) => `<=`
+- Eq(Location) => `==`
+- Diff(Location) => `!=`
+- And(Location) => `&&`
+- Or(Location) => `||`
+
 
 ```rust
 struct Location {

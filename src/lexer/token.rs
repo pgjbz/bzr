@@ -36,6 +36,7 @@ pub enum Token<'a> {
     Gte(Location<'a>),
     And(Location<'a>),
     Diff(Location<'a>),
+    Or(Location<'a>)
 }
 
 #[derive(PartialEq, Debug, Clone, Copy)]
