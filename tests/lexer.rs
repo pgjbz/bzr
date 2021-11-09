@@ -141,3 +141,23 @@ fn test_and_operator() {
         *lexer.next_token()
     );
 }
+
+#[test]
+fn test_diff_token() {
+    let source = "!=";
+    let mut lexer = Lexer::new(source, FILENAME);
+    assert_eq!(
+        Token::Diff(Location::new(1, 1, FILENAME)),
+        *lexer.next_token()
+    );
+}
+
+#[test]
+fn test_diff_illegal_order() {
+    let source = "=!";
+    let mut lexer = Lexer::new(source, FILENAME);
+    assert_eq!(
+        Token::Illegal(source.to_string(), Location::new(1, 1, FILENAME)),
+        *lexer.next_token()
+    );
+}

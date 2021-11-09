@@ -38,16 +38,25 @@ impl<'a> Lexer<'a> {
                         if nch == '=' {
                             self.read_char();
                             token = Token::Eq(location)
-                        } else if nch == '>' || nch == '<' {
+                        } else if nch == '>' || nch == '<' || nch == '!' {
                             token = Token::Illegal(format!("{}{}", ch, nch), location);
                             self.read_char();
-                        }
+                        } 
                     }
                     token
                 }
                 '+' => Token::Plus(location),
                 '-' => Token::Minus(location),
-                '!' => Token::Bang(location),
+                '!' => {
+                    let mut token: Token = Token::Bang(location);
+                    if let Some(ch) = self.input.chars().nth(self.read_position) {
+                        if ch == '=' {
+                            self.read_char();
+                            token = Token::Diff(location);
+                        }
+                    }
+                    token
+                },
                 '/' => Token::Slash(location),
                 '*' => Token::Asterisk(location),
                 '<' => {
