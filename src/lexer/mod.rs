@@ -105,21 +105,22 @@ impl<'a> Lexer<'a> {
                     }
                 }
                 _ => {
-                    if is_letter(Some(*ch)) {
+                    if Self::is_letter(Some(*ch)) {
                         let ident: &str = Self::read_identifier(self);
                         match Token::get_keyword_token(ident, location) {
                             Ok(keyword_token) => keyword_token,
                             Err(_) => Token::Ident(String::from(ident), location),
                         }
-                    } else if is_number(Some(*ch)) {
+                    } else if Self::is_number(Some(*ch)) {
                         let next_char = Self::peek_next_char(self, Some(1));
                         let ident: &str = Self::read_number(self);
                         let mut token: Token = Token::Illegal(String::from(ident), location);
-                        if is_math_simbol(next_char)
-                            || is_whitespace(Some(next_char))
+                        if Self::is_math_simbol(next_char)
+                            || Self::is_whitespace(Some(next_char))
                             || next_char == ';'
                             || next_char == '{'
                             || next_char == '&'
+                            || next_char == '\0' //TODO: check if this is necessary
                         {
                             token = Token::Number(String::from(ident), location)
                         } else {
@@ -139,7 +140,7 @@ impl<'a> Lexer<'a> {
 
     fn skip_whitespace(&mut self) {
         loop {
-            if is_whitespace(self.ch) {
+            if Self::is_whitespace(self.ch) {
                 self.read_char();
             } else {
                 break;
@@ -163,7 +164,7 @@ impl<'a> Lexer<'a> {
 
     fn read_number(input: &mut Self) -> &str {
         let position = input.position;
-        while input.position < input.input.len() && is_number(input.ch) {
+        while input.position < input.input.len() && Self::is_number(input.ch) {
             input.read_char();
         }
         let ret = &input.input[position..input.position];
@@ -173,7 +174,9 @@ impl<'a> Lexer<'a> {
 
     fn read_identifier(input: &mut Self) -> &str {
         let position = input.position;
-        while input.position < input.input.len() && is_letter(input.ch) || is_number(input.ch) {
+        while input.position < input.input.len() && Self::is_letter(input.ch)
+            || Self::is_number(input.ch)
+        {
             input.read_char();
         }
         let ret = &input.input[position..input.position];
@@ -204,6 +207,42 @@ impl<'a> Lexer<'a> {
             '\0'
         }
     }
+
+    fn is_letter(ch: Option<char>) -> bool {
+        if let Some(ch) = ch {
+            ('a'..='z').contains(&ch) || ('A'..='Z').contains(&ch) || ch == '_'
+        } else {
+            false
+        }
+    }
+
+    fn is_number(ch: Option<char>) -> bool {
+        if let Some(ch) = ch {
+            ('0'..='9').contains(&ch)
+        } else {
+            false
+        }
+    }
+
+    fn is_whitespace(ch: Option<char>) -> bool {
+        if let Some(ch) = ch {
+            ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
+        } else {
+            false
+        }
+    }
+
+    fn is_math_simbol(ch: char) -> bool {
+        ch == '*'
+            || ch == '/'
+            || ch == '+'
+            || ch == '-'
+            || ch == ')'
+            || ch == '('
+            || ch == '>'
+            || ch == '<'
+            || ch == '='
+    }
 }
 
 impl<'a> Iterator for Lexer<'a> {
@@ -217,40 +256,4 @@ impl<'a> Iterator for Lexer<'a> {
             Some(next)
         }
     }
-}
-
-fn is_letter(ch: Option<char>) -> bool {
-    if let Some(ch) = ch {
-        ('a'..='z').contains(&ch) || ('A'..='Z').contains(&ch) || ch == '_'
-    } else {
-        false
-    }
-}
-
-fn is_number(ch: Option<char>) -> bool {
-    if let Some(ch) = ch {
-        ('0'..='9').contains(&ch)
-    } else {
-        false
-    }
-}
-
-fn is_whitespace(ch: Option<char>) -> bool {
-    if let Some(ch) = ch {
-        ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
-    } else {
-        false
-    }
-}
-
-fn is_math_simbol(ch: char) -> bool {
-    ch == '*'
-        || ch == '/'
-        || ch == '+'
-        || ch == '-'
-        || ch == ')'
-        || ch == '('
-        || ch == '>'
-        || ch == '<'
-        || ch == '='
 }

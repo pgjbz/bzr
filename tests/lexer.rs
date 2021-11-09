@@ -83,7 +83,7 @@ fn test_string_token() {
 
 #[test]
 fn test_number_token() {
-    let source = "457;\n";
+    let source = "457;\0";
     let mut lexer = Lexer::new(source, FILENAME);
     //TODO: check why is illegal
     assert_eq!(

@@ -30,3 +30,5 @@ if 10 >= 1 {
 if numero == 5 && 10 == 10 {
 	var mod1 = 49;
 }
+
+let a bool = 1 != 2;
