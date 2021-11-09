@@ -34,14 +34,13 @@ impl<'a> Lexer<'a> {
             match ch {
                 '=' => {
                     let mut token: Token = Token::Assign(location);
-                    if let Some(nch) = self.input.chars().nth(self.read_position) {
-                        if nch == '=' {
-                            self.read_char();
-                            token = Token::Eq(location)
-                        } else if nch == '>' || nch == '<' || nch == '!' {
-                            token = Token::Illegal(format!("{}{}", ch, nch), location);
-                            self.read_char();
-                        } 
+                    let next_char = Self::peek_next_char(self, None);
+                    if next_char == '=' {
+                        self.read_char();
+                        token = Token::Eq(location)
+                    } else if next_char == '>' || next_char == '<' || next_char == '!' {
+                        token = Token::Illegal(format!("{}{}", ch, next_char), location);
+                        self.read_char();
                     }
                     token
                 }
@@ -49,43 +48,39 @@ impl<'a> Lexer<'a> {
                 '-' => Token::Minus(location),
                 '!' => {
                     let mut token: Token = Token::Bang(location);
-                    if let Some(ch) = self.input.chars().nth(self.read_position) {
-                        if ch == '=' {
-                            self.read_char();
-                            token = Token::Diff(location);
-                        }
+                    let next_char = Self::peek_next_char(self, None);
+                    if next_char == '=' {
+                        self.read_char();
+                        token = Token::Diff(location);
                     }
                     token
-                },
+                }
                 '/' => Token::Slash(location),
                 '*' => Token::Asterisk(location),
                 '<' => {
                     let mut token = Token::Lt(location);
-                    if let Some(ch) = self.input.chars().nth(self.read_position) {
-                        if ch == '=' {
-                            self.read_char();
-                            token = Token::Lte(location)
-                        }
+                    let next_char = Self::peek_next_char(self, None);
+                    if next_char == '=' {
+                        self.read_char();
+                        token = Token::Lte(location)
                     }
                     token
                 }
                 '>' => {
                     let mut token = Token::Gt(location);
-                    if let Some(ch) = self.input.chars().nth(self.read_position) {
-                        if ch == '=' {
-                            self.read_char();
-                            token = Token::Gte(location);
-                        }
+                    let next_char = Self::peek_next_char(self, None);
+                    if next_char == '=' {
+                        self.read_char();
+                        token = Token::Gte(location);
                     }
                     token
                 }
                 '&' => {
                     let mut token = Token::Illegal(String::from(self.ch.unwrap()), location);
-                    if let Some(ch) = self.input.chars().nth(self.read_position) {
-                        if ch == '&' {
-                            self.read_char();
-                            token = Token::And(location);
-                        }
+                    let next_char = Self::peek_next_char(self, None);
+                    if next_char == '&' {
+                        self.read_char();
+                        token = Token::And(location);
                     }
                     token
                 }
@@ -110,8 +105,6 @@ impl<'a> Lexer<'a> {
                     }
                 }
                 _ => {
-                    let read_position = self.read_position;
-                    let content = self.input;
                     if is_letter(Some(*ch)) {
                         let ident: &str = Self::read_identifier(self);
                         match Token::get_keyword_token(ident, location) {
@@ -119,19 +112,18 @@ impl<'a> Lexer<'a> {
                             Err(_) => Token::Ident(String::from(ident), location),
                         }
                     } else if is_number(Some(*ch)) {
+                        let next_char = Self::peek_next_char(self, Some(1));
                         let ident: &str = Self::read_number(self);
                         let mut token: Token = Token::Illegal(String::from(ident), location);
-                        if let Some(ch) = content.chars().nth(read_position + 1) {
-                            if is_math_simbol(ch)
-                                || is_whitespace(Some(ch))
-                                || ch == ';'
-                                || ch == '{'
-                                || ch == '&'
-                            {
-                                token = Token::Number(String::from(ident), location)
-                            } else {
-                                self.read_char();
-                            }
+                        if is_math_simbol(next_char)
+                            || is_whitespace(Some(next_char))
+                            || next_char == ';'
+                            || next_char == '{'
+                            || next_char == '&'
+                        {
+                            token = Token::Number(String::from(ident), location)
+                        } else {
+                            self.read_char();
                         }
                         token
                     } else {
@@ -202,6 +194,15 @@ impl<'a> Lexer<'a> {
             input.read_char();
         }
         &input.input[position..input.position + 1]
+    }
+
+    fn peek_next_char(input: &Self, offset: Option<usize>) -> char {
+        let offset = if let Some(offset) = offset { offset } else { 0 };
+        if let Some(ch) = input.input.chars().nth(input.read_position + offset) {
+            ch
+        } else {
+            '\0'
+        }
     }
 }
 
