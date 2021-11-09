@@ -90,6 +90,8 @@ impl<'a> Lexer<'a> {
                 ';' => Token::Semicolon(location),
                 '(' => Token::Lparen(location),
                 ')' => Token::Rparen(location),
+                '[' => Token::LSqBracket(location),
+                ']' => Token::RSqBracket(location),
                 ',' => Token::Comma(location),
                 '{' => Token::Lbrace(location),
                 '}' => Token::Rbrace(location),
@@ -124,6 +126,7 @@ impl<'a> Lexer<'a> {
                             Err(_) => Token::Ident(String::from(ident), location),
                         }
                     } else if Self::is_number(Some(*ch)) {
+                        //TODO: improve this
                         let next_char = Self::peek_next_char(self, Some(1));
                         let ident: &str = Self::read_number(self);
                         let mut token: Token = Token::Illegal(String::from(ident), location);
@@ -134,6 +137,9 @@ impl<'a> Lexer<'a> {
                             || next_char == '&'
                             || next_char == '\0' //TODO: check if this is necessary
                             || next_char == '!'
+                            || next_char == ','
+                            || next_char == ']'
+                            || Self::is_number(Some(next_char))
                         {
                             token = Token::Number(String::from(ident), location)
                         } else {

@@ -36,3 +36,5 @@ let a bool = 1 != 2;
 while a {
     a = !a;
 }
+
+let a int[] = [1,2,3];

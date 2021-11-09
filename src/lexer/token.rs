@@ -9,6 +9,8 @@ pub enum Token<'a> {
     Semicolon(Location<'a>),
     Lparen(Location<'a>),
     Rparen(Location<'a>),
+    LSqBracket(Location<'a>),
+    RSqBracket(Location<'a>),
     Lbrace(Location<'a>),
     Rbrace(Location<'a>),
     String(String, Location<'a>),
