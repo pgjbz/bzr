@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 pub trait Node {
-    fn literal(&self) -> String;
+    fn literal(&self) -> Box<dyn Display>;
 }

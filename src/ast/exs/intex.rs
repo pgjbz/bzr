@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::ast::{expression::Expression, node::Node};
 
 pub struct IntEx {
@@ -11,8 +13,8 @@ impl IntEx {
 }
 
 impl Node for IntEx {
-    fn literal(&self) -> String {
-        self.value.to_string()
+    fn literal(&self) -> Box<dyn Display> {
+        Box::new(self.value)
     }
 }
 

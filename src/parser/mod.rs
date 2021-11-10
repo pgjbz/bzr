@@ -5,7 +5,6 @@ use crate::{
         expression::Expression,
         exs::{boolex::BoolEx, intex::IntEx, strex::StrEx},
         identifier::Identifier,
-        node::Node,
         program::Program,
         statement::Statement,
         sts::{letsts::Let, varsts::Var},
@@ -275,17 +274,5 @@ impl Parser {
 
     pub fn current_token_is(&mut self, token: Token) -> bool {
         mem::discriminant(&*self.current_token) == mem::discriminant(&token)
-    }
-}
-
-impl Node for String {
-    fn literal(&self) -> String {
-        self.to_string()
-    }
-}
-
-impl Expression for String {
-    fn expression(&self) {
-        todo!()
     }
 }

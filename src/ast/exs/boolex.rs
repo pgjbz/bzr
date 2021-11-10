@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::ast::{expression::Expression, node::Node};
 
 pub struct BoolEx {
@@ -11,8 +13,8 @@ impl BoolEx {
 }
 
 impl Node for BoolEx {
-    fn literal(&self) -> String {
-        self.value.to_string()
+    fn literal(&self) -> Box<dyn Display> {
+        Box::new(self.value)
     }
 }
 

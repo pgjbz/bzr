@@ -39,8 +39,8 @@ impl Let {
 }
 
 impl Node for Let {
-    fn literal(&self) -> String {
-        format!("let {} {} = {}", self.name, self.typ, self.value)
+    fn literal(&self) -> Box<dyn Display> {
+        Box::new(format!("let {} {} = {}", self.name, self.typ, self.value))
     }
 }
 

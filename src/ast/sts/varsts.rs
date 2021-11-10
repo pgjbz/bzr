@@ -39,8 +39,8 @@ impl Var {
 }
 
 impl Node for Var {
-    fn literal(&self) -> String {
-        format!("var {} {} = {}", self.name, self.typ, self.value)
+    fn literal(&self) -> Box<dyn Display> {
+        Box::new(format!("var {} {} = {}", self.name, self.typ, self.value))
     }
 }
 

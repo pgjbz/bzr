@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::ast::{expression::Expression, node::Node};
 
 pub struct StrEx {
@@ -11,8 +13,8 @@ impl StrEx {
 }
 
 impl Node for StrEx {
-    fn literal(&self) -> String {
-        self.value.clone()
+    fn literal(&self) -> Box<dyn Display> {
+        Box::new(format!("{}", self.value))
     }
 }
 

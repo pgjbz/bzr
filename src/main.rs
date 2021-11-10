@@ -15,7 +15,7 @@ fn main() {
     let program = parse.parse_program();
 
     for sts in program.statements {
-        println!("{:?}", sts.literal());
+        println!("{}", sts.literal());
     }
 
     for error in program.errors {
