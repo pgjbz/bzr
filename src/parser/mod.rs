@@ -1,12 +1,23 @@
 use std::{cell::RefCell, mem, rc::Rc};
 
-use crate::{ast::{expression::Expression, identifier::Identifier, node::Node, program::Program, statement::Statement, statements::{letsts::Let, varsts::Var}, types::Type}, lexer::{Lexer, token::Token}};
+use crate::{
+    ast::{
+        expression::Expression,
+        identifier::Identifier,
+        node::Node,
+        program::Program,
+        statement::Statement,
+        statements::{letsts::Let, varsts::Var},
+        types::Type,
+    },
+    lexer::{token::Token, Lexer},
+};
 
 enum Precedence {
     Lowest,
 }
 
-pub struct Parser{
+pub struct Parser {
     pub lexer: RefCell<Lexer>,
     pub current_token: Rc<Token>,
     pub peek_token: Rc<Token>,
@@ -14,7 +25,6 @@ pub struct Parser{
 }
 
 impl Parser {
-
     pub fn new(lexer: RefCell<Lexer>) -> Self {
         let current_token = lexer.borrow_mut().next_token();
         let peek_token = lexer.borrow_mut().next_token();
@@ -22,7 +32,7 @@ impl Parser {
             lexer,
             current_token,
             peek_token,
-            errors: vec![]
+            errors: vec![],
         }
     }
 
@@ -64,18 +74,16 @@ impl Parser {
             return None;
         }
 
-        let identifier = 
-            match self.current_token.as_ref() {
-                Token::Ident(identifier, _) => identifier,
-                _ => return None
-            };
+        let identifier = match self.current_token.as_ref() {
+            Token::Ident(identifier, _) => identifier,
+            _ => return None,
+        };
 
         let identifier = Identifier::new(Some(Rc::clone(identifier.as_ref().unwrap())));
 
         let typ: Type;
         let val: String;
-        if self.has_type()
-        {
+        if self.has_type() {
             typ = self.extract_type();
             if !self.expected_peek(Token::Assign(None), true) {
                 return None;
@@ -104,18 +112,16 @@ impl Parser {
             return None;
         }
 
-        let identifier = 
-            match self.current_token.as_ref() {
-                Token::Ident(identifier, _) => identifier,
-                _ => return None
-            };
+        let identifier = match self.current_token.as_ref() {
+            Token::Ident(identifier, _) => identifier,
+            _ => return None,
+        };
 
         let identifier = Identifier::new(Some(Rc::clone(identifier.as_ref().unwrap())));
 
         let typ: Type;
         let val: String;
-        if self.has_type()
-        {
+        if self.has_type() {
             typ = self.extract_type();
             if !self.expected_peek(Token::Assign(None), true) {
                 return None;
@@ -133,7 +139,7 @@ impl Parser {
         }
         self.print_error_str_empty(&val);
         if let Some(expression) = Self::parse_expression(self, Precedence::Lowest, val) {
-           Some(Var::new(Token::Var(None), typ, identifier, expression))
+            Some(Var::new(Token::Var(None), typ, identifier, expression))
         } else {
             None
         }
@@ -159,18 +165,25 @@ impl Parser {
             Token::Int(_) => Type::Int,
             Token::Str(_) => Type::String,
             Token::Bool(_) => Type::Bool,
-            _ =>  Type::Unknown
+            _ => Type::Unknown,
         }
     }
-    
+
     fn extract_value(&mut self, typ: &Type) -> String {
         match self.current_token.as_ref() {
             Token::True(_) if Self::type_is_equal(typ, &Type::Bool) => String::from("true"),
             Token::False(_) if Self::type_is_equal(typ, &Type::Bool) => String::from("false"),
-            Token::Number(val, _) if Self::type_is_equal(typ, &Type::Int)  => val.as_ref().unwrap().as_ref().clone(),
-            Token::String(val, _) if Self::type_is_equal(typ, &Type::String) => val.as_ref().unwrap().as_ref().clone(),
+            Token::Number(val, _) if Self::type_is_equal(typ, &Type::Int) => {
+                val.as_ref().unwrap().as_ref().clone()
+            }
+            Token::String(val, _) if Self::type_is_equal(typ, &Type::String) => {
+                val.as_ref().unwrap().as_ref().clone()
+            }
             _ => {
-                self.errors.push(format!("Invalid type expected {}, got {}", typ, self.current_token));
+                self.errors.push(format!(
+                    "Invalid type expected {}, got {}",
+                    typ, self.current_token
+                ));
                 String::from("")
             }
         }
@@ -182,30 +195,35 @@ impl Parser {
             Token::True(_) | Token::False(_) => {
                 typ = Type::Bool;
                 format!("{}", typ)
-            },
+            }
             Token::Number(val, _) => {
                 typ = Type::Int;
                 val.as_ref().unwrap().as_ref().clone()
-            },
+            }
             Token::String(val, _) => {
                 typ = Type::String;
                 val.as_ref().unwrap().as_ref().clone()
-            },
+            }
             _ => {
                 typ = Type::Unknown;
-                self.errors.push(format!("expected a type, got error {}", self.current_token));
+                self.errors
+                    .push(format!("expected a type, got error {}", self.current_token));
                 String::from("")
             }
         };
         (typ, val)
     }
 
-    fn parse_expression(&mut self, precedence: Precedence, val: String) -> Option<Box<dyn Expression>> {
+    fn parse_expression(
+        &mut self,
+        precedence: Precedence,
+        val: String,
+    ) -> Option<Box<dyn Expression>> {
         match precedence {
-            Precedence::Lowest => { 
+            Precedence::Lowest => {
                 if self.expected_peek(Token::Semicolon(None), true) {
                     self.next_token();
-                    Some(Box::new(val)) 
+                    Some(Box::new(val))
                 } else {
                     None
                 }
@@ -217,7 +235,7 @@ impl Parser {
         if self.peek_token_is(&token) {
             self.next_token();
             return true;
-        } 
+        }
         if register_error {
             self.peek_error(&token);
         }
@@ -225,20 +243,17 @@ impl Parser {
     }
 
     pub fn peek_error(&mut self, token: &Token) {
-        let msg = format!("expected {}, got {}", 
-        token, 
-        self.peek_token);
+        let msg = format!("expected {}, got {}", token, self.peek_token);
         self.errors.push(msg);
     }
 
-    pub fn type_is_equal(token_compare: &Type, token: &Type) -> bool{
+    pub fn type_is_equal(token_compare: &Type, token: &Type) -> bool {
         mem::discriminant(token_compare) == mem::discriminant(token)
     }
 
     pub fn peek_token_is(&mut self, token: &Token) -> bool {
         mem::discriminant(&*self.peek_token) == mem::discriminant(token)
     }
-
 
     pub fn current_token_is(&mut self, token: Token) -> bool {
         mem::discriminant(&*self.current_token) == mem::discriminant(&token)

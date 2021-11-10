@@ -82,7 +82,6 @@ impl Token {
 }
 
 impl Display for Token {
-
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let str = match self {
             Self::And(pos) => {
@@ -91,208 +90,206 @@ impl Display for Token {
                 } else {
                     "&&".to_string()
                 }
-            },
+            }
             Self::Assign(pos) => {
                 if let Some(pos) = pos {
                     format!("'=' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "=".to_string()
                 }
-            } ,
+            }
             Self::Asterisk(pos) => {
                 if let Some(pos) = pos {
                     format!("'*' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "*".to_string()
                 }
-            },
+            }
             Self::Bang(pos) => {
                 if let Some(pos) = pos {
                     format!("'!' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "!".to_string()
                 }
-            },
+            }
             Self::Bool(pos) => {
                 if let Some(pos) = pos {
                     format!("'bool' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "bool".to_string()
                 }
-            },
+            }
             Self::Comma(pos) => {
                 if let Some(pos) = pos {
                     format!("',' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     ",".to_string()
                 }
-            },
+            }
             Self::Diff(pos) => {
                 if let Some(pos) = pos {
                     format!("'!=' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "!=".to_string()
                 }
-            },
+            }
             Self::EOF(pos) => {
                 if let Some(pos) = pos {
                     format!("'EOF' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "EOF".to_string()
                 }
-            },
+            }
             Self::Else(pos) => {
                 if let Some(pos) = pos {
                     format!("'else' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "else".to_string()
                 }
-            },
+            }
             Self::Eq(pos) => {
                 if let Some(pos) = pos {
                     format!("'==' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "==".to_string()
                 }
-            },
+            }
             Self::Function(pos) => {
                 if let Some(pos) = pos {
                     format!("'fn' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "fn".to_string()
                 }
-            },
+            }
             Self::Int(pos) => {
                 if let Some(pos) = pos {
                     format!("'int' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "int".to_string()
                 }
-            },
+            }
             Self::LSqBracket(pos) => {
                 if let Some(pos) = pos {
                     format!("'[' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "[".to_string()
                 }
-            },
+            }
             Self::Lbrace(pos) => {
                 if let Some(pos) = pos {
                     format!("'{{' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "{{".to_string()
                 }
-            },
+            }
             Self::Let(pos) => {
                 if let Some(pos) = pos {
                     format!("'let' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "let".to_string()
                 }
-            },
+            }
             Self::Lparen(pos) => {
                 if let Some(pos) = pos {
                     format!("'(' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "(".to_string()
                 }
-            },
+            }
             Self::RSqBracket(pos) => {
                 if let Some(pos) = pos {
                     format!("']' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "]".to_string()
                 }
-            },
+            }
             Self::Rbrace(pos) => {
                 if let Some(pos) = pos {
                     format!("'}}' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "}}".to_string()
                 }
-            },
+            }
             Self::Return(pos) => {
                 if let Some(pos) = pos {
                     format!("'ret' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "ret".to_string()
                 }
-            },
+            }
             Self::Rparen(pos) => {
                 if let Some(pos) = pos {
                     format!("')' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     ")".to_string()
                 }
-            },
+            }
             Self::Semicolon(pos) => {
                 if let Some(pos) = pos {
                     format!("';' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     ";".to_string()
                 }
-            },
+            }
             Self::Str(pos) => {
                 if let Some(pos) = pos {
                     format!("'str' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "str".to_string()
                 }
-            },
+            }
             Self::True(pos) | Self::False(pos) => {
                 if let Some(pos) = pos {
                     format!("'bool' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "bool".to_string()
                 }
-            },
+            }
             Self::Var(pos) => {
                 if let Some(pos) = pos {
                     format!("'var' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "var".to_string()
                 }
-            },
+            }
             Self::While(pos) => {
                 if let Some(pos) = pos {
                     format!("'while' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
                     "while".to_string()
                 }
+            }
+            Self::Number(val, pos) => match (val, pos) {
+                (Some(_), Some(pos)) => {
+                    format!("'number' in {}:{}:{}", pos.filename, pos.line, pos.position)
+                }
+                (_, _) => "number".to_string(),
             },
-            Self::Number(val, pos) => { 
-                    match (val, pos) {
-                        (Some(_), Some(pos)) => {
-                            format!("'number' in {}:{}:{}", pos.filename, pos.line, pos.position)
-                        },
-                        (_, _) => "number".to_string()
-                    }
+            Self::Illegal(val, pos) => match (val, pos) {
+                (Some(_), Some(pos)) => {
+                    format!(
+                        "'illegal' in {}:{}:{}",
+                        pos.filename, pos.line, pos.position
+                    )
+                }
+                (_, _) => "illegal".to_string(),
             },
-            Self::Illegal(val, pos) => { 
-                    match (val, pos) {
-                        (Some(_), Some(pos)) => {
-                            format!("'illegal' in {}:{}:{}", pos.filename, pos.line, pos.position)
-                        },
-                        (_, _) => "illegal".to_string()
-                    }
+            Self::Ident(val, pos) => match (val, pos) {
+                (Some(_), Some(pos)) => {
+                    format!(
+                        "'identifier' in {}:{}:{}",
+                        pos.filename, pos.line, pos.position
+                    )
+                }
+                (_, _) => "identifier".to_string(),
             },
-            Self::Ident(val, pos) => { 
-                    match (val, pos) {
-                        (Some(_), Some(pos)) => {
-                            format!("'identifier' in {}:{}:{}", pos.filename, pos.line, pos.position)
-                        },
-                        (_, _) => "identifier".to_string()
-                    }
+            Self::String(val, pos) => match (val, pos) {
+                (Some(_), Some(pos)) => {
+                    format!("'String' in {}:{}:{}", pos.filename, pos.line, pos.position)
+                }
+                (_, _) => "String".to_string(),
             },
-            Self::String(val, pos) => {
-                    match (val, pos) {
-                        (Some(_), Some(pos)) => {
-                            format!("'String' in {}:{}:{}", pos.filename, pos.line, pos.position)
-                        },
-                        (_, _) => "String".to_string()
-                    }
-            },
-            _ => String::from("another thing, found it")
+            _ => String::from("another thing, found it"),
         };
         write!(f, "{}", str)
     }

@@ -17,21 +17,16 @@ pub struct Let {
 
 impl Display for Let {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "tok: {}, typ: {}, name: {}, val: {}", 
-        self.token,
-        self.typ,
-        self.name,
-        self.value)
+        write!(
+            f,
+            "tok: {}, typ: {}, name: {}, val: {}",
+            self.token, self.typ, self.name, self.value
+        )
     }
 }
 
 impl Let {
-    pub fn new(
-        token: Token,
-        typ: Type,
-        name: Identifier,
-        value: Box<dyn Expression>,
-    ) -> Box<Self> {
+    pub fn new(token: Token, typ: Type, name: Identifier, value: Box<dyn Expression>) -> Box<Self> {
         Box::new({
             Self {
                 token,

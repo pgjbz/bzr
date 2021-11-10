@@ -34,7 +34,8 @@ fn test_tokens() {
 #[test]
 fn test_is_whitespace() {
     let source = Rc::new(" \r\t\n".to_string());
-    let eof = if let Token::EOF(_) = *Lexer::new(source, Rc::new(FILENAME.to_string())).next_token() {
+    let eof = if let Token::EOF(_) = *Lexer::new(source, Rc::new(FILENAME.to_string())).next_token()
+    {
         true
     } else {
         false
@@ -47,7 +48,10 @@ fn test_identifier_token() {
     let source = Rc::new("abc".to_string());
     let mut lexer = Lexer::new(Rc::clone(&source), Rc::new(FILENAME.to_string()));
     assert_eq!(
-        Token::Ident(Some(source), Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))),
+        Token::Ident(
+            Some(source),
+            Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))
+        ),
         *lexer.next_token()
     );
 }
@@ -57,7 +61,10 @@ fn test_identifier_with_number_token() {
     let source = Rc::new("abc123".to_string());
     let mut lexer = Lexer::new(Rc::clone(&source), Rc::new(FILENAME.to_string()));
     assert_eq!(
-        Token::Ident(Some(source), Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))),
+        Token::Ident(
+            Some(source),
+            Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))
+        ),
         *lexer.next_token()
     );
 }
@@ -68,7 +75,10 @@ fn test_invalid_token() {
 
     let mut lexer = Lexer::new(Rc::clone(&source), Rc::new(FILENAME.to_string()));
     assert_eq!(
-        Token::Illegal(Some(source), Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))),
+        Token::Illegal(
+            Some(source),
+            Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))
+        ),
         *lexer.next_token()
     );
 }
@@ -78,7 +88,10 @@ fn test_string_token() {
     let source = Rc::new("\"abc\"".to_string());
     let mut lexer = Lexer::new(Rc::clone(&source), Rc::new(FILENAME.to_string()));
     assert_eq!(
-        Token::String(Some(Rc::new("abc".to_string())), Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))),
+        Token::String(
+            Some(Rc::new("abc".to_string())),
+            Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))
+        ),
         *lexer.next_token()
     );
 }
@@ -88,7 +101,10 @@ fn test_number_token() {
     let source = Rc::new("457;\0".to_string());
     let mut lexer = Lexer::new(Rc::clone(&source), Rc::new(FILENAME.to_string()));
     assert_eq!(
-        Token::Number(Some(Rc::new("457".to_string())), Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))),
+        Token::Number(
+            Some(Rc::new("457".to_string())),
+            Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))
+        ),
         *lexer.next_token()
     );
 }
@@ -128,7 +144,10 @@ fn test_gte_illegal_order() {
     let source = Rc::new("=>".to_string());
     let mut lexer = Lexer::new(Rc::clone(&source), Rc::new(FILENAME.to_string()));
     assert_eq!(
-        Token::Illegal(Some(source), Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))),
+        Token::Illegal(
+            Some(source),
+            Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))
+        ),
         *lexer.next_token()
     );
 }
@@ -168,7 +187,10 @@ fn test_diff_illegal_order() {
     let source = Rc::new("=!".to_string());
     let mut lexer = Lexer::new(Rc::clone(&source), Rc::new(FILENAME.to_string()));
     assert_eq!(
-        Token::Illegal(Some(source), Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))),
+        Token::Illegal(
+            Some(source),
+            Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))
+        ),
         *lexer.next_token()
     );
 }
