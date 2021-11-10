@@ -32,6 +32,8 @@ impl<'a> Parser<'a> {
         while !self.current_token_is(Token::EOF(None)) {
             if let Some(sts) = self.parse_statement() {
                 statements.push(sts)
+            } else {
+                self.next_token();
             }
         }
         let mut errors = vec![];
@@ -47,8 +49,8 @@ impl<'a> Parser<'a> {
             Token::Var(_) => self.parse_var_sts(),
             Token::EOF(_) => None,
             _ => {
-                println!("{:?}", self.current_token);
-                todo!()
+                self.current_token = Rc::new(Token::EOF(None));
+                None
             }
         }
     }
@@ -59,7 +61,6 @@ impl<'a> Parser<'a> {
     }
 
     pub fn parse_let_sts(&mut self) -> Option<Box<dyn Statement>> {
-
         if !self.expected_peek(Token::Ident(None, None), true) {
             return None;
         }

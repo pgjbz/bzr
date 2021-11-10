@@ -6,3 +6,5 @@ let another_text = "txt";
 
 let boolean bool = false;
 let another_boolean = true;
+
+let bool = false;

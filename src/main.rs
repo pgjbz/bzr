@@ -17,4 +17,8 @@ fn main() {
     for sts in program.statements {
         println!("{:?}", sts.literal());
     }
+
+    for error in program.errors {
+        println!("{}", error);
+    }
 }
