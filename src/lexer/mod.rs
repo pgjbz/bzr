@@ -41,10 +41,10 @@ impl Lexer {
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '=' {
                         token = Token::Eq(Some(Location::new(line_position, line, Rc::clone(&filename))))
-                    } else if !(Self::is_whitespace(Some(next_char)) 
-                        && (next_char == '\"' || next_char == '(')
-                        && Self::is_number(Some(next_char))
-                        && Self::is_letter(Some(next_char)))
+                    } else if !Self::is_whitespace(Some(next_char))
+                        && !(next_char == '\"' || next_char == '(')
+                        && !Self::is_number(Some(next_char))
+                        && !Self::is_letter(Some(next_char))
                     {
                         token = Token::Illegal(Some(Rc::new(format!("{}{}", ch, next_char))), Some(Location::new(line_position, line, filename)));
                     }

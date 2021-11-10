@@ -73,7 +73,7 @@ impl<'a> Parser<'a> {
                 }
             };
         } else {
-            typ = Type::Int;
+            typ = Type::Bool;
             val = String::from("")
         }
         let expression = Self::parse_expression(Precedence::Lowest as isize, val);
@@ -86,17 +86,17 @@ impl<'a> Parser<'a> {
     }
 
     pub fn expected_peek(&mut self, token: Token, register_error: bool) -> bool {
-        if self.peek_token_is(Token::Ident(None, None)) {
+        if self.peek_token_is(&token) {
             self.next_token();
             return true;
         } 
         if register_error {
-            self.peek_error(token);
+            self.peek_error(&token);
         }
         return false;
     }
 
-    pub fn peek_error(&mut self, token: Token) {
+    pub fn peek_error(&mut self, token: &Token) {
         let msg = format!("expected {}, got {}", 
         token, 
         self.peek_token);
@@ -107,9 +107,9 @@ impl<'a> Parser<'a> {
         mem::discriminant(token_compare) == mem::discriminant(token)
     }
 
-    pub fn peek_token_is(&self, token: Token) -> bool {
+    pub fn peek_token_is(&self, token: &Token) -> bool {
         // mem::discriminant(&*self.peek_token) == mem::discriminant(&token);
-        Self::token_is_equal(&*self.peek_token, &token)
+        Self::token_is_equal(&*self.peek_token, token)
     }
 
 
