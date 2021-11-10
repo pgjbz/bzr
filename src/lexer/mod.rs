@@ -31,91 +31,94 @@ impl Lexer {
     pub fn next_token(&mut self) -> Rc<Token> {
         self.read_char();
         self.skip_whitespace();
+        let line_position = self.line_position;
+        let line = self.line;
+        let filename = Rc::clone(&self.filename);
         let token = if let Some(ch) = &self.ch {
             match ch {
                 '=' => {
-                    let mut token: Token = Token::Assign(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))));
+                    let mut token: Token = Token::Assign(Some(Location::new(line_position, line, Rc::clone(&filename))));
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '=' {
-                        token = Token::Eq(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))))
+                        token = Token::Eq(Some(Location::new(line_position, line, Rc::clone(&filename))))
                     } else if !(Self::is_whitespace(Some(next_char)) 
                         && (next_char == '\"' || next_char == '(')
                         && Self::is_number(Some(next_char))
                         && Self::is_letter(Some(next_char)))
                     {
-                        token = Token::Illegal(Some(Rc::new(format!("{}{}", ch, next_char))), Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))));
+                        token = Token::Illegal(Some(Rc::new(format!("{}{}", ch, next_char))), Some(Location::new(line_position, line, filename)));
                     }
                     self.read_char();
                     token
                 }
-                '+' => Token::Plus(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
-                '-' => Token::Minus(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
+                '+' => Token::Plus(Some(Location::new(line_position, line, filename))),
+                '-' => Token::Minus(Some(Location::new(line_position, line, filename))),
                 '!' => {
-                    let mut token: Token = Token::Bang(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))));
+                    let mut token: Token = Token::Bang(Some(Location::new(line_position, line, Rc::clone(&filename))));
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '=' {
-                        token = Token::Diff(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))));
+                        token = Token::Diff(Some(Location::new(line_position, line, filename)));
                         self.read_char();
                     }
                     token
                 }
-                '/' => Token::Slash(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
-                '*' => Token::Asterisk(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
+                '/' => Token::Slash(Some(Location::new(line_position, line, filename))),
+                '*' => Token::Asterisk(Some(Location::new(line_position, line, filename))),
                 '<' => {
-                    let mut token = Token::Lt(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))));
+                    let mut token = Token::Lt(Some(Location::new(line_position, line, Rc::clone(&filename))));
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '=' {
                         self.read_char();
-                        token = Token::Lte(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))))
+                        token = Token::Lte(Some(Location::new(line_position, line, filename)))
                     }
                     token
                 }
                 '>' => {
-                    let mut token = Token::Gt(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))));
+                    let mut token = Token::Gt(Some(Location::new(line_position, line, Rc::clone(&filename))));
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '=' {
                         self.read_char();
-                        token = Token::Gte(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))));
+                        token = Token::Gte(Some(Location::new(line_position, line, filename)));
                     }
                     token
                 }
                 '&' => {
-                    let mut token = Token::Illegal(Some(Rc::new(String::from(self.ch.unwrap()))), Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))));
+                    let mut token = Token::Illegal(Some(Rc::new(String::from(self.ch.unwrap()))), Some(Location::new(line_position, line, Rc::clone(&filename))));
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '&' {
                         self.read_char();
-                        token = Token::And(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))));
+                        token = Token::And(Some(Location::new(line_position, line, filename)));
                     }
                     token
                 }
-                ';' => Token::Semicolon(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
-                '(' => Token::Lparen(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
-                ')' => Token::Rparen(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
-                '[' => Token::LSqBracket(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
-                ']' => Token::RSqBracket(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
-                ',' => Token::Comma(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
-                '{' => Token::Lbrace(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
-                '}' => Token::Rbrace(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
+                ';' => Token::Semicolon(Some(Location::new(line_position, line, filename))),
+                '(' => Token::Lparen(Some(Location::new(line_position, line, filename))),
+                ')' => Token::Rparen(Some(Location::new(line_position, line, filename))),
+                '[' => Token::LSqBracket(Some(Location::new(line_position, line, filename))),
+                ']' => Token::RSqBracket(Some(Location::new(line_position, line, filename))),
+                ',' => Token::Comma(Some(Location::new(line_position, line, filename))),
+                '{' => Token::Lbrace(Some(Location::new(line_position, line, filename))),
+                '}' => Token::Rbrace(Some(Location::new(line_position, line, filename))),
                 '\"' => {
                     let string = Self::read_string(self);
                     let value = Some(Rc::new(String::from(string)));
                     match string.chars().last() {
                         Some(ch) => {
                             if ch != '\"' {
-                                Token::Illegal(value, Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))))
+                                Token::Illegal(value, Some(Location::new(line_position, line, filename)))
                             } else {
-                                Token::String(Some(Rc::new(String::from(&string[0..string.len() - 1]))), Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))))
+                                Token::String(Some(Rc::new(String::from(&string[0..string.len() - 1]))), Some(Location::new(line_position, line, filename)))
                             }
                         }
-                        None => Token::Illegal(value, Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename)))),
+                        None => Token::Illegal(value, Some(Location::new(line_position, line, filename))),
                     }
                 },
                 '|' => {
-                    let mut token = Token::Illegal(Some(Rc::new(String::from(self.ch.unwrap()))), Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))));
+                    let mut token = Token::Illegal(Some(Rc::new(String::from(self.ch.unwrap()))), Some(Location::new(line_position, line, Rc::clone(&filename))));
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '|' {
                         self.read_char();
-                        token = Token::Or(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))));
+                        token = Token::Or(Some(Location::new(line_position, line, filename)));
                     }
                     token
                 }
@@ -127,13 +130,13 @@ impl Lexer {
                         let ident: &str = Self::read_identifier(self);
                         match Token::get_keyword_token(ident, Some(Location::new(line_position, line, Rc::clone(&filename)))) {
                             Ok(keyword_token) => keyword_token,
-                            Err(_) => Token::Ident(Some(Rc::new(String::from(ident))), Some(Location::new(line_position, line, Rc::clone(&filename)))),
+                            Err(_) => Token::Ident(Some(Rc::new(String::from(ident))), Some(Location::new(line_position, line, filename))),
                         }
                     } else if Self::is_number(Some(*ch)) {
                         //TODO: improve this
                         let next_char = Self::peek_next_char(self, Some(1));
                         let ident: &str = Self::read_number(self);
-                        let mut token: Token = Token::Illegal(Some(Rc::new(String::from(ident))), Some(Location::new(line_position, line, filename)));
+                        let mut token: Token = Token::Illegal(Some(Rc::new(String::from(ident))), Some(Location::new(line_position, line, Rc::clone(&filename))));
                         if Self::is_math_simbol(next_char)
                             || Self::is_whitespace(Some(next_char))
                             || next_char == ';'
@@ -145,18 +148,18 @@ impl Lexer {
                             || next_char == ']'
                             || Self::is_number(Some(next_char))
                         {
-                            token = Token::Number(Some(Rc::new(String::from(ident))), Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))))
+                            token = Token::Number(Some(Rc::new(String::from(ident))), Some(Location::new(line_position, line, filename)))
                         } else {
                             self.read_char();
                         }
                         token
                     } else {
-                        Token::Illegal(Some(Rc::new(String::from(self.ch.unwrap()))), Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))))
+                        Token::Illegal(Some(Rc::new(String::from(self.ch.unwrap()))), Some(Location::new(line_position, line, filename)))
                     }
                 }
             }
         } else {
-            Token::EOF(Some(Location::new(self.line_position, self.line, Rc::clone(&self.filename))))
+            Token::EOF(Some(Location::new(line_position, line, Rc::clone(&filename))))
         };
         Rc::new(token)
     }
