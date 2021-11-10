@@ -18,9 +18,9 @@ enum Precedence {
 }
 
 pub struct Parser {
-    pub lexer: RefCell<Lexer>,
-    pub current_token: Rc<Token>,
-    pub peek_token: Rc<Token>,
+    lexer: RefCell<Lexer>,
+    current_token: Rc<Token>,
+    peek_token: Rc<Token>,
     errors: Vec<String>,
 }
 
@@ -64,12 +64,12 @@ impl Parser {
         }
     }
 
-    pub fn next_token(&mut self) {
+    fn next_token(&mut self) {
         mem::swap(&mut self.current_token, &mut self.peek_token);
         self.peek_token = self.lexer.borrow_mut().next_token();
     }
 
-    pub fn parse_let_sts(&mut self) -> Option<Box<dyn Statement>> {
+    fn parse_let_sts(&mut self) -> Option<Box<dyn Statement>> {
         if !self.expected_peek(Token::Ident(None, None), true) {
             return None;
         }
@@ -107,7 +107,7 @@ impl Parser {
         }
     }
 
-    pub fn parse_var_sts(&mut self) -> Option<Box<dyn Statement>> {
+    fn parse_var_sts(&mut self) -> Option<Box<dyn Statement>> {
         if !self.expected_peek(Token::Ident(None, None), true) {
             return None;
         }
@@ -251,7 +251,7 @@ impl Parser {
         }
     }
 
-    pub fn expected_peek(&mut self, token: Token, register_error: bool) -> bool {
+    fn expected_peek(&mut self, token: Token, register_error: bool) -> bool {
         if self.peek_token_is(&token) {
             self.next_token();
             return true;
@@ -262,20 +262,20 @@ impl Parser {
         false
     }
 
-    pub fn peek_error(&mut self, token: &Token) {
+    fn peek_error(&mut self, token: &Token) {
         let msg = format!("expected {}, got {}", token, self.peek_token);
         self.errors.push(msg);
     }
 
-    pub fn type_is_equal(token_compare: &Type, token: &Type) -> bool {
+    fn type_is_equal(token_compare: &Type, token: &Type) -> bool {
         mem::discriminant(token_compare) == mem::discriminant(token)
     }
 
-    pub fn peek_token_is(&mut self, token: &Token) -> bool {
+    fn peek_token_is(&mut self, token: &Token) -> bool {
         mem::discriminant(&*self.peek_token) == mem::discriminant(token)
     }
 
-    pub fn current_token_is(&mut self, token: Token) -> bool {
+    fn current_token_is(&mut self, token: Token) -> bool {
         mem::discriminant(&*self.current_token) == mem::discriminant(&token)
     }
 }

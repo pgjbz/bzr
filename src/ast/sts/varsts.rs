@@ -9,10 +9,10 @@ use crate::{
 };
 
 pub struct Var {
-    pub token: Token,
-    pub typ: Type,
-    pub name: Identifier,
-    pub value: Box<dyn Expression>,
+    token: Token,
+    typ: Type,
+    name: Identifier,
+    value: Box<dyn Expression>,
 }
 
 impl Display for Var {
