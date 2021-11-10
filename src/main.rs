@@ -1,12 +1,18 @@
-use std::{env, fs};
+use std::{env, fs, rc::Rc};
 
-use bzr::lexer::Lexer;
+use bzr::{lexer::Lexer, parser::Parser};
 
 fn main() {
     let filename = env::args().nth(1).expect("Expected filename");
     let input = fs::read_to_string(&filename).unwrap();
-    let mut lexer = Lexer::new(&input, &filename);
-    for token in &mut lexer {
-        println!("{:?}", token)
+    
+    let mut lexer = Lexer::new(Rc::new(input), Rc::new(filename));
+    let mut parse = Parser::new(&mut lexer);
+
+    let val = parse.parse_let_sts();
+    if let Some(val) = val {
+        println!("{}", val)
+    } else {
+        println!("Fake")
     }
 }

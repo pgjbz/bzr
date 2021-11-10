@@ -1,5 +1,5 @@
 use super::node::Node;
 
-pub trait Statement<'a>: Node<'a> {
+pub trait Statement: Node {
     fn statement(&self);
 }

@@ -1,16 +1,21 @@
-use std::mem;
+use std::{mem, rc::Rc};
 
-use crate::{lexer::{Lexer, token::Token}};
+use crate::{ast::{expression::Expression, identifier::Identifier, node::Node, statements::letsts::Let, types::Type}, lexer::{Lexer, token::Token}};
+
+enum Precedence {
+    Lowest = 0,
+}
 
 pub struct Parser<'a> {
-    pub lexer: &'a mut Lexer<'a>,
-    pub current_token: Box<Token<'a>>,
-    pub peek_token: Box<Token<'a>>,
+    pub lexer: &'a mut Lexer,
+    pub current_token: Rc<Token>,
+    pub peek_token: Rc<Token>,
     errors: Vec<String>,
 }
 
 impl<'a> Parser<'a> {
-    pub fn new(lexer: &'a mut Lexer<'a>) -> Self {
+
+    pub fn new(lexer: &'a mut Lexer) -> Self {
         let current_token = lexer.next_token();
         let peek_token = lexer.next_token();
         Self {
@@ -26,31 +31,101 @@ impl<'a> Parser<'a> {
         self.peek_token = self.lexer.next_token();
     }
 
-    pub fn parse_let_sts(&mut self) {
+    pub fn parse_let_sts(&mut self) -> Option<Box<Let>> {
 
+        if !self.expected_peek(Token::Ident(None, None), true) {
+            return None;
+        }
+
+        let identifier = 
+            match self.current_token.as_ref() {
+                Token::Ident(identifier, _) => identifier,
+                _ => return None
+            };
+
+        let identifier = Identifier::new(Some(Rc::clone(identifier.as_ref().unwrap())));
+        //let nome tipo = valor;
+        //let nome = valor;
+
+        let typ: Type;
+        let val: String;
+        if self.expected_peek(Token::Int(None), false)
+            || self.expected_peek(Token::Str(None), false)
+            || self.expected_peek(Token::Bool(None), false)
+        {
+            typ = match self.current_token.as_ref() {
+                Token::Int(_) => Type::Int,
+                Token::Str(_) => Type::String,
+                Token::Bool(_) => Type::Bool,
+                _ =>  Type::Unknown
+            };
+            if !self.expected_peek(Token::Assign(None), true) {
+                return None;
+            }
+            self.next_token();
+            val = match self.current_token.as_ref() {
+                Token::True(_) if Self::token_is_equal(&typ, &Type::Bool) => String::from("true"),
+                Token::False(_) if Self::token_is_equal(&typ, &Type::Bool) => String::from("false"),
+                Token::Number(val, _) => val.as_ref().unwrap().as_ref().clone(),
+                Token::String(val, _) => val.as_ref().unwrap().as_ref().clone(),
+                _ => {
+                    String::from("")
+                }
+            };
+        } else {
+            typ = Type::Int;
+            val = String::from("")
+        }
+        let expression = Self::parse_expression(Precedence::Lowest as isize, val);
+        Some(Let::new(Token::Let(None), typ, identifier, expression))
+        // None
     }
 
-    pub fn expected_peek(&mut self, token: Token<'a>) -> bool {
+    fn parse_expression(_precedence: isize, val: String) -> Box<dyn Expression> {
+        Box::new(val)
+    }
+
+    pub fn expected_peek(&mut self, token: Token, register_error: bool) -> bool {
         if self.peek_token_is(Token::Ident(None, None)) {
             self.next_token();
             return true;
         } 
-        self.peek_error(token);
+        if register_error {
+            self.peek_error(token);
+        }
         return false;
     }
 
-    pub fn peek_error(&mut self, token: Token<'a>) {
+    pub fn peek_error(&mut self, token: Token) {
         let msg = format!("expected {}, got {}", 
         token, 
         self.peek_token);
         self.errors.push(msg);
     }
 
-    pub fn peek_token_is(&self, token: Token) -> bool {
-        mem::discriminant(&*self.peek_token) == mem::discriminant(&token)
+    pub fn token_is_equal<T>(token_compare: &T, token: &T) -> bool {
+        mem::discriminant(token_compare) == mem::discriminant(token)
     }
+
+    pub fn peek_token_is(&self, token: Token) -> bool {
+        // mem::discriminant(&*self.peek_token) == mem::discriminant(&token);
+        Self::token_is_equal(&*self.peek_token, &token)
+    }
+
 
     pub fn current_token_is(&self, token: Token) -> bool {
         mem::discriminant(&*self.current_token) == mem::discriminant(&token)
+    }
+}
+
+impl Node for String {
+    fn literal(&self) -> String {
+        todo!()
+    }
+}
+
+impl Expression for String {
+    fn expression(&self) {
+        todo!()
     }
 }

@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::{
     ast::{
         expression::Expression, identifier::Identifier, node::Node, statement::Statement,
@@ -6,19 +8,29 @@ use crate::{
     lexer::token::Token,
 };
 
-pub struct Let<'a> {
-    pub token: Token<'a>,
+pub struct Let {
+    pub token: Token,
     pub typ: Type,
-    pub name: Identifier<'a>,
-    pub value: Box<dyn Expression<'a>>,
+    pub name: Identifier,
+    pub value: Box<dyn Expression>,
 }
 
-impl<'a> Let<'a> {
+impl Display for Let {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "tok: {}, typ: {}, name: {}, val: {}", 
+        self.token,
+        self.typ,
+        self.name,
+        self.value)
+    }
+}
+
+impl Let {
     pub fn new(
-        token: Token<'a>,
+        token: Token,
         typ: Type,
-        name: Identifier<'a>,
-        value: Box<dyn Expression<'a>>,
+        name: Identifier,
+        value: Box<dyn Expression>,
     ) -> Box<Self> {
         Box::new({
             Self {
@@ -31,13 +43,13 @@ impl<'a> Let<'a> {
     }
 }
 
-impl<'a> Node<'a> for Let<'a> {
-    fn literal(&self) -> &'a str {
-        "let"
+impl Node for Let {
+    fn literal(&self) -> String {
+        "let".to_string()
     }
 }
 
-impl<'a> Statement<'a> for Let<'a> {
+impl Statement for Let {
     fn statement(&self) {
         todo!()
     }

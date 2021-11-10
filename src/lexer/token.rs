@@ -1,57 +1,57 @@
-use std::fmt::Display;
+use std::{fmt::Display, rc::Rc};
 
 #[derive(PartialEq, Debug)]
-pub enum Token<'a> {
-    Illegal(Option<String>, Option<Location<'a>>),
-    EOF(Option<Location<'a>>),
-    Ident(Option<String>, Option<Location<'a>>),
-    Number(Option<String>, Option<Location<'a>>),
-    Comma(Option<Location<'a>>),
-    Semicolon(Option<Location<'a>>),
-    Lparen(Option<Location<'a>>),
-    Rparen(Option<Location<'a>>),
-    LSqBracket(Option<Location<'a>>),
-    RSqBracket(Option<Location<'a>>),
-    Lbrace(Option<Location<'a>>),
-    Rbrace(Option<Location<'a>>),
-    String(Option<String>, Option<Location<'a>>),
-    Function(Option<Location<'a>>),
-    Let(Option<Location<'a>>),
-    Var(Option<Location<'a>>),
-    Bool(Option<Location<'a>>),
-    True(Option<Location<'a>>),
-    False(Option<Location<'a>>),
-    While(Option<Location<'a>>),
-    If(Option<Location<'a>>),
-    Else(Option<Location<'a>>),
-    Return(Option<Location<'a>>),
-    Int(Option<Location<'a>>),
-    Str(Option<Location<'a>>),
-    Bang(Option<Location<'a>>),
-    Asterisk(Option<Location<'a>>),
-    Plus(Option<Location<'a>>),
-    Minus(Option<Location<'a>>),
-    Slash(Option<Location<'a>>),
-    Assign(Option<Location<'a>>),
-    Lt(Option<Location<'a>>),
-    Gt(Option<Location<'a>>),
-    Eq(Option<Location<'a>>),
-    Lte(Option<Location<'a>>),
-    Gte(Option<Location<'a>>),
-    Diff(Option<Location<'a>>),
-    And(Option<Location<'a>>),
-    Or(Option<Location<'a>>),
+pub enum Token {
+    Illegal(Option<Rc<String>>, Option<Location>),
+    EOF(Option<Location>),
+    Ident(Option<Rc<String>>, Option<Location>),
+    Number(Option<Rc<String>>, Option<Location>),
+    Comma(Option<Location>),
+    Semicolon(Option<Location>),
+    Lparen(Option<Location>),
+    Rparen(Option<Location>),
+    LSqBracket(Option<Location>),
+    RSqBracket(Option<Location>),
+    Lbrace(Option<Location>),
+    Rbrace(Option<Location>),
+    String(Option<Rc<String>>, Option<Location>),
+    Function(Option<Location>),
+    Let(Option<Location>),
+    Var(Option<Location>),
+    Bool(Option<Location>),
+    True(Option<Location>),
+    False(Option<Location>),
+    While(Option<Location>),
+    If(Option<Location>),
+    Else(Option<Location>),
+    Return(Option<Location>),
+    Int(Option<Location>),
+    Str(Option<Location>),
+    Bang(Option<Location>),
+    Asterisk(Option<Location>),
+    Plus(Option<Location>),
+    Minus(Option<Location>),
+    Slash(Option<Location>),
+    Assign(Option<Location>),
+    Lt(Option<Location>),
+    Gt(Option<Location>),
+    Eq(Option<Location>),
+    Lte(Option<Location>),
+    Gte(Option<Location>),
+    Diff(Option<Location>),
+    And(Option<Location>),
+    Or(Option<Location>),
 }
 
-#[derive(PartialEq, Debug, Clone, Copy)]
-pub struct Location<'a> {
+#[derive(PartialEq, Debug, Clone)]
+pub struct Location {
     pub position: usize,
     pub line: usize,
-    filename: &'a str,
+    filename: Rc<String>,
 }
 
-impl<'a> Location<'a> {
-    pub fn new(position: usize, line: usize, filename: &'a str) -> Self {
+impl Location {
+    pub fn new(position: usize, line: usize, filename: Rc<String>) -> Self {
         Self {
             position,
             line,
@@ -60,8 +60,8 @@ impl<'a> Location<'a> {
     }
 }
 
-impl<'a> Token<'a> {
-    pub fn get_keyword_token(ident: &str, location: Option<Location<'a>>) -> Result<Token<'a>, String> {
+impl Token {
+    pub fn get_keyword_token(ident: &str, location: Option<Location>) -> Result<Token, String> {
         let identifier: String = String::from(ident);
         match &identifier[..] {
             "if" => Ok(Token::If(location)),
@@ -81,117 +81,90 @@ impl<'a> Token<'a> {
     }
 }
 
-impl<'a> Display for Token<'a> {
+impl Display for Token {
 
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let str = match self {
-            Self::And(loc) => {
-                let loc = loc.unwrap();
-                format!("&& in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::And(_) => {
+                format!("&&")
             },
-            Self::Assign(loc) => {
-                let loc = loc.unwrap();
-                format!("= in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Assign(_) => {
+                format!("=")
             },
-            Self::Asterisk(loc) => {
-                let loc = loc.unwrap();
-                format!("* in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Asterisk(_) => {
+                format!("*")
             },
-            Self::Bang(loc) => {
-                let loc = loc.unwrap();
-                format!("! in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Bang(_) => {
+                format!("!")
             },
-            Self::Bool(loc) => {
-                let loc = loc.unwrap();
-                format!("boolean type in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Bool(_) => {
+                format!("boolean type")
             },
-            Self::Comma(loc) => {
-                let loc = loc.unwrap();
-                format!(", in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Comma(_) => {
+                format!(",")
             },
-            Self::Diff(loc) => {
-                let loc = loc.unwrap();
-                format!("!= in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Diff(_) => {
+                format!("!=")
             },
-            Self::EOF(loc) => {
-                let loc = loc.unwrap();
-                format!("EOF in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::EOF(_) => {
+                format!("EOF")
             },
-            Self::Else(loc) => {
-                let loc = loc.unwrap();
-                format!("else in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Else(_) => {
+                format!("else")
             },
-            Self::Eq(loc) => {
-                let loc = loc.unwrap();
-                format!("== in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Eq(_) => {
+                format!("==")
             },
-            Self::Function(loc) => {
-                let loc = loc.unwrap();
-                format!("fn in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Function(_) => {
+                format!("fn")
             },
-            Self::Ident(_, loc) => {
-                let loc = loc.unwrap();
-                format!("identifier in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Ident(_, _) => {
+                format!("identifier")
             },
-            Self::Int(loc) => {
-                let loc = loc.unwrap();
-                format!("integer type in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Int(_) => {
+                format!("integer type")
             },
-            Self::LSqBracket(loc) => {
-                let loc = loc.unwrap();
-                format!("[ in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::LSqBracket(_) => {
+                format!("[")
             },
-            Self::Lbrace(loc) => {
-                let loc = loc.unwrap();
-                format!("{{ in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Lbrace(_) => {
+                format!("{{")
             },
-            Self::Let(loc) => {
-                let loc = loc.unwrap();
-                format!("let in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Let(_) => {
+                format!("let")
             },
-            Self::Lparen(loc) => {
-                let loc = loc.unwrap();
-                format!("( in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Lparen(_) => {
+                format!("(")
             },
-            Self::Number(_, loc) => {
-                let loc = loc.unwrap();
-                format!("number value in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Number(_, _) => {
+                format!("number value")
             },
-            Self::RSqBracket(loc) => {
-                let loc = loc.unwrap();
-                format!("] in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::RSqBracket(_) => {
+                format!("]")
             },
-            Self::Rbrace(loc) => {
-                let loc = loc.unwrap();
-                format!("}} in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Rbrace(_) => {
+                format!("}}")
             },
-            Self::Return(loc) => {
-                let loc = loc.unwrap();
-                format!("ret in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Return(_) => {
+                format!("ret")
             },
-            Self::Rparen(loc) => {
-                let loc = loc.unwrap();
-                format!(") in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Rparen(_) => {
+                format!(")")
             },
-            Self::Semicolon(loc) => {
-                let loc = loc.unwrap();
-                format!("; in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Semicolon(_) => {
+                format!(";")
             },
-            Self::Str(loc) => {
-                let loc = loc.unwrap();
-                format!("string type in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Str(_) => {
+                format!("string type")
             },
-            Self::String(_, loc) => {
-                let loc = loc.unwrap();
-                format!("String value in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::String(_, _) => {
+                format!("String value")
             },
-            Self::Var(loc) => {
-                let loc = loc.unwrap();
-                format!("var in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::Var(_) => {
+                format!("var")
             },
-            Self::While(loc) => {
-                let loc = loc.unwrap();
-                format!("while in {}:{}:{}", loc.filename, loc.line, loc.position)
+            Self::While(_) => {
+                format!("while")
             },
             _ => String::from("another thing, found it")
         };

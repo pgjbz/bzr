@@ -1,3 +1,3 @@
-pub trait Node<'a> {
-    fn literal(&self) -> &'a str;
+pub trait Node {
+    fn literal(&self) -> String;
 }
