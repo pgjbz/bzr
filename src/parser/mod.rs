@@ -63,15 +63,23 @@ impl<'a> Parser<'a> {
                 return None;
             }
             self.next_token();
+            println!("{:?}", self.current_token);
             val = match self.current_token.as_ref() {
                 Token::True(_) if Self::type_is_equal(&typ, &Type::Bool) => String::from("true"),
                 Token::False(_) if Self::type_is_equal(&typ, &Type::Bool) => String::from("false"),
-                Token::Number(val, _) => val.as_ref().unwrap().as_ref().clone(),
-                Token::String(val, _) => val.as_ref().unwrap().as_ref().clone(),
+                Token::Number(val, _) if Self::type_is_equal(&typ, &Type::Int)  => val.as_ref().unwrap().as_ref().clone(),
+                Token::String(val, _) if Self::type_is_equal(&typ, &Type::String) => val.as_ref().unwrap().as_ref().clone(),
                 _ => {
+                    self.errors.push(format!("Invalid type expected {}, got {}", typ, self.current_token));
                     String::from("")
                 }
             };
+            if val.is_empty() {
+                for error in &mut self.errors {
+                    println!("{}", error);
+                }
+                panic!("INVALID TYPE");
+            }
         } else {
             typ = Type::Bool;
             val = String::from("")

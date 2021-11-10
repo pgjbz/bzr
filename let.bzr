@@ -1,1 +1,1 @@
-let meu_texto str = 10;
+let numero int = "10";
