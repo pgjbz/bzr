@@ -44,36 +44,17 @@ impl<'a> Parser<'a> {
             };
 
         let identifier = Identifier::new(Some(Rc::clone(identifier.as_ref().unwrap())));
-        //let nome tipo = valor;
-        //let nome = valor;
 
         let typ: Type;
         let val: String;
-        if self.expected_peek(Token::Int(None), false)
-            || self.expected_peek(Token::Str(None), false)
-            || self.expected_peek(Token::Bool(None), false)
+        if self.has_type()
         {
-            typ = match self.current_token.as_ref() {
-                Token::Int(_) => Type::Int,
-                Token::Str(_) => Type::String,
-                Token::Bool(_) => Type::Bool,
-                _ =>  Type::Unknown
-            };
+            typ = self.extract_type();
             if !self.expected_peek(Token::Assign(None), true) {
                 return None;
             }
             self.next_token();
-            println!("{:?}", self.current_token);
-            val = match self.current_token.as_ref() {
-                Token::True(_) if Self::type_is_equal(&typ, &Type::Bool) => String::from("true"),
-                Token::False(_) if Self::type_is_equal(&typ, &Type::Bool) => String::from("false"),
-                Token::Number(val, _) if Self::type_is_equal(&typ, &Type::Int)  => val.as_ref().unwrap().as_ref().clone(),
-                Token::String(val, _) if Self::type_is_equal(&typ, &Type::String) => val.as_ref().unwrap().as_ref().clone(),
-                _ => {
-                    self.errors.push(format!("Invalid type expected {}, got {}", typ, self.current_token));
-                    String::from("")
-                }
-            };
+            val = self.extract_value(&typ);
             if val.is_empty() {
                 for error in &mut self.errors {
                     println!("{}", error);
@@ -85,32 +66,63 @@ impl<'a> Parser<'a> {
                 return None;
             }
             self.next_token();
-            val = match self.current_token.as_ref() {
-                Token::True(_) => {
-                    typ = Type::Bool;
-                    String::from("true")
-                },
-                Token::False(_) => {
-                    typ = Type::Bool;
-                    String::from("false")
-                },
-                Token::Number(val, _) => {
-                    typ = Type::Int;
-                    val.as_ref().unwrap().as_ref().clone()
-                },
-                Token::String(val, _) => {
-                    typ = Type::String;
-                    val.as_ref().unwrap().as_ref().clone()
-                },
-                _ => {
-                    typ = Type::Unknown;
-                    String::from("")
-                }
-            };
+            let (t, v) = self.extract_value_and_type();
+            typ = t;
+            val = v;
         }
         let expression = Self::parse_expression(Precedence::Lowest as isize, val);
         Some(Let::new(Token::Let(None), typ, identifier, expression))
-        // None
+    }
+
+    fn has_type(&mut self) -> bool {
+        self.expected_peek(Token::Int(None), false)
+            || self.expected_peek(Token::Str(None), false)
+            || self.expected_peek(Token::Bool(None), false)
+    }
+
+    fn extract_type(&self) -> Type {
+        match self.current_token.as_ref() {
+            Token::Int(_) => Type::Int,
+            Token::Str(_) => Type::String,
+            Token::Bool(_) => Type::Bool,
+            _ =>  Type::Unknown
+        }
+    }
+    
+    fn extract_value(&mut self, typ: &Type) -> String {
+        match self.current_token.as_ref() {
+            Token::True(_) if Self::type_is_equal(typ, &Type::Bool) => String::from("true"),
+            Token::False(_) if Self::type_is_equal(typ, &Type::Bool) => String::from("false"),
+            Token::Number(val, _) if Self::type_is_equal(typ, &Type::Int)  => val.as_ref().unwrap().as_ref().clone(),
+            Token::String(val, _) if Self::type_is_equal(typ, &Type::String) => val.as_ref().unwrap().as_ref().clone(),
+            _ => {
+                self.errors.push(format!("Invalid type expected {}, got {}", typ, self.current_token));
+                String::from("")
+            }
+        }
+    }
+
+    fn extract_value_and_type(&self) -> (Type, String) {
+        let typ: Type;
+        let val = match self.current_token.as_ref() {
+            Token::True(_) | Token::False(_) => {
+                typ = Type::Bool;
+                format!("{}", typ)
+            },
+            Token::Number(val, _) => {
+                typ = Type::Int;
+                val.as_ref().unwrap().as_ref().clone()
+            },
+            Token::String(val, _) => {
+                typ = Type::String;
+                val.as_ref().unwrap().as_ref().clone()
+            },
+            _ => {
+                typ = Type::Unknown;
+                String::from("")
+            }
+        };
+        (typ, val)
     }
 
     fn parse_expression(_precedence: isize, val: String) -> Box<dyn Expression> {

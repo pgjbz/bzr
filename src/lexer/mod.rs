@@ -219,10 +219,14 @@ impl Lexer {
     fn read_string(input: &mut Self) -> &str {
         let position = input.position + 1;
         input.read_char();
-        while input.position < input.input.len() && input.ch != Some('\"') || input.ch == None {
+        while input.position < input.input.len() && (input.ch != Some('\"') || input.ch == None) {
             input.read_char();
         }
-        &input.input[position..input.position + 1]
+        let mut last_position = input.position + 1;
+        while last_position > input.input.len() {
+            last_position -= 1;
+        }
+        &input.input[position..last_position]
     }
 
     fn peek_next_char(input: &Self, offset: Option<usize>) -> char {

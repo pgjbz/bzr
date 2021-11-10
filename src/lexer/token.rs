@@ -47,7 +47,7 @@ pub enum Token {
 pub struct Location {
     pub position: usize,
     pub line: usize,
-    filename: Rc<String>,
+    pub filename: Rc<String>,
 }
 
 impl Location {
@@ -96,6 +96,7 @@ impl Display for Token {
             Self::Else(_) => "else".to_string(),
             Self::Eq(_) => "==".to_string(),
             Self::Function(_) => "fn".to_string(),
+            Self::Illegal(_, _) => "illegal".to_string(),
             Self::Ident(_, _) => "identifier".to_string(),
             Self::Int(_) => "integer type".to_string(),
             Self::LSqBracket(_) => "[".to_string(),
@@ -110,6 +111,8 @@ impl Display for Token {
             Self::Semicolon(_) => ";".to_string(),
             Self::Str(_) => "string type".to_string(),
             Self::String(_, _) => "String value".to_string(),
+            Self::True(_) => "true".to_string(),
+            Self::False(_) => "false".to_string(),
             Self::Var(_) => "var".to_string(),
             Self::While(_) => "while".to_string(),
             _ => String::from("another thing, found it")
