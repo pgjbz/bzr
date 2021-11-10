@@ -81,8 +81,32 @@ impl<'a> Parser<'a> {
                 panic!("INVALID TYPE");
             }
         } else {
-            typ = Type::Bool;
-            val = String::from("")
+            if !self.expected_peek(Token::Assign(None), true) {
+                return None;
+            }
+            self.next_token();
+            val = match self.current_token.as_ref() {
+                Token::True(_) => {
+                    typ = Type::Bool;
+                    String::from("true")
+                },
+                Token::False(_) => {
+                    typ = Type::Bool;
+                    String::from("false")
+                },
+                Token::Number(val, _) => {
+                    typ = Type::Int;
+                    val.as_ref().unwrap().as_ref().clone()
+                },
+                Token::String(val, _) => {
+                    typ = Type::String;
+                    val.as_ref().unwrap().as_ref().clone()
+                },
+                _ => {
+                    typ = Type::Unknown;
+                    String::from("")
+                }
+            };
         }
         let expression = Self::parse_expression(Precedence::Lowest as isize, val);
         Some(Let::new(Token::Let(None), typ, identifier, expression))
