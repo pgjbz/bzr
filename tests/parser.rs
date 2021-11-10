@@ -2,7 +2,6 @@ use std::{cell::RefCell, rc::Rc};
 
 use bzr::{lexer::Lexer, parser::Parser};
 
-
 #[test]
 fn test_parse_let_int_type() {
     let source = "let a int = 10;".to_string();
@@ -84,7 +83,6 @@ fn test_parse_let_str_type_erros() {
 }
 
 //
-
 
 #[test]
 fn test_parse_bool_int_type() {

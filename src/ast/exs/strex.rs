@@ -14,7 +14,7 @@ impl StrEx {
 
 impl Node for StrEx {
     fn literal(&self) -> Box<dyn Display> {
-        Box::new(format!("{}", self.value))
+        Box::new(self.value.to_string())
     }
 }
 

@@ -151,9 +151,8 @@ impl Parser {
                 println!("{}", error);
             }
             let tok = self.current_token.as_ref();
-            self.errors.push(
-                format!("Error expected value got {}", tok)
-            )
+            self.errors
+                .push(format!("Error expected value got {}", tok))
         }
     }
 
