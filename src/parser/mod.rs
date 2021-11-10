@@ -1,4 +1,4 @@
-use std::{mem, rc::Rc};
+use std::{cell::RefCell, mem, rc::Rc};
 
 use crate::{ast::{expression::Expression, identifier::Identifier, node::Node, program::Program, statement::Statement, statements::{letsts::Let, varsts::Var}, types::Type}, lexer::{Lexer, token::Token}};
 
@@ -6,18 +6,18 @@ enum Precedence {
     Lowest,
 }
 
-pub struct Parser<'a> {
-    pub lexer: &'a mut Lexer,
+pub struct Parser{
+    pub lexer: RefCell<Lexer>,
     pub current_token: Rc<Token>,
     pub peek_token: Rc<Token>,
     errors: Vec<String>,
 }
 
-impl<'a> Parser<'a> {
+impl Parser {
 
-    pub fn new(lexer: &'a mut Lexer) -> Self {
-        let current_token = lexer.next_token();
-        let peek_token = lexer.next_token();
+    pub fn new(lexer: RefCell<Lexer>) -> Self {
+        let current_token = lexer.borrow_mut().next_token();
+        let peek_token = lexer.borrow_mut().next_token();
         Self {
             lexer,
             current_token,
@@ -26,8 +26,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    pub fn parse_program(&mut self) -> Box<Program> {
-        
+    pub fn parse_program(mut self) -> Box<Program> {
         let mut statements = vec![];
         while !self.current_token_is(Token::EOF(None)) {
             if let Some(sts) = self.parse_statement() {
@@ -57,7 +56,7 @@ impl<'a> Parser<'a> {
 
     pub fn next_token(&mut self) {
         mem::swap(&mut self.current_token, &mut self.peek_token);
-        self.peek_token = self.lexer.next_token();
+        self.peek_token = self.lexer.borrow_mut().next_token();
     }
 
     pub fn parse_let_sts(&mut self) -> Option<Box<dyn Statement>> {

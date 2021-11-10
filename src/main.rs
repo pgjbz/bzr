@@ -1,4 +1,4 @@
-use std::{env, fs, rc::Rc};
+use std::{cell::RefCell, env, fs, rc::Rc};
 
 use bzr::{lexer::Lexer, parser::Parser};
 
@@ -6,11 +6,11 @@ fn main() {
     let filename = env::args().nth(1).expect("Expected filename");
     let input = fs::read_to_string(&filename).unwrap();
     
-    let mut lexer = Lexer::new(Rc::new(input), Rc::new(filename));
+    let lexer = Lexer::new(Rc::new(input), Rc::new(filename));
     // for tok in &mut lexer {
     //     println!("{:?}", tok);
     // }
-    let mut parse = Parser::new(&mut lexer);
+    let parse = Parser::new(RefCell::new(lexer));
 
     let program = parse.parse_program();
     
@@ -21,4 +21,5 @@ fn main() {
     for error in program.errors {
         println!("{}", error);
     }
+
 }
