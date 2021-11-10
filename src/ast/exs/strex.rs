@@ -1,7 +1,7 @@
 use crate::ast::{expression::Expression, node::Node};
 
 pub struct StrEx {
-    value: String
+    value: String,
 }
 
 impl StrEx {
@@ -21,4 +21,3 @@ impl Expression for StrEx {
         todo!()
     }
 }
-

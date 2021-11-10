@@ -1,6 +1,18 @@
 use std::{cell::RefCell, mem, rc::Rc};
 
-use crate::{ast::{expression::Expression, exs::{boolex::BoolEx, intex::IntEx, strex::StrEx}, identifier::Identifier, node::Node, program::Program, statement::Statement, sts::{letsts::Let, varsts::Var}, types::Type}, lexer::{token::Token, Lexer}};
+use crate::{
+    ast::{
+        expression::Expression,
+        exs::{boolex::BoolEx, intex::IntEx, strex::StrEx},
+        identifier::Identifier,
+        node::Node,
+        program::Program,
+        statement::Statement,
+        sts::{letsts::Let, varsts::Var},
+        types::Type,
+    },
+    lexer::{token::Token, Lexer},
+};
 
 enum Precedence {
     Lowest,
@@ -220,7 +232,7 @@ impl Parser {
                             } else {
                                 None
                             }
-                        },
+                        }
                         Type::String => Some(Box::new(StrEx::new(val))),
                         Type::Bool => {
                             if let Ok(value) = val.parse() {
@@ -228,8 +240,8 @@ impl Parser {
                             } else {
                                 None
                             }
-                        },
-                        Type::Unknown => None
+                        }
+                        Type::Unknown => None,
                     }
                 } else {
                     None

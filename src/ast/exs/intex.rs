@@ -1,7 +1,7 @@
 use crate::ast::{expression::Expression, node::Node};
 
 pub struct IntEx {
-    value: i64
+    value: i64,
 }
 
 impl IntEx {
@@ -21,4 +21,3 @@ impl Expression for IntEx {
         todo!()
     }
 }
-

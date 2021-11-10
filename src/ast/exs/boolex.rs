@@ -1,7 +1,7 @@
 use crate::ast::{expression::Expression, node::Node};
 
 pub struct BoolEx {
-    value: bool
+    value: bool,
 }
 
 impl BoolEx {
@@ -21,4 +21,3 @@ impl Expression for BoolEx {
         todo!()
     }
 }
-
