@@ -12,7 +12,7 @@ fn main() {
     // }
     let mut parse = Parser::new(&mut lexer);
 
-    let val = parse.parse_let_sts();
+    let val = parse.parse_var_sts();
     if let Some(val) = val {
         println!("{}", val)
     } else {

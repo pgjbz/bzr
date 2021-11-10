@@ -1,9 +1,9 @@
 use std::{mem, rc::Rc};
 
-use crate::{ast::{expression::Expression, identifier::Identifier, node::Node, statements::letsts::Let, types::Type}, lexer::{Lexer, token::Token}};
+use crate::{ast::{expression::Expression, identifier::Identifier, node::Node, statements::{letsts::Let, varsts::Var}, types::Type}, lexer::{Lexer, token::Token}};
 
 enum Precedence {
-    Lowest = 0,
+    Lowest,
 }
 
 pub struct Parser<'a> {
@@ -55,12 +55,6 @@ impl<'a> Parser<'a> {
             }
             self.next_token();
             val = self.extract_value(&typ);
-            if val.is_empty() {
-                for error in &mut self.errors {
-                    println!("{}", error);
-                }
-                panic!("INVALID TYPE");
-            }
         } else {
             if !self.expected_peek(Token::Assign(None), true) {
                 return None;
@@ -70,8 +64,61 @@ impl<'a> Parser<'a> {
             typ = t;
             val = v;
         }
-        let expression = Self::parse_expression(Precedence::Lowest as isize, val);
-        Some(Let::new(Token::Let(None), typ, identifier, expression))
+        self.print_error_str_empty(&val);
+        if let Some(expression) = Self::parse_expression(self, Precedence::Lowest, val) {
+            Some(Let::new(Token::Let(None), typ, identifier, expression))
+        } else {
+            None
+        }
+    }
+
+    pub fn parse_var_sts(&mut self) -> Option<Box<Var>> {
+        if !self.expected_peek(Token::Ident(None, None), true) {
+            return None;
+        }
+
+        let identifier = 
+            match self.current_token.as_ref() {
+                Token::Ident(identifier, _) => identifier,
+                _ => return None
+            };
+
+        let identifier = Identifier::new(Some(Rc::clone(identifier.as_ref().unwrap())));
+
+        let typ: Type;
+        let val: String;
+        if self.has_type()
+        {
+            typ = self.extract_type();
+            if !self.expected_peek(Token::Assign(None), true) {
+                return None;
+            }
+            self.next_token();
+            val = self.extract_value(&typ);
+        } else {
+            if !self.expected_peek(Token::Assign(None), true) {
+                return None;
+            }
+            self.next_token();
+            let (t, v) = self.extract_value_and_type();
+            typ = t;
+            val = v;
+        }
+        self.print_error_str_empty(&val);
+        if let Some(expression) = Self::parse_expression(self, Precedence::Lowest, val) {
+           Some(Var::new(Token::Var(None), typ, identifier, expression))
+        } else {
+            None
+        }
+    }
+
+    fn print_error_str_empty(&mut self, str: &str) {
+        if str.is_empty() {
+            for error in &mut self.errors {
+                println!("{}", error);
+            }
+            panic!("error");
+        }
     }
 
     fn has_type(&mut self) -> bool {
@@ -102,7 +149,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn extract_value_and_type(&self) -> (Type, String) {
+    fn extract_value_and_type(&mut self) -> (Type, String) {
         let typ: Type;
         let val = match self.current_token.as_ref() {
             Token::True(_) | Token::False(_) => {
@@ -119,14 +166,23 @@ impl<'a> Parser<'a> {
             },
             _ => {
                 typ = Type::Unknown;
+                self.errors.push(format!("expected a type, got error {}", self.current_token));
                 String::from("")
             }
         };
         (typ, val)
     }
 
-    fn parse_expression(_precedence: isize, val: String) -> Box<dyn Expression> {
-        Box::new(val)
+    fn parse_expression(&mut self, precedence: Precedence, val: String) -> Option<Box<dyn Expression>> {
+        match precedence {
+            Precedence::Lowest => { 
+                if self.expected_peek(Token::Semicolon(None), true) {
+                    Some(Box::new(val)) 
+                } else {
+                    None
+                }
+            }
+        }
     }
 
     pub fn expected_peek(&mut self, token: Token, register_error: bool) -> bool {
