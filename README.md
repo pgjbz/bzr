@@ -101,6 +101,55 @@ Rbrace(Location { position: 1, line: 6, filename: "foo.bzr" })
 To run the lexer use command: cargo r --release -- file.bzr
 
 
-### Rust version to write code:
+### Rust version to write this code:
 
 Minival version used to write this code is [Rust 1.56](https://github.com/rust-lang/rust/releases/tag/1.56.0), but i think this work in others versions
+
+<hr>
+# Types
+
+For now only have 3 types:
+
+- Boolean => `bool`
+- Integer => `int`
+- String => `str`
+
+<hr>
+# Expressions
+
+For now only parse 1 expressions in one line
+
+<hr>
+Let:<br>
+
+```bzr
+let name type = val
+```
+Examples:
+
+Let type integer
+```bzr
+let number int = 10;
+let another_number = 10;
+```
+
+Type inference is possible
+
+Let type bool
+```bzr
+let boolean bool = false;
+let another_boolean = true;
+```
+
+Let type String
+```bzr
+let string str = "text";
+let another_string = "text";
+```
+
+Let error
+```
+let dife bool = 10;
+```
+
+<hr>
