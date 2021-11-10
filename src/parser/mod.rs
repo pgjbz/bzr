@@ -1,17 +1,6 @@
 use std::{cell::RefCell, mem, rc::Rc};
 
-use crate::{
-    ast::{
-        expression::Expression,
-        identifier::Identifier,
-        node::Node,
-        program::Program,
-        statement::Statement,
-        statements::{letsts::Let, varsts::Var},
-        types::Type,
-    },
-    lexer::{token::Token, Lexer},
-};
+use crate::{ast::{expression::Expression, exs::{boolex::BoolEx, intex::IntEx, strex::StrEx}, identifier::Identifier, node::Node, program::Program, statement::Statement, sts::{letsts::Let, varsts::Var}, types::Type}, lexer::{token::Token, Lexer}};
 
 enum Precedence {
     Lowest,
@@ -100,7 +89,7 @@ impl Parser {
             val = v;
         }
         self.print_error_str_empty(&val);
-        if let Some(expression) = Self::parse_expression(self, Precedence::Lowest, val) {
+        if let Some(expression) = Self::parse_expression(self, Precedence::Lowest, val, &typ) {
             Some(Let::new(Token::Let(None), typ, identifier, expression))
         } else {
             None
@@ -138,7 +127,7 @@ impl Parser {
             val = v;
         }
         self.print_error_str_empty(&val);
-        if let Some(expression) = Self::parse_expression(self, Precedence::Lowest, val) {
+        if let Some(expression) = Self::parse_expression(self, Precedence::Lowest, val, &typ) {
             Some(Var::new(Token::Var(None), typ, identifier, expression))
         } else {
             None
@@ -218,12 +207,30 @@ impl Parser {
         &mut self,
         precedence: Precedence,
         val: String,
+        typ: &Type,
     ) -> Option<Box<dyn Expression>> {
         match precedence {
             Precedence::Lowest => {
                 if self.expected_peek(Token::Semicolon(None), true) {
                     self.next_token();
-                    Some(Box::new(val))
+                    match typ {
+                        Type::Int => {
+                            if let Ok(value) = val.parse() {
+                                Some(Box::new(IntEx::new(value)))
+                            } else {
+                                None
+                            }
+                        },
+                        Type::String => Some(Box::new(StrEx::new(val))),
+                        Type::Bool => {
+                            if let Ok(value) = val.parse() {
+                                Some(Box::new(BoolEx::new(value)))
+                            } else {
+                                None
+                            }
+                        },
+                        Type::Unknown => None
+                    }
                 } else {
                     None
                 }
