@@ -150,7 +150,10 @@ impl Parser {
             for error in &mut self.errors {
                 println!("{}", error);
             }
-            panic!("error");
+            let tok = self.current_token.as_ref();
+            self.errors.push(
+                format!("Error expected value got {}", tok)
+            )
         }
     }
 
