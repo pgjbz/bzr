@@ -12,10 +12,9 @@ fn main() {
     // }
     let mut parse = Parser::new(&mut lexer);
 
-    let val = parse.parse_var_sts();
-    if let Some(val) = val {
-        println!("{}", val)
-    } else {
-        println!("Fake")
+    let program = parse.parse_program();
+    
+    for sts in program.statements {
+        println!("{:?}", sts.literal());
     }
 }

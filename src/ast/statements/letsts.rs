@@ -45,7 +45,7 @@ impl Let {
 
 impl Node for Let {
     fn literal(&self) -> String {
-        "let".to_string()
+        format!("let {} {} = {}", self.name, self.typ, self.value)
     }
 }
 

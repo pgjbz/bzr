@@ -1,6 +1,6 @@
 use std::{mem, rc::Rc};
 
-use crate::{ast::{expression::Expression, identifier::Identifier, node::Node, statements::{letsts::Let, varsts::Var}, types::Type}, lexer::{Lexer, token::Token}};
+use crate::{ast::{expression::Expression, identifier::Identifier, node::Node, program::Program, statement::Statement, statements::{letsts::Let, varsts::Var}, types::Type}, lexer::{Lexer, token::Token}};
 
 enum Precedence {
     Lowest,
@@ -26,12 +26,39 @@ impl<'a> Parser<'a> {
         }
     }
 
+    pub fn parse_program(&mut self) -> Box<Program> {
+        
+        let mut statements = vec![];
+        while !self.current_token_is(Token::EOF(None)) {
+            if let Some(sts) = self.parse_statement() {
+                statements.push(sts)
+            }
+        }
+        let mut errors = vec![];
+        for error in &mut self.errors {
+            errors.push(error.clone());
+        }
+        Program::new(statements, errors)
+    }
+
+    fn parse_statement(&mut self) -> Option<Box<dyn Statement>> {
+        match self.current_token.as_ref() {
+            Token::Let(_) => self.parse_let_sts(),
+            Token::Var(_) => self.parse_var_sts(),
+            Token::EOF(_) => None,
+            _ => {
+                println!("{:?}", self.current_token);
+                todo!()
+            }
+        }
+    }
+
     pub fn next_token(&mut self) {
         mem::swap(&mut self.current_token, &mut self.peek_token);
         self.peek_token = self.lexer.next_token();
     }
 
-    pub fn parse_let_sts(&mut self) -> Option<Box<Let>> {
+    pub fn parse_let_sts(&mut self) -> Option<Box<dyn Statement>> {
 
         if !self.expected_peek(Token::Ident(None, None), true) {
             return None;
@@ -72,7 +99,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    pub fn parse_var_sts(&mut self) -> Option<Box<Var>> {
+    pub fn parse_var_sts(&mut self) -> Option<Box<dyn Statement>> {
         if !self.expected_peek(Token::Ident(None, None), true) {
             return None;
         }
@@ -177,6 +204,7 @@ impl<'a> Parser<'a> {
         match precedence {
             Precedence::Lowest => { 
                 if self.expected_peek(Token::Semicolon(None), true) {
+                    self.next_token();
                     Some(Box::new(val)) 
                 } else {
                     None
@@ -207,12 +235,12 @@ impl<'a> Parser<'a> {
         mem::discriminant(token_compare) == mem::discriminant(token)
     }
 
-    pub fn peek_token_is(&self, token: &Token) -> bool {
+    pub fn peek_token_is(&mut self, token: &Token) -> bool {
         mem::discriminant(&*self.peek_token) == mem::discriminant(token)
     }
 
 
-    pub fn current_token_is(&self, token: Token) -> bool {
+    pub fn current_token_is(&mut self, token: Token) -> bool {
         mem::discriminant(&*self.current_token) == mem::discriminant(&token)
     }
 }

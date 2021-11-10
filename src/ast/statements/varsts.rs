@@ -45,7 +45,7 @@ impl Var {
 
 impl Node for Var {
     fn literal(&self) -> String {
-        "Var".to_string()
+        format!("var {} {} = {}", self.name, self.typ, self.value)
     }
 }
 
