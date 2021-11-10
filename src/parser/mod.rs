@@ -224,7 +224,6 @@ impl Parser {
         match precedence {
             Precedence::Lowest => {
                 if self.expected_peek(Token::Semicolon(None), true) {
-                    self.next_token();
                     match typ {
                         Type::Int => {
                             if let Ok(value) = val.parse() {
