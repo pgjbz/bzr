@@ -85,87 +85,33 @@ impl Display for Token {
 
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let str = match self {
-            Self::And(_) => {
-                format!("&&")
-            },
-            Self::Assign(_) => {
-                format!("=")
-            },
-            Self::Asterisk(_) => {
-                format!("*")
-            },
-            Self::Bang(_) => {
-                format!("!")
-            },
-            Self::Bool(_) => {
-                format!("boolean type")
-            },
-            Self::Comma(_) => {
-                format!(",")
-            },
-            Self::Diff(_) => {
-                format!("!=")
-            },
-            Self::EOF(_) => {
-                format!("EOF")
-            },
-            Self::Else(_) => {
-                format!("else")
-            },
-            Self::Eq(_) => {
-                format!("==")
-            },
-            Self::Function(_) => {
-                format!("fn")
-            },
-            Self::Ident(_, _) => {
-                format!("identifier")
-            },
-            Self::Int(_) => {
-                format!("integer type")
-            },
-            Self::LSqBracket(_) => {
-                format!("[")
-            },
-            Self::Lbrace(_) => {
-                format!("{{")
-            },
-            Self::Let(_) => {
-                format!("let")
-            },
-            Self::Lparen(_) => {
-                format!("(")
-            },
-            Self::Number(_, _) => {
-                format!("number value")
-            },
-            Self::RSqBracket(_) => {
-                format!("]")
-            },
-            Self::Rbrace(_) => {
-                format!("}}")
-            },
-            Self::Return(_) => {
-                format!("ret")
-            },
-            Self::Rparen(_) => {
-                format!(")")
-            },
-            Self::Semicolon(_) => {
-                format!(";")
-            },
-            Self::Str(_) => {
-                format!("string type")
-            },
-            Self::String(_, _) => {
-                format!("String value")
-            },
-            Self::Var(_) => {
-                format!("var")
-            },
-            Self::While(_) => {
-                format!("while")
-            },
+            Self::And(_) => "&&".to_string(),
+            Self::Assign(_) => "=".to_string(),
+            Self::Asterisk(_) => "*".to_string(),
+            Self::Bang(_) => "!".to_string(),
+            Self::Bool(_) => "boolean type".to_string(),
+            Self::Comma(_) => ",".to_string(),
+            Self::Diff(_) => "!=".to_string(),
+            Self::EOF(_) => "EOF".to_string(),
+            Self::Else(_) => "else".to_string(),
+            Self::Eq(_) => "==".to_string(),
+            Self::Function(_) => "fn".to_string(),
+            Self::Ident(_, _) => "identifier".to_string(),
+            Self::Int(_) => "integer type".to_string(),
+            Self::LSqBracket(_) => "[".to_string(),
+            Self::Lbrace(_) => "{{".to_string(),
+            Self::Let(_) => "let".to_string(),
+            Self::Lparen(_) => "(".to_string(),
+            Self::Number(_, _) => "number value".to_string(),
+            Self::RSqBracket(_) => "]".to_string(),
+            Self::Rbrace(_) => "}}".to_string(),
+            Self::Return(_) => "ret".to_string(),
+            Self::Rparen(_) => ")".to_string(),
+            Self::Semicolon(_) => ";".to_string(),
+            Self::Str(_) => "string type".to_string(),
+            Self::String(_, _) => "String value".to_string(),
+            Self::Var(_) => "var".to_string(),
+            Self::While(_) => "while".to_string(),
             _ => String::from("another thing, found it")
         };
         write!(f, "{}", str)

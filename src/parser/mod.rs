@@ -64,8 +64,8 @@ impl<'a> Parser<'a> {
             }
             self.next_token();
             val = match self.current_token.as_ref() {
-                Token::True(_) if Self::token_is_equal(&typ, &Type::Bool) => String::from("true"),
-                Token::False(_) if Self::token_is_equal(&typ, &Type::Bool) => String::from("false"),
+                Token::True(_) if Self::type_is_equal(&typ, &Type::Bool) => String::from("true"),
+                Token::False(_) if Self::type_is_equal(&typ, &Type::Bool) => String::from("false"),
                 Token::Number(val, _) => val.as_ref().unwrap().as_ref().clone(),
                 Token::String(val, _) => val.as_ref().unwrap().as_ref().clone(),
                 _ => {
@@ -93,7 +93,7 @@ impl<'a> Parser<'a> {
         if register_error {
             self.peek_error(&token);
         }
-        return false;
+        false
     }
 
     pub fn peek_error(&mut self, token: &Token) {
@@ -103,13 +103,12 @@ impl<'a> Parser<'a> {
         self.errors.push(msg);
     }
 
-    pub fn token_is_equal<T>(token_compare: &T, token: &T) -> bool {
+    pub fn type_is_equal(token_compare: &Type, token: &Type) -> bool{
         mem::discriminant(token_compare) == mem::discriminant(token)
     }
 
     pub fn peek_token_is(&self, token: &Token) -> bool {
-        // mem::discriminant(&*self.peek_token) == mem::discriminant(&token);
-        Self::token_is_equal(&*self.peek_token, token)
+        mem::discriminant(&*self.peek_token) == mem::discriminant(token)
     }
 
 

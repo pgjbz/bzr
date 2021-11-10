@@ -1,1 +1,1 @@
-let a bool = 10;
+let meu_texto str = 10;
