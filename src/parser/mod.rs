@@ -127,7 +127,7 @@ impl<'a> Parser<'a> {
 
 impl Node for String {
     fn literal(&self) -> String {
-        todo!()
+        self.to_string()
     }
 }
 
