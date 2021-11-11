@@ -266,26 +266,29 @@ impl Display for Token {
                 (_, _) => "number".to_string(),
             },
             Self::Illegal(val, pos) => match (val, pos) {
-                (Some(_), Some(pos)) => {
+                (Some(val), Some(pos)) => {
                     format!(
-                        "'illegal' in {}:{}:{}",
-                        pos.filename, pos.line, pos.position
+                        "'illegal ({})' in {}:{}:{}",
+                        val, pos.filename, pos.line, pos.position
                     )
                 }
                 (_, _) => "illegal".to_string(),
             },
             Self::Ident(val, pos) => match (val, pos) {
-                (Some(_), Some(pos)) => {
+                (Some(val), Some(pos)) => {
                     format!(
-                        "'identifier' in {}:{}:{}",
-                        pos.filename, pos.line, pos.position
+                        "'identifier ({})' in {}:{}:{}",
+                        val, pos.filename, pos.line, pos.position
                     )
                 }
                 (_, _) => "identifier".to_string(),
             },
             Self::String(val, pos) => match (val, pos) {
-                (Some(_), Some(pos)) => {
-                    format!("'String' in {}:{}:{}", pos.filename, pos.line, pos.position)
+                (Some(val), Some(pos)) => {
+                    format!(
+                        "'String' ({}) in {}:{}:{}",
+                        val, pos.filename, pos.line, pos.position
+                    )
                 }
                 (_, _) => "String".to_string(),
             },

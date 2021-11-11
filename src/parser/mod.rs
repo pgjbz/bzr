@@ -100,7 +100,7 @@ impl Parser {
             val = v;
         }
         self.print_error_str_empty(&val);
-        if let Some(expression) = Self::parse_expression(self, Precedence::Lowest, val, &typ) {
+        if let Ok(expression) = Self::parse_expression(self, Precedence::Lowest, val, &typ) {
             Some(Let::new(Token::Let(None), typ, identifier, expression))
         } else {
             None
@@ -138,7 +138,7 @@ impl Parser {
             val = v;
         }
         self.print_error_str_empty(&val);
-        if let Some(expression) = Self::parse_expression(self, Precedence::Lowest, val, &typ) {
+        if let Ok(expression) = Self::parse_expression(self, Precedence::Lowest, val, &typ) {
             Some(Var::new(Token::Var(None), typ, identifier, expression))
         } else {
             None
@@ -147,9 +147,6 @@ impl Parser {
 
     fn print_error_str_empty(&mut self, str: &str) {
         if str.is_empty() {
-            for error in &mut self.errors {
-                println!("{}", error);
-            }
             let tok = self.current_token.as_ref();
             self.errors
                 .push(format!("Error expected value got {}", tok))
@@ -221,30 +218,36 @@ impl Parser {
         precedence: Precedence,
         val: String,
         typ: &Type,
-    ) -> Option<Box<dyn Expression>> {
+    ) -> Result<Box<dyn Expression>, String> {
         match precedence {
             Precedence::Lowest => {
                 if self.expected_peek(Token::Semicolon(None), true) {
                     match typ {
                         Type::Int => {
                             if let Ok(value) = val.parse() {
-                                Some(Box::new(IntEx::new(value)))
+                                Ok(Box::new(IntEx::new(value)))
                             } else {
-                                None
+                                Err(format!(
+                                    "Error on parse token value {} {}",
+                                    val, self.current_token
+                                ))
                             }
                         }
-                        Type::String => Some(Box::new(StrEx::new(val))),
+                        Type::String => Ok(Box::new(StrEx::new(val))),
                         Type::Bool => {
                             if let Ok(value) = val.parse() {
-                                Some(Box::new(BoolEx::new(value)))
+                                Ok(Box::new(BoolEx::new(value)))
                             } else {
-                                None
+                                Err(format!(
+                                    "Error on parse token value {} {}",
+                                    val, self.current_token
+                                ))
                             }
                         }
-                        Type::Unknown => None,
+                        Type::Unknown => Err("Unknown type".to_string()),
                     }
                 } else {
-                    None
+                    Err(format!("Error on parse token value {}", self.current_token))
                 }
             }
         }
