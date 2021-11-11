@@ -31,7 +31,7 @@ impl Lexer {
     pub fn next_token(&mut self) -> Rc<Token> {
         self.read_char();
         self.skip_whitespace();
-        let line_position = self.line_position;
+        let line_position = self.line_position - 1;
         let line = self.line;
         let filename = Rc::clone(&self.filename);
         let token = if let Some(ch) = &self.ch {
@@ -161,9 +161,6 @@ impl Lexer {
                     token
                 }
                 _ => {
-                    let line_position = self.line_position;
-                    let line = self.line;
-                    let filename = Rc::clone(&self.filename);
                     if Self::is_letter(Some(*ch)) {
                         let ident: &str = Self::read_identifier(self);
                         match Token::get_keyword_token(
