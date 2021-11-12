@@ -7,7 +7,7 @@ use crate::{
         identifier::Identifier,
         program::Program,
         statement::Statement,
-        stmt::{letsts::Let, varsts::Var},
+        stmt::{letstmt::Let, varstmt::Var},
         types::Type,
     },
     lexer::{token::Token, Lexer},
