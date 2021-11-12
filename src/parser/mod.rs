@@ -2,12 +2,12 @@ use std::{cell::RefCell, mem, rc::Rc};
 
 use crate::{
     ast::{
+        expr::{boolexpr::BoolExpr, intexpr::IntExpr, strexpr::StrExpr},
         expression::Expression,
-        exs::{boolex::BoolEx, intex::IntEx, strex::StrEx},
         identifier::Identifier,
         program::Program,
         statement::Statement,
-        sts::{letsts::Let, varsts::Var},
+        stmt::{letsts::Let, varsts::Var},
         types::Type,
     },
     lexer::{token::Token, Lexer},
@@ -225,7 +225,7 @@ impl Parser {
                     match typ {
                         Type::Int => {
                             if let Ok(value) = val.parse() {
-                                Ok(Box::new(IntEx::new(value)))
+                                Ok(Box::new(IntExpr::new(value)))
                             } else {
                                 Err(format!(
                                     "Error on parse token value {} {}",
@@ -233,10 +233,10 @@ impl Parser {
                                 ))
                             }
                         }
-                        Type::String => Ok(Box::new(StrEx::new(val))),
+                        Type::String => Ok(Box::new(StrExpr::new(val))),
                         Type::Bool => {
                             if let Ok(value) = val.parse() {
-                                Ok(Box::new(BoolEx::new(value)))
+                                Ok(Box::new(BoolExpr::new(value)))
                             } else {
                                 Err(format!(
                                     "Error on parse token value {} {}",

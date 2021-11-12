@@ -2,23 +2,23 @@ use std::fmt::Display;
 
 use crate::ast::{expression::Expression, node::Node};
 
-pub struct StrEx {
+pub struct StrExpr {
     value: String,
 }
 
-impl StrEx {
+impl StrExpr {
     pub fn new(value: String) -> Self {
         Self { value }
     }
 }
 
-impl Node for StrEx {
+impl Node for StrExpr {
     fn literal(&self) -> Box<dyn Display> {
         Box::new(self.value.to_string())
     }
 }
 
-impl Expression for StrEx {
+impl Expression for StrExpr {
     fn expression(&self) {
         todo!()
     }

@@ -2,23 +2,23 @@ use std::fmt::Display;
 
 use crate::ast::{expression::Expression, node::Node};
 
-pub struct IntEx {
-    value: i64,
+pub struct BoolExpr {
+    value: bool,
 }
 
-impl IntEx {
-    pub fn new(value: i64) -> Self {
+impl BoolExpr {
+    pub fn new(value: bool) -> Self {
         Self { value }
     }
 }
 
-impl Node for IntEx {
+impl Node for BoolExpr {
     fn literal(&self) -> Box<dyn Display> {
         Box::new(self.value)
     }
 }
 
-impl Expression for IntEx {
+impl Expression for BoolExpr {
     fn expression(&self) {
         todo!()
     }
