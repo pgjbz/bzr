@@ -1,4 +1,4 @@
-use std::{cell::RefCell, mem, rc::Rc};
+use std::{mem, rc::Rc};
 
 use crate::{
     ast::{
@@ -18,16 +18,16 @@ enum Precedence {
 }
 
 pub struct Parser {
-    lexer: RefCell<Lexer>,
+    lexer: Lexer,
     current_token: Rc<Token>,
     peek_token: Rc<Token>,
     errors: Vec<String>,
 }
 
 impl Parser {
-    pub fn new(lexer: RefCell<Lexer>) -> Self {
-        let current_token = lexer.borrow_mut().next_token();
-        let peek_token = lexer.borrow_mut().next_token();
+    pub fn new(mut lexer: Lexer) -> Self {
+        let current_token = lexer.next_token();
+        let peek_token = lexer.next_token();
         Self {
             lexer,
             current_token,
@@ -66,7 +66,7 @@ impl Parser {
 
     fn next_token(&mut self) {
         mem::swap(&mut self.current_token, &mut self.peek_token);
-        self.peek_token = self.lexer.borrow_mut().next_token();
+        self.peek_token = self.lexer.next_token();
     }
 
     fn parse_let_sts(&mut self) -> Option<Box<dyn Statement>> {

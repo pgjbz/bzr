@@ -1,4 +1,4 @@
-use std::{cell::RefCell, env, fs, rc::Rc};
+use std::{env, fs, rc::Rc};
 
 use bzr::{lexer::Lexer, parser::Parser};
 
@@ -8,7 +8,7 @@ fn main() {
 
     let lexer = Lexer::new(Rc::new(input), Rc::new(filename));
 
-    let parse = Parser::new(RefCell::new(lexer));
+    let parse = Parser::new(lexer);
 
     let program = parse.parse_program();
 
