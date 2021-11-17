@@ -63,7 +63,27 @@ impl Lexer {
                     token
                 }
                 '+' => Token::Plus(Some(Location::new(line_position, line, filename))),
-                '-' => Token::Minus(Some(Location::new(line_position, line, filename))),
+                '-' => {
+                    let mut token = Token::Minus(Some(Location::new(
+                        line_position,
+                        line,
+                        Rc::clone(&filename),
+                    )));
+                    let next_char = Self::peek_next_char(self, None);
+                    if Self::is_number(Some(next_char)) {
+                        self.read_char();
+                        let ident: &str = self.read_number();
+                        if Self::valid_number_sufix(Some(next_char)) {
+                            token = Token::Number(
+                                Some(Rc::new(format!("-{}", ident))),
+                                Some(Location::new(line_position, line, filename)),
+                            )
+                        } else {
+                            self.read_char();
+                        }
+                    }
+                    token
+                }
                 '!' => {
                     let mut token: Token = Token::Bang(Some(Location::new(
                         line_position,
@@ -174,24 +194,13 @@ impl Lexer {
                             ),
                         }
                     } else if Self::is_number(Some(*ch)) {
-                        //TODO: improve this
                         let next_char = Self::peek_next_char(self, Some(1));
-                        let ident: &str = Self::read_number(self);
+                        let ident: &str = self.read_number();
                         let mut token: Token = Token::Illegal(
                             Some(Rc::new(String::from(ident))),
                             Some(Location::new(line_position, line, Rc::clone(&filename))),
                         );
-                        if Self::is_math_simbol(next_char)
-                            || Self::is_whitespace(Some(next_char))
-                            || next_char == ';'
-                            || next_char == '{'
-                            || next_char == '&'
-                            || next_char == '\0' //TODO: check if this is necessary
-                            || next_char == '!'
-                            || next_char == ','
-                            || next_char == ']'
-                            || Self::is_number(Some(next_char))
-                        {
+                        if Self::valid_number_sufix(Some(next_char)) {
                             token = Token::Number(
                                 Some(Rc::new(String::from(ident))),
                                 Some(Location::new(line_position, line, filename)),
@@ -218,6 +227,22 @@ impl Lexer {
         Rc::new(token)
     }
 
+    fn valid_number_sufix(ch: Option<char>) -> bool {
+        if let Some(ch) = ch {
+            Self::is_math_simbol(ch)
+                            || Self::is_whitespace(Some(ch))
+                            || ch == ';'
+                            || ch == '{'
+                            || ch == '&'
+                            || ch == '\0' //TODO: check if this is necessary
+                            || ch == '!'
+                            || ch == ','
+                            || ch == ']'
+                            || Self::is_number(Some(ch))
+        } else {
+            false
+        }
+    }
     fn skip_whitespace(&mut self) {
         loop {
             if Self::is_whitespace(self.ch) {
