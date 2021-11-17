@@ -74,34 +74,13 @@ impl Parser {
             return None;
         }
 
-        let identifier = match self.current_token.as_ref() {
-            Token::Ident(identifier, _) => identifier,
-            _ => return None,
-        };
-
-        let identifier = Identifier::new(Some(Rc::clone(identifier.as_ref().unwrap())));
-
-        let typ: Type;
-        let val: String;
-        if self.has_type() {
-            typ = self.extract_type();
-            if !self.expected_peek(Token::Assign(None), true) {
-                return None;
+        if let Some((identifier, typ, val)) = self.extract_variables_fields() {
+            self.print_error_str_empty(&val);
+            if let Ok(expression) = Self::parse_expression(self, Precedence::Lowest, val, &typ) {
+                Some(Let::new(Token::Let(None), typ, identifier, expression))
+            } else {
+                None
             }
-            self.next_token();
-            val = self.extract_value(&typ);
-        } else {
-            if !self.expected_peek(Token::Assign(None), true) {
-                return None;
-            }
-            self.next_token();
-            let (t, v) = self.extract_value_and_type();
-            typ = t;
-            val = v;
-        }
-        self.print_error_str_empty(&val);
-        if let Ok(expression) = Self::parse_expression(self, Precedence::Lowest, val, &typ) {
-            Some(Let::new(Token::Let(None), typ, identifier, expression))
         } else {
             None
         }
@@ -111,7 +90,19 @@ impl Parser {
         if !self.expected_peek(Token::Ident(None, None), true) {
             return None;
         }
+        if let Some((identifier, typ, val)) = self.extract_variables_fields() {
+            self.print_error_str_empty(&val);
+            if let Ok(expression) = Self::parse_expression(self, Precedence::Lowest, val, &typ) {
+                Some(Var::new(Token::Var(None), typ, identifier, expression))
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
 
+    fn extract_variables_fields(&mut self) -> Option<(Identifier, Type, String)> {
         let identifier = match self.current_token.as_ref() {
             Token::Ident(identifier, _) => identifier,
             _ => return None,
@@ -137,12 +128,7 @@ impl Parser {
             typ = t;
             val = v;
         }
-        self.print_error_str_empty(&val);
-        if let Ok(expression) = Self::parse_expression(self, Precedence::Lowest, val, &typ) {
-            Some(Var::new(Token::Var(None), typ, identifier, expression))
-        } else {
-            None
-        }
+        Some((identifier, typ, val))
     }
 
     fn print_error_str_empty(&mut self, str: &str) {

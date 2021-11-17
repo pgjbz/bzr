@@ -7,4 +7,7 @@ let another_text = "txt";
 let boolean bool = false;
 let another_boolean = true;
 
-let bool = false;
+let bool = true;
+let n int = false;
+let string str = 10;
+let a = "a;

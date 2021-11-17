@@ -8,3 +8,6 @@ var boolean bool = false;
 var another_boolean = true;
 
 var bool = true;
+var n int = false;
+var string str = 10;
+var a = "a;
