@@ -1,6 +1,17 @@
 use std::{mem, process, rc::Rc};
 
-use crate::{ast::{expr::{boolexpr::BoolExpr, intexpr::IntExpr, strexpr::StrExpr}, expression::{self, Expression}, identifier::Identifier, program::Program, statement::Statement, stmt::{letstmt::Let, varstmt::Var}, types::Type}, lexer::{token::Token, Lexer}};
+use crate::{
+    ast::{
+        expr::{boolexpr::BoolExpr, intexpr::IntExpr, strexpr::StrExpr},
+        expression::Expression,
+        identifier::Identifier,
+        program::Program,
+        statement::Statement,
+        stmt::{letstmt::Let, varstmt::Var},
+        types::Type,
+    },
+    lexer::{token::Token, Lexer},
+};
 
 enum Precedence {
     Lowest,
@@ -46,9 +57,7 @@ impl Parser {
             Token::Let(_) => self.parse_let_sts(),
             Token::Var(_) => self.parse_var_sts(),
             Token::EOF(_) => None,
-            _ => {
-                None
-            }
+            _ => None,
         }
     }
 
@@ -172,11 +181,11 @@ impl Parser {
             Token::True(_) => {
                 typ = Type::Bool;
                 "true".to_string()
-            },  
+            }
             Token::False(_) => {
                 typ = Type::Bool;
                 "false".to_string()
-            },
+            }
             Token::Number(val, _) => {
                 typ = Type::Int;
                 val.as_ref().unwrap().as_ref().clone()
