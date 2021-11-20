@@ -1,17 +1,6 @@
-use std::{mem, rc::Rc};
+use std::{mem, process, rc::Rc};
 
-use crate::{
-    ast::{
-        expr::{boolexpr::BoolExpr, intexpr::IntExpr, strexpr::StrExpr},
-        expression::Expression,
-        identifier::Identifier,
-        program::Program,
-        statement::Statement,
-        stmt::{letstmt::Let, varstmt::Var},
-        types::Type,
-    },
-    lexer::{token::Token, Lexer},
-};
+use crate::{ast::{expr::{boolexpr::BoolExpr, intexpr::IntExpr, strexpr::StrExpr}, expression::{self, Expression}, identifier::Identifier, program::Program, statement::Statement, stmt::{letstmt::Let, varstmt::Var}, types::Type}, lexer::{token::Token, Lexer}};
 
 enum Precedence {
     Lowest,
@@ -58,7 +47,6 @@ impl Parser {
             Token::Var(_) => self.parse_var_sts(),
             Token::EOF(_) => None,
             _ => {
-                self.current_token = Rc::new(Token::EOF(None));
                 None
             }
         }
@@ -76,10 +64,12 @@ impl Parser {
 
         if let Some((identifier, typ, val)) = self.extract_variables_fields() {
             self.print_error_str_empty(&val);
-            if let Ok(expression) = Self::parse_expression(self, Precedence::Lowest, val, &typ) {
-                Some(Let::new(Token::Let(None), typ, identifier, expression))
-            } else {
-                None
+            match Self::parse_expression(self, Precedence::Lowest, val, &typ) {
+                Ok(expression) => Some(Let::new(Token::Let(None), typ, identifier, expression)),
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    process::exit(1);
+                }
             }
         } else {
             None
@@ -92,10 +82,12 @@ impl Parser {
         }
         if let Some((identifier, typ, val)) = self.extract_variables_fields() {
             self.print_error_str_empty(&val);
-            if let Ok(expression) = Self::parse_expression(self, Precedence::Lowest, val, &typ) {
-                Some(Var::new(Token::Var(None), typ, identifier, expression))
-            } else {
-                None
+            match Self::parse_expression(self, Precedence::Lowest, val, &typ) {
+                Ok(expression) => Some(Var::new(Token::Let(None), typ, identifier, expression)),
+                Err(e) => {
+                    eprintln!("Error: {}", e);
+                    process::exit(1);
+                }
             }
         } else {
             None
@@ -177,10 +169,14 @@ impl Parser {
     fn extract_value_and_type(&mut self) -> (Type, String) {
         let typ: Type;
         let val = match self.current_token.as_ref() {
-            Token::True(_) | Token::False(_) => {
+            Token::True(_) => {
                 typ = Type::Bool;
-                format!("{}", typ)
-            }
+                "true".to_string()
+            },  
+            Token::False(_) => {
+                typ = Type::Bool;
+                "false".to_string()
+            },
             Token::Number(val, _) => {
                 typ = Type::Int;
                 val.as_ref().unwrap().as_ref().clone()
