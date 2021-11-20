@@ -1,4 +1,4 @@
-use std::{mem, process, rc::Rc};
+use std::{mem, rc::Rc};
 
 use crate::{
     ast::{
@@ -77,7 +77,7 @@ impl Parser {
                 Ok(expression) => Some(Let::new(Token::Let(None), typ, identifier, expression)),
                 Err(e) => {
                     eprintln!("Error: {}", e);
-                    process::exit(1);
+                    None
                 }
             }
         } else {
@@ -95,7 +95,7 @@ impl Parser {
                 Ok(expression) => Some(Var::new(Token::Let(None), typ, identifier, expression)),
                 Err(e) => {
                     eprintln!("Error: {}", e);
-                    process::exit(1);
+                    None
                 }
             }
         } else {
