@@ -39,8 +39,8 @@ impl Parser {
     pub fn parse_program(mut self) -> Box<Program> {
         let mut statements = vec![];
         while !self.current_token_is(Token::EOF(None)) {
-            if let Some(sts) = self.parse_statement() {
-                statements.push(sts)
+            if let Some(stmt) = self.parse_statement() {
+                statements.push(stmt)
             } else {
                 self.next_token();
             }
@@ -54,8 +54,8 @@ impl Parser {
 
     fn parse_statement(&mut self) -> Option<Box<dyn Statement>> {
         match *self.current_token {
-            Token::Let(_) => self.parse_let_sts(),
-            Token::Var(_) => self.parse_var_sts(),
+            Token::Let(_) => self.parse_let_stmt(),
+            Token::Var(_) => self.parse_var_stmt(),
             Token::EOF(_) => None,
             _ => None,
         }
@@ -66,7 +66,7 @@ impl Parser {
         self.peek_token = self.lexer.next_token();
     }
 
-    fn parse_let_sts(&mut self) -> Option<Box<dyn Statement>> {
+    fn parse_let_stmt(&mut self) -> Option<Box<dyn Statement>> {
         if !self.expected_peek(Token::Ident(None, None), true) {
             return None;
         }
@@ -86,7 +86,7 @@ impl Parser {
         }
     }
 
-    fn parse_var_sts(&mut self) -> Option<Box<dyn Statement>> {
+    fn parse_var_stmt(&mut self) -> Option<Box<dyn Statement>> {
         if !self.expected_peek(Token::Ident(None, None), true) {
             return None;
         }
