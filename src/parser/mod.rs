@@ -53,7 +53,7 @@ impl Parser {
     }
 
     fn parse_statement(&mut self) -> Option<Box<dyn Statement>> {
-        match self.current_token.as_ref() {
+        match *self.current_token {
             Token::Let(_) => self.parse_let_sts(),
             Token::Var(_) => self.parse_var_sts(),
             Token::EOF(_) => None,
@@ -72,6 +72,7 @@ impl Parser {
         }
 
         if let Some((identifier, typ, val)) = self.extract_variables_fields() {
+            //TODO: consumes expression before var statement
             self.print_error_str_empty(&val);
             match Self::parse_expression(self, Precedence::Lowest, val, &typ) {
                 Ok(expression) => Some(Let::new(Token::Let(None), typ, identifier, expression)),
@@ -147,7 +148,7 @@ impl Parser {
     }
 
     fn extract_type(&self) -> Type {
-        match self.current_token.as_ref() {
+        match *self.current_token {
             Token::Int(_) => Type::Int,
             Token::Str(_) => Type::String,
             Token::Bool(_) => Type::Bool,
