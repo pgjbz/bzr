@@ -1,2 +1,2 @@
-pub mod letstmt;
-pub mod varstmt;
+pub mod let_stmt;
+pub mod var_stmt;

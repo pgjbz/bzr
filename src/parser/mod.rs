@@ -2,12 +2,12 @@ use std::{mem, rc::Rc};
 
 use crate::{
     ast::{
-        expr::{boolexpr::BoolExpr, intexpr::IntExpr, strexpr::StrExpr},
+        expr::{bool_expr::BoolExpr, int_expr::IntExpr, str_expr::StrExpr},
         expression::Expression,
         identifier::Identifier,
         program::Program,
         statement::Statement,
-        stmt::{letstmt::Let, varstmt::Var},
+        stmt::{let_stmt::Let, var_stmt::Var},
         types::Type,
     },
     lexer::{token::Token, Lexer},
@@ -39,8 +39,8 @@ impl Parser {
     pub fn parse_program(mut self) -> Box<Program> {
         let mut statements = vec![];
         while !self.current_token_is(Token::EOF(None)) {
-            if let Some(stmt) = self.parse_statement() {
-                statements.push(stmt)
+            if let Ok(sts) = self.parse_statement() {
+                statements.push(sts)
             } else {
                 self.next_token();
             }
@@ -52,12 +52,12 @@ impl Parser {
         Program::new(statements, errors)
     }
 
-    fn parse_statement(&mut self) -> Option<Box<dyn Statement>> {
-        match *self.current_token {
-            Token::Let(_) => self.parse_let_stmt(),
-            Token::Var(_) => self.parse_var_stmt(),
-            Token::EOF(_) => None,
-            _ => None,
+    fn parse_statement(&mut self) -> Result<Box<dyn Statement>, ()> {
+        match self.current_token.as_ref() {
+            Token::Let(_) => self.parse_let_sts(),
+            Token::Var(_) => self.parse_var_sts(),
+            Token::EOF(_) => Err(()),
+            _ => Err(()),
         }
     }
 
@@ -66,41 +66,41 @@ impl Parser {
         self.peek_token = self.lexer.next_token();
     }
 
-    fn parse_let_stmt(&mut self) -> Option<Box<dyn Statement>> {
+    fn parse_let_sts(&mut self) -> Result<Box<dyn Statement>, ()> {
         if !self.expected_peek(Token::Ident(None, None), true) {
-            return None;
+            return Err(());
         }
 
         if let Some((identifier, typ, val)) = self.extract_variables_fields() {
             //TODO: consumes expression before var statement
             self.print_error_str_empty(&val);
             match Self::parse_expression(self, Precedence::Lowest, val, &typ) {
-                Ok(expression) => Some(Let::new(Token::Let(None), typ, identifier, expression)),
+                Ok(expression) => Ok(Let::new(Token::Let(None), typ, identifier, expression)),
                 Err(e) => {
                     eprintln!("Error: {}", e);
-                    None
+                    Err(())
                 }
             }
         } else {
-            None
+            Err(())
         }
     }
 
-    fn parse_var_stmt(&mut self) -> Option<Box<dyn Statement>> {
+    fn parse_var_sts(&mut self) -> Result<Box<dyn Statement>, ()> {
         if !self.expected_peek(Token::Ident(None, None), true) {
-            return None;
+            return Err(());
         }
         if let Some((identifier, typ, val)) = self.extract_variables_fields() {
             self.print_error_str_empty(&val);
             match Self::parse_expression(self, Precedence::Lowest, val, &typ) {
-                Ok(expression) => Some(Var::new(Token::Let(None), typ, identifier, expression)),
+                Ok(expression) => Ok(Var::new(Token::Let(None), typ, identifier, expression)),
                 Err(e) => {
                     eprintln!("Error: {}", e);
-                    None
+                    Err(())
                 }
             }
         } else {
-            None
+            Err(())
         }
     }
 
