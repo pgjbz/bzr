@@ -67,7 +67,7 @@ impl Parser {
     }
 
     fn parse_let_sts(&mut self) -> Result<Box<dyn Statement>, ()> {
-        if !self.expected_peek(Token::Ident(None, None), true) {
+        if !self.expected_peek(Token::Ident(None, None)) {
             return Err(());
         }
 
@@ -87,7 +87,7 @@ impl Parser {
     }
 
     fn parse_var_sts(&mut self) -> Result<Box<dyn Statement>, ()> {
-        if !self.expected_peek(Token::Ident(None, None), true) {
+        if !self.expected_peek(Token::Ident(None, None)) {
             return Err(());
         }
         if let Some((identifier, typ, val)) = self.extract_variables_fields() {
@@ -115,14 +115,15 @@ impl Parser {
         let typ: Type;
         let val: String;
         if self.has_type() {
+            self.next_token();
             typ = self.extract_type();
-            if !self.expected_peek(Token::Assign(None), true) {
+            if !self.expected_peek(Token::Assign(None)) {
                 return None;
             }
             self.next_token();
             val = self.extract_value(&typ);
         } else {
-            if !self.expected_peek(Token::Assign(None), true) {
+            if !self.expected_peek(Token::Assign(None)) {
                 return None;
             }
             self.next_token();
@@ -142,9 +143,9 @@ impl Parser {
     }
 
     fn has_type(&mut self) -> bool {
-        self.expected_peek(Token::Int(None), false)
-            || self.expected_peek(Token::Str(None), false)
-            || self.expected_peek(Token::Bool(None), false)
+        self.peek_token_is(&Token::Int(None))
+            || self.peek_token_is(&Token::Str(None))
+            || self.peek_token_is(&Token::Bool(None))
     }
 
     fn extract_type(&self) -> Type {
@@ -213,7 +214,7 @@ impl Parser {
     ) -> Result<Box<dyn Expression>, String> {
         match precedence {
             Precedence::Lowest => {
-                if self.expected_peek(Token::Semicolon(None), true) {
+                if self.expected_peek(Token::Semicolon(None)) {
                     self.next_token();
                     match typ {
                         Type::Int => {
@@ -246,14 +247,13 @@ impl Parser {
         }
     }
 
-    fn expected_peek(&mut self, token: Token, register_error: bool) -> bool {
+    //TODO: verify if possible to use Result and Remove register_error paramater
+    fn expected_peek(&mut self, token: Token) -> bool {
         if self.peek_token_is(&token) {
             self.next_token();
             return true;
         }
-        if register_error {
-            self.peek_error(&token);
-        }
+        self.peek_error(&token);
         false
     }
 
