@@ -48,4 +48,8 @@ impl Statement for Var {
     fn statement(&self) {
         todo!()
     }
+
+    fn get_statament_token(&self) -> Token {
+        Token::Var(None)
+    }
 }
