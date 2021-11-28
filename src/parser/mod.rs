@@ -114,6 +114,7 @@ impl Parser {
 
         let typ: Type;
         let val: String;
+        //TODO: Use methods to get type to improve this método type validation
         if self.has_type() {
             self.next_token();
             typ = self.extract_type();
