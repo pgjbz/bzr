@@ -1,3 +1,5 @@
+mod errors;
+
 use std::{mem, rc::Rc};
 
 use crate::{
@@ -12,6 +14,8 @@ use crate::{
     },
     lexer::{token::Token, Lexer},
 };
+
+use self::errors::ParseError;
 
 enum Precedence {
     Lowest,
@@ -38,26 +42,28 @@ impl Parser {
 
     pub fn parse_program(mut self) -> Box<Program> {
         let mut statements = vec![];
-        while !self.current_token_is(Token::EOF(None)) {
-            if let Ok(sts) = self.parse_statement() {
-                statements.push(sts)
-            } else {
-                self.next_token();
+        'parse: loop {
+            match self.parse_statement() {
+                Ok(sts) => statements.push(sts),
+                Err(e) => match e {
+                    ParseError::Eof => break 'parse,
+                    ParseError::Unknown => self.next_token(),
+                    ParseError::Message(msg) => {
+                        self.next_token();
+                        self.errors.push(msg)
+                    }
+                },
             }
         }
-        let mut errors = vec![];
-        for error in &mut self.errors {
-            errors.push(error.clone());
-        }
-        Program::new(statements, errors)
+        Program::new(statements, self.errors)
     }
 
-    fn parse_statement(&mut self) -> Result<Box<dyn Statement>, ()> {
+    fn parse_statement(&mut self) -> Result<Box<dyn Statement>, ParseError> {
         match self.current_token.as_ref() {
             Token::Let(_) => self.parse_let_sts(),
             Token::Var(_) => self.parse_var_sts(),
-            Token::EOF(_) => Err(()),
-            _ => Err(()),
+            Token::EOF(_) => Err(ParseError::Eof),
+            _ => Err(ParseError::Unknown),
         }
     }
 
@@ -66,48 +72,41 @@ impl Parser {
         self.peek_token = self.lexer.next_token();
     }
 
-    fn parse_let_sts(&mut self) -> Result<Box<dyn Statement>, ()> {
-        if !self.expected_peek(Token::Ident(None, None)) {
-            return Err(());
-        }
-
-        if let Some((identifier, typ, val)) = self.extract_variables_fields() {
-            //TODO: consumes expression before var statement
-            self.print_error_str_empty(&val);
-            match Self::parse_expression(self, Precedence::Lowest, val, &typ) {
-                Ok(expression) => Ok(Let::new(Token::Let(None), typ, identifier, expression)),
-                Err(e) => {
-                    eprintln!("Error: {}", e);
-                    Err(())
+    fn parse_let_sts(&mut self) -> Result<Box<dyn Statement>, ParseError> {
+        self.expected_peek(Token::Ident(None, None))?;
+        match self.extract_variables_fields() {
+            Ok((identifier, typ, val)) => {
+                self.print_error_str_empty(&val);
+                match Self::parse_expression(self, Precedence::Lowest, val, &typ) {
+                    Ok(expression) => Ok(Let::new(Token::Let(None), typ, identifier, expression)),
+                    Err(e) => Err(e),
                 }
             }
-        } else {
-            Err(())
+            Err(e) => Err(e),
         }
     }
 
-    fn parse_var_sts(&mut self) -> Result<Box<dyn Statement>, ()> {
-        if !self.expected_peek(Token::Ident(None, None)) {
-            return Err(());
-        }
-        if let Some((identifier, typ, val)) = self.extract_variables_fields() {
-            self.print_error_str_empty(&val);
-            match Self::parse_expression(self, Precedence::Lowest, val, &typ) {
-                Ok(expression) => Ok(Var::new(Token::Let(None), typ, identifier, expression)),
-                Err(e) => {
-                    eprintln!("Error: {}", e);
-                    Err(())
+    fn parse_var_sts(&mut self) -> Result<Box<dyn Statement>, ParseError> {
+        self.expected_peek(Token::Ident(None, None))?;
+        match self.extract_variables_fields() {
+            Ok((identifier, typ, val)) => {
+                self.print_error_str_empty(&val);
+                match Self::parse_expression(self, Precedence::Lowest, val, &typ) {
+                    Ok(expression) => Ok(Var::new(Token::Let(None), typ, identifier, expression)),
+                    Err(e) => Err(e),
                 }
             }
-        } else {
-            Err(())
+            Err(e) => Err(e),
         }
     }
 
-    fn extract_variables_fields(&mut self) -> Option<(Identifier, Type, String)> {
+    fn extract_variables_fields(&mut self) -> Result<(Identifier, Type, String), ParseError> {
         let identifier = match self.current_token.as_ref() {
             Token::Ident(identifier, _) => identifier,
-            _ => return None,
+            tok => {
+                let msg = format!("Expected identifier, got {}", tok);
+                return Err(ParseError::Message(msg));
+            }
         };
 
         let identifier = Identifier::new(Some(Rc::clone(identifier.as_ref().unwrap())));
@@ -118,21 +117,17 @@ impl Parser {
         if self.has_type() {
             self.next_token();
             typ = self.extract_type();
-            if !self.expected_peek(Token::Assign(None)) {
-                return None;
-            }
+            self.expected_peek(Token::Assign(None))?;
             self.next_token();
             val = self.extract_value(&typ);
         } else {
-            if !self.expected_peek(Token::Assign(None)) {
-                return None;
-            }
+            self.expected_peek(Token::Assign(None))?;
             self.next_token();
             let (t, v) = self.extract_value_and_type();
             typ = t;
             val = v;
         }
-        Some((identifier, typ, val))
+        Ok((identifier, typ, val))
     }
 
     fn print_error_str_empty(&mut self, str: &str) {
@@ -212,58 +207,56 @@ impl Parser {
         precedence: Precedence,
         val: String,
         typ: &Type,
-    ) -> Result<Box<dyn Expression>, String> {
+    ) -> Result<Box<dyn Expression>, ParseError> {
         match precedence {
             Precedence::Lowest => {
-                if self.expected_peek(Token::Semicolon(None)) {
-                    self.next_token();
-                    match typ {
-                        Type::Int => {
-                            if let Ok(value) = val.parse() {
-                                Ok(Box::new(IntExpr::new(value)))
-                            } else {
-                                Err(format!(
-                                    "Error on parse token value {} {}",
-                                    val, self.current_token
-                                ))
-                            }
+                self.expected_peek(Token::Semicolon(None))?;
+                self.next_token();
+                match typ {
+                    Type::Int => {
+                        if let Ok(value) = val.parse() {
+                            Ok(Box::new(IntExpr::new(value)))
+                        } else {
+                            let msg = format!(
+                                "Error on parse token value {} {}",
+                                val, self.current_token
+                            );
+                            Err(ParseError::Message(msg))
                         }
-                        Type::String => Ok(Box::new(StrExpr::new(val))),
-                        Type::Bool => {
-                            if let Ok(value) = val.parse() {
-                                Ok(Box::new(BoolExpr::new(value)))
-                            } else {
-                                Err(format!(
-                                    "Error on parse token value {} {}",
-                                    val, self.current_token
-                                ))
-                            }
-                        },
-                        Type::Function => {
-                            todo!()
-                        }
-                        Type::Unknown => Err("Unknown type".to_string()),
                     }
-                } else {
-                    Err(format!("Error on parse token value {}", self.current_token))
+                    Type::String => Ok(Box::new(StrExpr::new(val))),
+                    Type::Bool => {
+                        if let Ok(value) = val.parse() {
+                            Ok(Box::new(BoolExpr::new(value)))
+                        } else {
+                            let msg = format!(
+                                "Error on parse token value {} {}",
+                                val, self.current_token
+                            );
+                            Err(ParseError::Message(msg))
+                        }
+                    }
+                    Type::Function => {
+                        todo!()
+                    }
+                    Type::Unknown => {
+                        let msg = "Unknown type".to_string();
+                        Err(ParseError::Message(msg))
+                    }
                 }
             }
         }
     }
 
     //TODO: verify if possible to use Result and Remove register_error paramater
-    fn expected_peek(&mut self, token: Token) -> bool {
+    fn expected_peek(&mut self, token: Token) -> Result<(), ParseError> {
         if self.peek_token_is(&token) {
             self.next_token();
-            return true;
+            Ok(())
+        } else {
+            let msg = format!("expected {}, got {}", token, self.peek_token);
+            Err(ParseError::Message(msg))
         }
-        self.peek_error(&token);
-        false
-    }
-
-    fn peek_error(&mut self, token: &Token) {
-        let msg = format!("expected {}, got {}", token, self.peek_token);
-        self.errors.push(msg);
     }
 
     fn type_is_equal(token_compare: &Type, token: &Type) -> bool {
@@ -274,7 +267,7 @@ impl Parser {
         mem::discriminant(&*self.peek_token) == mem::discriminant(token)
     }
 
-    fn current_token_is(&mut self, token: Token) -> bool {
+    fn _current_token_is(&mut self, token: Token) -> bool {
         mem::discriminant(&*self.current_token) == mem::discriminant(&token)
     }
 }
