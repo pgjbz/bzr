@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::ast::{expression::Expression, node::Node};
+use crate::ast::{expression::Expression, node::Node, types::Type};
 
 pub struct StrExpr {
     value: String,
@@ -21,5 +21,9 @@ impl Node for StrExpr {
 impl Expression for StrExpr {
     fn expression(&self) {
         todo!()
+    }
+
+    fn get_type(&self) -> Type {
+        Type::String
     }
 }

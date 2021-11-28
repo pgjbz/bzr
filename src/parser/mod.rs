@@ -237,6 +237,9 @@ impl Parser {
                                     val, self.current_token
                                 ))
                             }
+                        },
+                        Type::Function => {
+                            todo!()
                         }
                         Type::Unknown => Err("Unknown type".to_string()),
                     }

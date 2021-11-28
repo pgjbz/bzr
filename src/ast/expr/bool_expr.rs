@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::ast::{expression::Expression, node::Node};
+use crate::ast::{expression::Expression, node::Node, types::Type};
 
 pub struct BoolExpr {
     value: bool,
@@ -21,5 +21,9 @@ impl Node for BoolExpr {
 impl Expression for BoolExpr {
     fn expression(&self) {
         todo!()
+    }
+
+    fn get_type(&self) -> Type {
+        Type::Bool
     }
 }

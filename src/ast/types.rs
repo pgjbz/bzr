@@ -5,6 +5,7 @@ pub enum Type {
     String,
     Int,
     Bool,
+    Function,
     Unknown,
 }
 
@@ -14,6 +15,7 @@ impl Display for Type {
             Self::String => "str",
             Self::Int => "int",
             Self::Bool => "bool",
+            Self::Function => "function",
             Self::Unknown => "unk",
         };
         write!(f, "{}", val)

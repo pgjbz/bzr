@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::ast::{expression::Expression, node::Node};
+use crate::ast::{expression::Expression, node::Node, types::Type};
 
 pub struct IntExpr {
     value: i64,
@@ -21,5 +21,9 @@ impl Node for IntExpr {
 impl Expression for IntExpr {
     fn expression(&self) {
         todo!()
+    }
+
+    fn get_type(&self) -> Type {
+        Type::Int
     }
 }
