@@ -25,7 +25,7 @@ impl Display for Var {
         stmt.push_str("= ");
         stmt.push_str(&self.value.to_string());
         stmt.push(';');
-        writeln!(f, "{}", stmt)
+        write!(f, "{}", stmt)
     }
 }
 

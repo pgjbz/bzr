@@ -2,18 +2,7 @@ pub mod errors;
 
 use std::{mem, rc::Rc, collections::HashMap};
 
-use crate::{
-    ast::{
-        expr::{bool_expr::{BoolExpr}, int_expr::IntExpr, prefix_expr::PrefixExpr},
-        expression::Expression,
-        identifier::Identifier,
-        program::Program,
-        statement::Statement,
-        stmt::{let_stmt::Let, return_stmt::Return, var_stmt::Var, expression_stmt::ExpressionStatement},
-        types::Type, PrefixParseFn, InfixParseFn,
-    },
-    lexer::{token::Token, Lexer},
-};
+use crate::{ast::{InfixParseFn, PrefixParseFn, expr::{bool_expr::{BoolExpr}, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr}, expression::Expression, identifier::Identifier, program::Program, statement::Statement, stmt::{let_stmt::Let, return_stmt::Return, var_stmt::Var, expression_stmt::ExpressionStatement}, types::Type}, lexer::{token::Token, Lexer}};
 
 use self::errors::ParseError;
 
@@ -48,6 +37,7 @@ impl Parser {
         prefix_parse_fns.insert(Token::Bang(None), Self::parse_prefix_expression);
         prefix_parse_fns.insert(Token::True(None), Self::parse_bool_literal);
         prefix_parse_fns.insert(Token::False(None), Self::parse_bool_literal);
+        prefix_parse_fns.insert(Token::String(None, None), Self::parse_string_literal);
         Self {
             lexer,
             current_token,
@@ -245,6 +235,19 @@ impl Parser {
         };
 
         Ok(Box::new(prefix_expr))
+    }
+
+    fn parse_string_literal(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
+        let current_token = Rc::clone(&parser.current_token);
+        let string = match parser.current_token.as_ref() {
+            Token::String(val, _) => val.as_ref().unwrap().as_ref().trim(),
+            tok => {
+                let msg = format!("expected boolean value got: {}", tok);
+                return Err(ParseError::Message(msg));
+            }
+        };
+        let string_expr = StrExpr::new(string.to_string(), current_token);
+        Ok(Box::new(string_expr))
     }
 
     fn expected_peek(&mut self, token: Token) -> Result<(), ParseError> {
