@@ -1,4 +1,4 @@
-mod errors;
+pub mod errors;
 
 use std::{mem, rc::Rc};
 

@@ -1,6 +1,14 @@
+use bzr::ast::expression::Expression;
 use std::rc::Rc;
 
-use bzr::{lexer::Lexer, parser::Parser};
+use bzr::{
+    ast::{
+        expr::int_expr::IntExpr, identifier::Identifier, program::Program, statement::Statement,
+        stmt::let_stmt::Let, types::Type,
+    },
+    lexer::{token::Token, Lexer},
+    parser::Parser,
+};
 
 #[test]
 fn test_parse_let_int_type() {
@@ -172,4 +180,17 @@ fn test_parse_return_type() {
     let progrma = parser.parse_program();
     assert!(progrma.errors.len() <= 0);
     assert!(progrma.statements.len() > 0);
+}
+
+#[test]
+fn test_program_to_string() {
+    let token = Rc::new(Token::Let(None));
+    let typ = Type::Int;
+    let identifier = Identifier::new(Some(Rc::new("my_var".to_string())));
+    let expr: Box<dyn Expression> = Box::new(IntExpr::new(10, Rc::new(Token::Number(None, None))));
+    let statements: Vec<Box<dyn Statement>> =
+        vec![Let::new(token, typ, identifier, expr)];
+    let program = Program::new(statements, vec![]);
+    let program_str = program.to_string();
+    assert_eq!("let my_var int = 10;\n", program_str);
 }

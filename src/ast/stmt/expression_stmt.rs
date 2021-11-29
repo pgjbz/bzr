@@ -35,8 +35,8 @@ impl Expression for ExpressionStatement {
 impl Display for ExpressionStatement {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut expr = String::new();
-        while let Some(ref expression) = self.expression {
-            expr.push_str(&format!("{}", expression));
+        if let Some(ref expression) = self.expression {
+            expr.push_str(&expression.to_string());
         }
         write!(f, "{}", expr)
     }
