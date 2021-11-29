@@ -3,7 +3,7 @@ use std::rc::Rc;
 
 use crate::{
     ast::{
-        expression::Expression, identifier::Identifier, node::Node, statement::Statement,
+        expression::Expression, node::Node, statement::Statement,
         types::Type,
     },
     lexer::token::Token,
@@ -12,7 +12,7 @@ use crate::{
 pub struct Let {
     pub token: Rc<Token>,
     typ: Type,
-    name: Identifier,
+    name: Box<dyn Expression>,
     value: Box<dyn Expression>,
 }
 
@@ -33,7 +33,7 @@ impl Let {
     pub fn new(
         token: Rc<Token>,
         typ: Type,
-        name: Identifier,
+        name: Box<dyn Expression>,
         value: Box<dyn Expression>,
     ) -> Box<Self> {
         Box::new({
@@ -58,7 +58,7 @@ impl Statement for Let {
         todo!()
     }
 
-    fn get_statement_token(&self) -> Token {
-        Token::Let(None)
+    fn get_statement_token(&self) -> Rc<Token> {
+        Rc::clone(&self.token)
     }
 }

@@ -1,21 +1,22 @@
-use crate::ast::expression::Expression;
+use crate::{ast::expression::Expression, lexer::token::Token};
 use crate::ast::node::Node;
 use crate::ast::types::Type;
 use std::{fmt::Display, rc::Rc};
 
 pub struct Identifier {
-    pub value: Option<Rc<String>>,
+    pub token: Rc<Token>,
+    pub value: Rc<String>,
 }
 
 impl Identifier {
-    pub fn new(value: Option<Rc<String>>) -> Self {
-        Self { value }
+    pub fn new(value: Rc<String>, token: Rc<Token>) -> Self {
+        Self { value, token }
     }
 }
 
 impl Display for Identifier {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.value.as_ref().unwrap())
+        write!(f, "{}", self.value.as_ref())
     }
 }
 

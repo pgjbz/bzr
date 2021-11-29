@@ -1,6 +1,8 @@
-use std::{fmt::Display, rc::Rc};
+use std::{fmt::Display, rc::Rc, hash::Hash};
 
-#[derive(PartialEq, Debug)]
+use crate::ast::types::Type;
+
+#[derive(Debug)]
 pub enum Token {
     Illegal(Option<Rc<String>>, Option<Location>),
     EOF(Option<Location>),
@@ -43,7 +45,7 @@ pub enum Token {
     Or(Option<Location>),
 }
 
-#[derive(PartialEq, Debug, Clone)]
+#[derive(PartialEq, Debug, Clone, Hash)]
 pub struct Location {
     pub position: usize,
     pub line: usize,
@@ -77,6 +79,25 @@ impl Token {
             "bool" => Ok(Token::Bool(location)),
             "while" => Ok(Token::While(location)),
             _ => Err(String::from("Not a keyword")),
+        }
+    }
+
+    pub fn literal(&self) -> String {
+        match self {
+            Self::Minus(_) => "-".to_string(),
+            Self::Plus(_) => "+".to_string(),
+            Self::Bang(_) => "!".to_string(),
+            _ => "unknown".to_string(),
+        }
+    }
+
+    pub fn to_type(&self) -> Type {
+        match self {
+            Token::Int(_) => Type::Int,
+            Token::Bool(_) => Type::Bool,
+            Token::Str(_) => Type::String,
+            Token::Function(_) => Type::Function,
+            _ => Type::Unknown
         }
     }
 }
@@ -296,4 +317,20 @@ impl Display for Token {
         };
         write!(f, "{}", str)
     }
+}
+
+impl Hash for Token {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        core::mem::discriminant(self).hash(state);
+    }
+}
+
+impl PartialEq for Token {
+    fn eq(&self, other: &Self) -> bool {
+       std::mem::discriminant(self) == std::mem::discriminant(other)
+    }
+}
+
+impl std::cmp::Eq for Token {
+    fn assert_receiver_is_total_eq(&self) {}
 }

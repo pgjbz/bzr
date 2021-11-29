@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, rc::Rc};
 
 use crate::{
     ast::{
@@ -9,12 +9,13 @@ use crate::{
 };
 
 pub struct Return {
+    pub token: Rc<Token>,
     pub return_value: Option<Box<dyn Expression>>,
 }
 
 impl Return {
-    pub fn new(return_value: Option<Box<dyn Expression>>) -> Self {
-        Self { return_value }
+    pub fn new(return_value: Option<Box<dyn Expression>>, token: Rc<Token>) -> Self {
+        Self { return_value, token }
     }
 }
 
@@ -29,8 +30,8 @@ impl Statement for Return {
         todo!()
     }
 
-    fn get_statement_token(&self) -> crate::lexer::token::Token {
-        Token::Return(None)
+    fn get_statement_token(&self) -> Rc<Token> {
+        Rc::clone(&self.token)
     }
 }
 

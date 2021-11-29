@@ -1,9 +1,6 @@
 var number int = 1345;
 var another_number = 1234;
 
-var text str = "txt";
-var another_text = "txt";
-
 var boolean bool = false;
 var another_boolean = true;
 

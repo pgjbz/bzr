@@ -1,8 +1,5 @@
 let number int = 1345;
 let another_number = 1234;
 
-let text str = "txt";
-let another_text = "txt";
-
 let boolean bool = false;
 let another_boolean = true;

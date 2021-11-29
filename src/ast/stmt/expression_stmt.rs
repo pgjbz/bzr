@@ -1,9 +1,9 @@
-use std::fmt::Display;
+use std::{fmt::Display, rc::Rc};
 
 use crate::{
     ast::{
         expression::{Expression, Node},
-        types::Type,
+        types::Type, statement::Statement,
     },
     lexer::token::Token,
 };
@@ -11,10 +11,18 @@ use crate::{
 pub struct ExpressionStatement {
     pub expression: Option<Box<dyn Expression>>,
     pub typ: Type,
-    pub token: Token,
+    pub token: Rc<Token>,
 }
 
-impl ExpressionStatement {}
+impl ExpressionStatement {
+    pub fn new(typ: Type, token: Rc<Token>) -> Self {
+        Self {
+            expression: None,
+            typ,
+            token
+        }
+    }
+}
 
 impl Node for ExpressionStatement {
     fn literal(&self) -> Box<dyn std::fmt::Display> {
@@ -29,6 +37,16 @@ impl Expression for ExpressionStatement {
 
     fn get_type(&self) -> Type {
         self.typ
+    }
+}
+
+impl Statement for ExpressionStatement {
+    fn statement(&self) {
+        todo!()
+    }
+
+    fn get_statement_token(&self) -> Rc<Token> {
+        Rc::clone(&self.token)
     }
 }
 
