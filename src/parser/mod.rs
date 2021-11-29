@@ -106,6 +106,7 @@ impl Parser {
         Ok(Box::new(ret))
     }
 
+    //TODO: purge this method, its initial let test
     fn extract_variables_fields(&mut self) -> Result<(Identifier, Type, String), ParseError> {
         let identifier = match self.current_token.as_ref() {
             Token::Ident(identifier, _) => identifier,
@@ -207,6 +208,7 @@ impl Parser {
         (typ, val)
     }
 
+    //TODO: improve parse expression to really parse expression
     fn parse_expression(
         &mut self,
         precedence: Precedence,
