@@ -52,7 +52,7 @@ fn test_parse_var_negative_int_type() {
 
 #[test]
 fn test_parse_var_int_type_erros() {
-    let source = "var a int = 10".to_string();
+    let source = "var a int = \"texto\"".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
     let progrma = parser.parse_program();
@@ -62,7 +62,7 @@ fn test_parse_var_int_type_erros() {
 
 #[test]
 fn test_parse_let_int_type_erros() {
-    let source = "var a int = 10".to_string();
+    let source = "var a int = \"10\"".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
     let progrma = parser.parse_program();
@@ -164,7 +164,7 @@ fn test_parse_var_bool_type_erros() {
 
 #[test]
 fn test_parse_let_bool_type_erros() {
-    let source = "var a bool = false".to_string();
+    let source = "var a bool = \"false\"".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
     let progrma = parser.parse_program();
@@ -186,11 +186,11 @@ fn test_parse_return_type() {
 fn test_program_to_string() {
     let token = Rc::new(Token::Let(None));
     let typ = Type::Int;
-    let identifier = Identifier::new(Some(Rc::new("my_var".to_string())));
+    let identifier = Box::new(Identifier::new(Rc::new("my_var".to_string()), Rc::new(Token::Ident(None, None))));
     let expr: Box<dyn Expression> = Box::new(IntExpr::new(10, Rc::new(Token::Number(None, None))));
     let statements: Vec<Box<dyn Statement>> =
         vec![Let::new(token, typ, identifier, expr)];
     let program = Program::new(statements, vec![]);
     let program_str = program.to_string();
-    assert_eq!("let my_var int = 10;\n", program_str);
+    assert_eq!("let my_var int = 10;", program_str);
 }
