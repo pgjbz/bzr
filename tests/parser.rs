@@ -163,3 +163,13 @@ fn test_parse_let_bool_type_erros() {
     assert!(progrma.errors.len() > 0);
     assert!(progrma.statements.len() <= 0);
 }
+
+#[test]
+fn test_parse_return_type() {
+    let source = "ret false;".to_string();
+    let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
+    let parser = Parser::new(lexer);
+    let progrma = parser.parse_program();
+    assert!(progrma.errors.len() <= 0);
+    assert!(progrma.statements.len() > 0);
+}

@@ -9,7 +9,7 @@ use crate::{
         identifier::Identifier,
         program::Program,
         statement::Statement,
-        stmt::{let_stmt::Let, var_stmt::Var},
+        stmt::{let_stmt::Let, return_stmt::Return, var_stmt::Var},
         types::Type,
     },
     lexer::{token::Token, Lexer},
@@ -62,6 +62,7 @@ impl Parser {
         match self.current_token.as_ref() {
             Token::Let(_) => self.parse_let_var(true),
             Token::Var(_) => self.parse_let_var(false),
+            Token::Return(_) => self.parse_return(),
             Token::EOF(_) => Err(ParseError::Eof),
             _ => Err(ParseError::Unknown),
         }
@@ -84,12 +85,25 @@ impl Parser {
                         } else {
                             Ok(Var::new(Token::Var(None), typ, identifier, expression))
                         }
-                    },
+                    }
                     Err(e) => Err(e),
                 }
             }
             Err(e) => Err(e),
         }
+    }
+
+    fn parse_return(&mut self) -> Result<Box<dyn Statement>, ParseError> {
+        let ret = Return::new(None);
+        //TODO: we're skipping expression until found a semicolon
+        while !self._current_token_is(Token::Semicolon(None)) {
+            self.next_token();
+            if self._current_token_is(Token::EOF(None)) {
+                let msg = format!("expected semicolon, got {}", self.current_token);
+                return Err(ParseError::Message(msg));
+            }
+        }
+        Ok(Box::new(ret))
     }
 
     fn extract_variables_fields(&mut self) -> Result<(Identifier, Type, String), ParseError> {
@@ -125,8 +139,7 @@ impl Parser {
     fn print_error_str_empty(&mut self, str: &str) {
         if str.is_empty() {
             let tok = self.current_token.as_ref();
-            self.errors
-                .push(format!("expected value got {}", tok))
+            self.errors.push(format!("expected value got {}", tok))
         }
     }
 
@@ -156,10 +169,8 @@ impl Parser {
                 val.as_ref().unwrap().as_ref().clone()
             }
             _ => {
-                self.errors.push(format!(
-                    "expected {}, got {}",
-                    typ, self.current_token
-                ));
+                self.errors
+                    .push(format!("expected {}, got {}", typ, self.current_token));
                 String::from("")
             }
         }
@@ -186,8 +197,10 @@ impl Parser {
             }
             _ => {
                 typ = Type::Unknown;
-                self.errors
-                    .push(format!("expected a value, got error {}", self.current_token));
+                self.errors.push(format!(
+                    "expected a value, got error {}",
+                    self.current_token
+                ));
                 String::from("err")
             }
         };
@@ -240,7 +253,6 @@ impl Parser {
         }
     }
 
-    //TODO: verify if possible to use Result and Remove register_error paramater
     fn expected_peek(&mut self, token: Token) -> Result<(), ParseError> {
         if self.peek_token_is(&token) {
             self.next_token();

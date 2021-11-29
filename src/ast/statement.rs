@@ -4,5 +4,5 @@ use super::node::Node;
 
 pub trait Statement: Node {
     fn statement(&self);
-    fn get_statament_token(&self) -> Token;
+    fn get_statement_token(&self) -> Token;
 }

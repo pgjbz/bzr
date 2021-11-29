@@ -49,7 +49,7 @@ impl Statement for Let {
         todo!()
     }
 
-    fn get_statament_token(&self) -> Token {
+    fn get_statement_token(&self) -> Token {
         Token::Let(None)
     }
 }
