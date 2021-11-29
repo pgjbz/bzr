@@ -19,12 +19,12 @@ use self::errors::ParseError;
 
 enum Precedence {
     Lowest,
-    Equals,
-    LessGreater,
-    Sum,
-    Product,
+    _Equals,
+    _LessGreater,
+    _Sum,
+    _Product,
     Prefix,
-    Call
+    _Call
 }
 
 pub struct Parser {
@@ -33,7 +33,7 @@ pub struct Parser {
     peek_token: Rc<Token>,
     errors: Vec<String>,
     prefix_parse_fns: HashMap<Token, PrefixParseFn>,
-    infix_parse_fns: HashMap<Token, InfixParseFn>,
+    _infix_parse_fns: HashMap<Token, InfixParseFn>,
 }
 
 impl Parser {
@@ -54,7 +54,7 @@ impl Parser {
             peek_token,
             errors: vec![],
             prefix_parse_fns,
-            infix_parse_fns: HashMap::new(),
+            _infix_parse_fns: HashMap::new(),
         }
     }
 
@@ -97,7 +97,7 @@ impl Parser {
     fn parse_let_var(&mut self, is_let: bool) -> Result<Box<dyn Statement>, ParseError> {
         let current_token = Rc::clone(&self.current_token);
         self.expected_peek(Token::Ident(None, None))?;
-        let identifier: Box<dyn Expression> = Self::parse_identifier(self);
+        let identifier: Box<dyn Expression> = Self::parse_identifier(self)?;
         let expression: Box<dyn Expression>;
         if self.has_type() {
             self.next_token();
@@ -186,7 +186,7 @@ impl Parser {
         let prefix = self.prefix_parse_fns.get(token);
         
         match prefix {
-            Some(prefix_fn) => Ok(prefix_fn(self)),
+            Some(prefix_fn) => Ok(prefix_fn(self)?),
             None => {
                 let msg = format!("invalid expression in {}", self.current_token);
                 Err(ParseError::Message(msg))
@@ -194,56 +194,57 @@ impl Parser {
         }
     }
 
-    fn parse_identifier(parser: &mut Self) -> Box<dyn Expression> {
+    fn parse_identifier(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
         let current_token = Rc::clone(&parser.current_token);
         let identifier_value = match current_token.as_ref() {
             Token::Ident(Some(ident), _) => Rc::clone(ident),
-            _ => Rc::new("unknown".to_string())
+            tok => {
+                let msg = format!("expected indentifer, got {}", tok);
+                return Err(ParseError::Message(msg));
+            }
         };
-        Box::new(Identifier::new(identifier_value, current_token))
+        Ok(Box::new(Identifier::new(identifier_value, current_token)))
     }
 
-    fn parse_number_literal(parser: &mut Self) -> Box<dyn Expression> {
+    fn parse_number_literal(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
         let current_token = Rc::clone(&parser.current_token);
         let number = if let Token::Number(Some(val), _) = parser.current_token.as_ref() {
             val.trim().parse().unwrap()
         } else {
-            parser.errors.push(format!("fail on parse value: {}", current_token));
-            0
+            let msg = format!("fail on parse value: {}", current_token);
+            return Err(ParseError::Message(msg));
         };
         let int_expr = IntExpr::new(number, current_token);
-        Box::new(int_expr)
+        Ok(Box::new(int_expr))
     }
 
-    fn parse_bool_literal(parser: &mut Self) -> Box<dyn Expression> {
+    fn parse_bool_literal(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
         let current_token = Rc::clone(&parser.current_token);
         let boolean = match parser.current_token.as_ref() {
             Token::True(_) => true,
             Token::False(_) => false,
             tok => {
-                parser.errors.push(format!("expected boolean value got: {}", tok));
-                false
+                let msg = format!("expected boolean value got: {}", tok);
+                return Err(ParseError::Message(msg));
             }
         };
         let bool_expr = BoolExpr::new(boolean, current_token);
-        Box::new(bool_expr)
+        Ok(Box::new(bool_expr))
     }
 
-    fn parse_prefix_expression(parser: &mut Self) -> Box<dyn Expression> {
+    fn parse_prefix_expression(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
         let current_token = Rc::clone(&parser.current_token);
         let mut prefix_expr = PrefixExpr::new(Rc::clone(&current_token), current_token.literal());
 
         parser.next_token();
 
         prefix_expr.right = if let Ok(expr) = parser.parse_expression(Precedence::Prefix) {
-            println!("prefix");
             Some(expr)
         } else {
-            println!("no prefix");
             None
         };
 
-        Box::new(prefix_expr)
+        Ok(Box::new(prefix_expr))
     }
 
     fn expected_peek(&mut self, token: Token) -> Result<(), ParseError> {
