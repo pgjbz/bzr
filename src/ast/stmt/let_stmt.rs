@@ -1,5 +1,5 @@
-use std::rc::Rc;
 use std::fmt::Display;
+use std::rc::Rc;
 
 use crate::{
     ast::{
@@ -27,7 +27,12 @@ impl Display for Let {
 }
 
 impl Let {
-    pub fn new(token: Rc<Token>, typ: Type, name: Identifier, value: Box<dyn Expression>) -> Box<Self> {
+    pub fn new(
+        token: Rc<Token>,
+        typ: Type,
+        name: Identifier,
+        value: Box<dyn Expression>,
+    ) -> Box<Self> {
         Box::new({
             Self {
                 token,
@@ -41,7 +46,7 @@ impl Let {
 
 impl Node for Let {
     fn literal(&self) -> Box<dyn Display> {
-        Box::new(format!("let {} {} = {}", self.name, self.typ, self.value))
+        Box::new("let".to_string())
     }
 }
 
