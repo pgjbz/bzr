@@ -60,8 +60,8 @@ impl Parser {
 
     fn parse_statement(&mut self) -> Result<Box<dyn Statement>, ParseError> {
         match self.current_token.as_ref() {
-            Token::Let(_) => self.parse_let_sts(),
-            Token::Var(_) => self.parse_var_sts(),
+            Token::Let(_) => self.parse_let_var(true),
+            Token::Var(_) => self.parse_let_var(false),
             Token::EOF(_) => Err(ParseError::Eof),
             _ => Err(ParseError::Unknown),
         }
@@ -72,27 +72,19 @@ impl Parser {
         self.peek_token = self.lexer.next_token();
     }
 
-    fn parse_let_sts(&mut self) -> Result<Box<dyn Statement>, ParseError> {
+    fn parse_let_var(&mut self, is_let: bool) -> Result<Box<dyn Statement>, ParseError> {
         self.expected_peek(Token::Ident(None, None))?;
         match self.extract_variables_fields() {
             Ok((identifier, typ, val)) => {
                 self.print_error_str_empty(&val);
                 match Self::parse_expression(self, Precedence::Lowest, val, &typ) {
-                    Ok(expression) => Ok(Let::new(Token::Let(None), typ, identifier, expression)),
-                    Err(e) => Err(e),
-                }
-            }
-            Err(e) => Err(e),
-        }
-    }
-
-    fn parse_var_sts(&mut self) -> Result<Box<dyn Statement>, ParseError> {
-        self.expected_peek(Token::Ident(None, None))?;
-        match self.extract_variables_fields() {
-            Ok((identifier, typ, val)) => {
-                self.print_error_str_empty(&val);
-                match Self::parse_expression(self, Precedence::Lowest, val, &typ) {
-                    Ok(expression) => Ok(Var::new(Token::Let(None), typ, identifier, expression)),
+                    Ok(expression) => {
+                        if is_let {
+                            Ok(Let::new(Token::Let(None), typ, identifier, expression))
+                        } else {
+                            Ok(Var::new(Token::Var(None), typ, identifier, expression))
+                        }
+                    },
                     Err(e) => Err(e),
                 }
             }
