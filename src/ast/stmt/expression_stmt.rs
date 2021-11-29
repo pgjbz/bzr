@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use crate::{
     ast::{
         expression::{Expression, Node},
@@ -7,7 +9,7 @@ use crate::{
 };
 
 pub struct ExpressionStatement {
-    pub expression: Box<dyn Expression>,
+    pub expression: Option<Box<dyn Expression>>,
     pub typ: Type,
     pub token: Token,
 }
@@ -27,5 +29,15 @@ impl Expression for ExpressionStatement {
 
     fn get_type(&self) -> Type {
         self.typ
+    }
+}
+
+impl Display for ExpressionStatement {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut expr = String::new();
+        while let Some(ref expression) = self.expression {
+            expr.push_str(&format!("{}", expression));
+        }
+        write!(f, "{}", expr)
     }
 }

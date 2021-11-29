@@ -14,7 +14,7 @@ fn main() {
 
     if program.errors.is_empty() {
         for sts in program.statements {
-            println!("{}", sts.literal());
+            println!("{}", sts.to_string());
         }
     } else {
         for error in program.errors {

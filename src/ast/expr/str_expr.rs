@@ -30,3 +30,9 @@ impl Expression for StrExpr {
         Type::String
     }
 }
+
+impl Display for StrExpr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.literal())
+    }
+}

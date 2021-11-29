@@ -10,7 +10,7 @@ use crate::{
 };
 
 pub struct Var {
-    token: Rc<Token>,
+    pub token: Rc<Token>,
     typ: Type,
     name: Identifier,
     value: Box<dyn Expression>,
@@ -18,11 +18,14 @@ pub struct Var {
 
 impl Display for Var {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "tok: {}, typ: {}, name: {}, val: {}",
-            self.token, self.typ, self.name, self.value
-        )
+        let mut stmt = String::new();
+        stmt.push_str(&format!("{} ", self.literal()));
+        stmt.push_str(&format!("{} ", self.name));
+        stmt.push_str(&format!("{} ", self.typ));
+        stmt.push_str("= ");
+        stmt.push_str(&self.value.to_string());
+        stmt.push(';');
+        writeln!(f, "{}", stmt)
     }
 }
 

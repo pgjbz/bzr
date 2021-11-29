@@ -33,3 +33,15 @@ impl Statement for Return {
         Token::Return(None)
     }
 }
+
+impl Display for Return {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut stmt = String::new();
+        stmt.push_str(&format!("{} ", &self.literal()));
+        if let Some(ref ret_val) = self.return_value {
+            stmt.push_str(&format!("{} ", ret_val));
+        }
+        stmt.push(';');
+        write!(f, "{}", stmt)
+    }
+}
