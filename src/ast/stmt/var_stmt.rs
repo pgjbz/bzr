@@ -1,3 +1,4 @@
+use std::rc::Rc;
 use std::fmt::Display;
 
 use crate::{
@@ -9,7 +10,7 @@ use crate::{
 };
 
 pub struct Var {
-    token: Token,
+    token: Rc<Token>,
     typ: Type,
     name: Identifier,
     value: Box<dyn Expression>,
@@ -26,7 +27,7 @@ impl Display for Var {
 }
 
 impl Var {
-    pub fn new(token: Token, typ: Type, name: Identifier, value: Box<dyn Expression>) -> Box<Self> {
+    pub fn new(token: Rc<Token>, typ: Type, name: Identifier, value: Box<dyn Expression>) -> Box<Self> {
         Box::new({
             Self {
                 token,

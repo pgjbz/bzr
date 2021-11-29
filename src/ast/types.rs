@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub enum Type {
     String,
     Int,

@@ -74,6 +74,7 @@ impl Parser {
     }
 
     fn parse_let_var(&mut self, is_let: bool) -> Result<Box<dyn Statement>, ParseError> {
+        let current_token = Rc::clone(&self.current_token);
         self.expected_peek(Token::Ident(None, None))?;
         match self.extract_variables_fields() {
             Ok((identifier, typ, val)) => {
@@ -81,9 +82,9 @@ impl Parser {
                 match Self::parse_expression(self, Precedence::Lowest, val, &typ) {
                     Ok(expression) => {
                         if is_let {
-                            Ok(Let::new(Token::Let(None), typ, identifier, expression))
+                            Ok(Let::new(current_token, typ, identifier, expression))
                         } else {
-                            Ok(Var::new(Token::Var(None), typ, identifier, expression))
+                            Ok(Var::new(current_token, typ, identifier, expression))
                         }
                     }
                     Err(e) => Err(e),
@@ -218,11 +219,12 @@ impl Parser {
         match precedence {
             Precedence::Lowest => {
                 self.expected_peek(Token::Semicolon(None))?;
+                let token = Rc::clone(&self.current_token);
                 self.next_token();
                 match typ {
                     Type::Int => {
                         if let Ok(value) = val.parse() {
-                            Ok(Box::new(IntExpr::new(value)))
+                            Ok(Box::new(IntExpr::new(value, token)))
                         } else {
                             let msg = format!(
                                 "error on parse token value {} {}",
@@ -231,10 +233,10 @@ impl Parser {
                             Err(ParseError::Message(msg))
                         }
                     }
-                    Type::String => Ok(Box::new(StrExpr::new(val))),
+                    Type::String => Ok(Box::new(StrExpr::new(val, token))),
                     Type::Bool => {
                         if let Ok(value) = val.parse() {
-                            Ok(Box::new(BoolExpr::new(value)))
+                            Ok(Box::new(BoolExpr::new(value, token)))
                         } else {
                             let msg = format!(
                                 "Error on parse token value {} {}",
