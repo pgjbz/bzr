@@ -126,7 +126,7 @@ impl Parser {
         if str.is_empty() {
             let tok = self.current_token.as_ref();
             self.errors
-                .push(format!("Error expected value got {}", tok))
+                .push(format!("expected value got {}", tok))
         }
     }
 
@@ -157,7 +157,7 @@ impl Parser {
             }
             _ => {
                 self.errors.push(format!(
-                    "Invalid type expected {}, got {}",
+                    "expected {}, got {}",
                     typ, self.current_token
                 ));
                 String::from("")
@@ -187,8 +187,8 @@ impl Parser {
             _ => {
                 typ = Type::Unknown;
                 self.errors
-                    .push(format!("expected a type, got error {}", self.current_token));
-                String::from("")
+                    .push(format!("expected a value, got error {}", self.current_token));
+                String::from("err")
             }
         };
         (typ, val)
@@ -210,7 +210,7 @@ impl Parser {
                             Ok(Box::new(IntExpr::new(value)))
                         } else {
                             let msg = format!(
-                                "Error on parse token value {} {}",
+                                "error on parse token value {} {}",
                                 val, self.current_token
                             );
                             Err(ParseError::Message(msg))
