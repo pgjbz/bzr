@@ -3,7 +3,8 @@ use std::{fmt::Display, rc::Rc};
 use crate::{
     ast::{
         expression::{Expression, Node},
-        types::Type, statement::Statement,
+        statement::Statement,
+        types::Type,
     },
     lexer::token::Token,
 };
@@ -19,7 +20,7 @@ impl ExpressionStatement {
         Self {
             expression: None,
             typ,
-            token
+            token,
         }
     }
 }

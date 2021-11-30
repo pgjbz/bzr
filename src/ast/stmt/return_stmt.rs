@@ -15,7 +15,10 @@ pub struct Return {
 
 impl Return {
     pub fn new(return_value: Option<Box<dyn Expression>>, token: Rc<Token>) -> Self {
-        Self { return_value, token }
+        Self {
+            return_value,
+            token,
+        }
     }
 }
 

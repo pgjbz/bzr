@@ -1,4 +1,4 @@
-use crate::parser::{Parser, errors::ParseError};
+use crate::parser::{errors::ParseError, Parser};
 
 use self::expression::Expression;
 
@@ -12,4 +12,5 @@ pub mod stmt;
 pub mod types;
 
 pub type PrefixParseFn = fn(&mut Parser) -> Result<Box<dyn Expression>, ParseError>;
-pub type InfixParseFn = fn(&mut Parser, dyn Expression) -> Result<Box<dyn Expression>, ParseError>;
+pub type InfixParseFn =
+    fn(&mut Parser, Box<dyn Expression>) -> Result<Box<dyn Expression>, ParseError>;

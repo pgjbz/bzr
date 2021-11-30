@@ -1,4 +1,4 @@
-use std::{fmt::Display, rc::Rc, hash::Hash};
+use std::{fmt::Display, hash::Hash, rc::Rc};
 
 use crate::ast::types::Type;
 
@@ -87,6 +87,14 @@ impl Token {
             Self::Minus(_) => "-".to_string(),
             Self::Plus(_) => "+".to_string(),
             Self::Bang(_) => "!".to_string(),
+            Self::Eq(_) => "==".to_string(),
+            Self::Diff(_) => "!=".to_string(),
+            Self::Gt(_) => ">".to_string(),
+            Self::Lt(_) => "<".to_string(),
+            Self::Gte(_) => ">=".to_string(),
+            Self::Lte(_) => "<=".to_string(),
+            Self::Slash(_) => "/".to_string(),
+            Self::Asterisk(_) => "*".to_string(),
             _ => "unknown".to_string(),
         }
     }
@@ -97,7 +105,7 @@ impl Token {
             Token::Bool(_) => Type::Bool,
             Token::Str(_) => Type::String,
             Token::Function(_) => Type::Function,
-            _ => Type::Unknown
+            _ => Type::Unknown,
         }
     }
 }
@@ -327,7 +335,7 @@ impl Hash for Token {
 
 impl PartialEq for Token {
     fn eq(&self, other: &Self) -> bool {
-       std::mem::discriminant(self) == std::mem::discriminant(other)
+        std::mem::discriminant(self) == std::mem::discriminant(other)
     }
 }
 

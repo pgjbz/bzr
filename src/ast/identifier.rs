@@ -1,6 +1,6 @@
-use crate::{ast::expression::Expression, lexer::token::Token};
 use crate::ast::node::Node;
 use crate::ast::types::Type;
+use crate::{ast::expression::Expression, lexer::token::Token};
 use std::{fmt::Display, rc::Rc};
 
 pub struct Identifier {

@@ -8,34 +8,42 @@ use crate::{
     lexer::token::Token,
 };
 
-pub struct PrefixExpr {
+pub struct InfixExpr {
     pub token: Rc<Token>,
     pub operator: String,
+    pub left: Option<Box<dyn Expression>>,
     pub right: Option<Box<dyn Expression>>,
+    pub typ: Option<Type>,
 }
 
-impl PrefixExpr {
+impl InfixExpr {
     pub fn new(token: Rc<Token>, operator: String) -> Self {
         Self {
             token,
             operator,
             right: None,
+            left: None,
+            typ: None,
         }
     }
 }
 
-impl Node for PrefixExpr {
+impl Node for InfixExpr {
     fn literal(&self) -> Box<dyn std::fmt::Display> {
         Box::new(self.token.to_string())
     }
 }
 
-impl Display for PrefixExpr {
+impl Display for InfixExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut prefix = String::new();
         prefix.push('(');
-        prefix.push_str(&self.operator);
-
+        prefix.push_str(&if let Some(ref left) = self.left {
+            left.to_string()
+        } else {
+            "".to_string()
+        });
+        prefix.push_str(&format!(" {} ", &self.operator));
         prefix.push_str(&if let Some(ref right) = self.right {
             right.to_string()
         } else {
@@ -46,12 +54,12 @@ impl Display for PrefixExpr {
     }
 }
 
-impl Expression for PrefixExpr {
+impl Expression for InfixExpr {
     fn expression(&self) {
         todo!()
     }
 
     fn get_type(&self) -> Type {
-        Type::Prefix
+        self.typ.unwrap()
     }
 }

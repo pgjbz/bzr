@@ -186,10 +186,12 @@ fn test_parse_return_type() {
 fn test_program_to_string() {
     let token = Rc::new(Token::Let(None));
     let typ = Type::Int;
-    let identifier = Box::new(Identifier::new(Rc::new("my_var".to_string()), Rc::new(Token::Ident(None, None))));
+    let identifier = Box::new(Identifier::new(
+        Rc::new("my_var".to_string()),
+        Rc::new(Token::Ident(None, None)),
+    ));
     let expr: Box<dyn Expression> = Box::new(IntExpr::new(10, Rc::new(Token::Number(None, None))));
-    let statements: Vec<Box<dyn Statement>> =
-        vec![Let::new(token, typ, identifier, expr)];
+    let statements: Vec<Box<dyn Statement>> = vec![Let::new(token, typ, identifier, expr)];
     let program = Program::new(statements, vec![]);
     let program_str = program.to_string();
     assert_eq!("let my_var int = 10;", program_str);

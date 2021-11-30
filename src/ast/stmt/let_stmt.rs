@@ -2,10 +2,7 @@ use std::fmt::Display;
 use std::rc::Rc;
 
 use crate::{
-    ast::{
-        expression::Expression, node::Node, statement::Statement,
-        types::Type,
-    },
+    ast::{expression::Expression, node::Node, statement::Statement, types::Type},
     lexer::token::Token,
 };
 

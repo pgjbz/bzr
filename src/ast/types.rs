@@ -6,7 +6,7 @@ pub enum Type {
     Int,
     Bool,
     Function,
-    Prefix, 
+    Prefix,
     Unknown,
 }
 
