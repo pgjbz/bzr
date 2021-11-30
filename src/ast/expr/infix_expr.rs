@@ -60,6 +60,6 @@ impl Expression for InfixExpr {
     }
 
     fn get_type(&self) -> Type {
-        self.typ.unwrap()
+        todo!()
     }
 }

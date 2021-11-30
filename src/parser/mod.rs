@@ -6,15 +6,16 @@ use std::{collections::HashMap, mem, rc::Rc};
 use crate::{
     ast::{
         expr::{
-            bool_expr::BoolExpr, infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr,
-            str_expr::StrExpr,
+            bool_expr::BoolExpr, if_expr::IfExpr, infix_expr::InfixExpr, int_expr::IntExpr,
+            prefix_expr::PrefixExpr, str_expr::StrExpr,
         },
         expression::Expression,
         identifier::Identifier,
         program::Program,
         statement::Statement,
         stmt::{
-            expression_stmt::ExpressionStatement, let_stmt::Let, return_stmt::Return, var_stmt::Var,
+            block_stmt::BlockStatement, expression_stmt::ExpressionStatement, let_stmt::Let,
+            return_stmt::Return, var_stmt::Var,
         },
         types::Type,
     },
@@ -49,6 +50,7 @@ impl Parser {
         prefix_parse_fns.insert(Token::False(None), Self::parse_bool_literal);
         prefix_parse_fns.insert(Token::String(None, None), Self::parse_string_literal);
         prefix_parse_fns.insert(Token::Lparen(None), Self::parse_grouped_expression);
+        prefix_parse_fns.insert(Token::If(None), Self::parse_if_expression);
 
         infix_parse_fns.insert(Token::Plus(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Minus(None), Self::parse_infix_expression);
@@ -297,6 +299,46 @@ impl Parser {
         };
         let string_expr = StrExpr::new(string.to_string(), current_token);
         Ok(Box::new(string_expr))
+    }
+
+    fn parse_if_expression(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
+        let current_token = Rc::clone(&parser.current_token);
+
+        parser.next_token();
+
+        let expr = parser.parse_expression(Precedence::Lowest)?;
+
+        parser.expected_peek(Token::Lbrace(None))?;
+
+        let consequence_block = parser.parse_block_statement();
+
+        let mut if_expr = IfExpr::new(current_token, expr);
+        if_expr.consequence = consequence_block;
+
+        if parser.peek_token_is(&Token::Else(None)) {
+            parser.next_token();
+            parser.expected_peek(Token::Lbrace(None))?;
+            let alternative_block = parser.parse_block_statement();
+            if_expr.alternative = alternative_block;
+        }
+
+        Ok(Box::new(if_expr))
+    }
+
+    fn parse_block_statement(&mut self) -> Option<BlockStatement> {
+        let mut block_stmt = BlockStatement::new(Rc::clone(&self.current_token));
+
+        while !self.current_token_is(Token::Rbrace(None))
+            && !self.current_token_is(Token::EOF(None))
+        {
+            let statement = self.parse_statement();
+            if let Ok(statement) = statement {
+                block_stmt.push_stmt(statement);
+            }
+            self.next_token();
+        }
+
+        Some(block_stmt)
     }
 
     //TODO: add type checking

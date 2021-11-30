@@ -1,4 +1,4 @@
-use bzr::ast::expression::Expression;
+use bzr::ast::{expr::if_expr::IfExpr, expression::Expression};
 use std::rc::Rc;
 
 use bzr::{
@@ -259,4 +259,22 @@ fn test_parse_precedence() {
         output.push_str("\n");
     }
     assert_eq!(&expected, &output);
+}
+
+#[test]
+fn test_if_expression() {
+    let source = "if x < y { x }".to_string();
+    let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
+    let parser = Parser::new(lexer);
+    let program = parser.parse_program();
+    assert_eq!(1, program.statements.len());
+}
+
+#[test]
+fn test_if_else_expression() {
+    let source = "if x < y { x } else { y }".to_string();
+    let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
+    let parser = Parser::new(lexer);
+    let program = parser.parse_program();
+    assert_eq!(1, program.statements.len());
 }
