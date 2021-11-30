@@ -317,7 +317,10 @@ impl Parser {
 
         if parser.peek_token_is(&Token::Else(None)) {
             parser.next_token();
-            parser.expected_peek(Token::Lbrace(None))?;
+            match parser.expected_peek(Token::Lbrace(None)) {
+                Ok(_) => {}
+                Err(_) => parser.expected_peek(Token::If(None))?,
+            }
             let alternative_block = parser.parse_block_statement();
             if_expr.alternative = alternative_block;
         }

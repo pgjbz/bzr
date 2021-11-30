@@ -43,7 +43,7 @@ impl Display for IfExpr {
             "".to_string()
         });
         if let Some(ref alternative) = self.alternative {
-            buffer.push_str(&format!("else {}", alternative.to_string()))
+            buffer.push_str(&format!(" else {}", alternative.to_string()))
         };
         write!(f, "{}", buffer)
     }
