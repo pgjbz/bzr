@@ -138,8 +138,8 @@ impl Lexer {
                     token
                 }
                 ';' => Token::Semicolon(Some(Location::new(line_position, line, filename))),
-                '(' => Token::Lparen(Some(Location::new(line_position, line, filename))),
-                ')' => Token::Rparen(Some(Location::new(line_position, line, filename))),
+                '(' => Token::LParen(Some(Location::new(line_position, line, filename))),
+                ')' => Token::RParen(Some(Location::new(line_position, line, filename))),
                 '[' => Token::LSqBracket(Some(Location::new(line_position, line, filename))),
                 ']' => Token::RSqBracket(Some(Location::new(line_position, line, filename))),
                 ',' => Token::Comma(Some(Location::new(line_position, line, filename))),

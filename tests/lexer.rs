@@ -18,8 +18,8 @@ fn test_tokens() {
     let tokens = vec![
         Token::Lbrace(Some(Location::new(0, 1, Rc::new(FILENAME.to_string())))),
         Token::Rbrace(Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))),
-        Token::Lparen(Some(Location::new(2, 1, Rc::new(FILENAME.to_string())))),
-        Token::Rparen(Some(Location::new(3, 1, Rc::new(FILENAME.to_string())))),
+        Token::LParen(Some(Location::new(2, 1, Rc::new(FILENAME.to_string())))),
+        Token::RParen(Some(Location::new(3, 1, Rc::new(FILENAME.to_string())))),
         Token::Comma(Some(Location::new(4, 1, Rc::new(FILENAME.to_string())))),
         Token::Semicolon(Some(Location::new(5, 1, Rc::new(FILENAME.to_string())))),
         Token::Comma(Some(Location::new(7, 1, Rc::new(FILENAME.to_string())))),

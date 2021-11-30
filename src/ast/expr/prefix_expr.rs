@@ -12,6 +12,7 @@ pub struct PrefixExpr {
     pub token: Rc<Token>,
     pub operator: String,
     pub right: Option<Box<dyn Expression>>,
+    pub typ: Option<Type>,
 }
 
 impl PrefixExpr {
@@ -20,6 +21,7 @@ impl PrefixExpr {
             token,
             operator,
             right: None,
+            typ: None,
         }
     }
 }
@@ -53,5 +55,9 @@ impl Expression for PrefixExpr {
 
     fn get_type(&self) -> Type {
         Type::Prefix
+    }
+
+    fn set_type(&mut self, typ: Type) {
+        self.typ = Some(typ)
     }
 }

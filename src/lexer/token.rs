@@ -10,8 +10,8 @@ pub enum Token {
     Number(Option<Rc<String>>, Option<Location>),
     Comma(Option<Location>),
     Semicolon(Option<Location>),
-    Lparen(Option<Location>),
-    Rparen(Option<Location>),
+    LParen(Option<Location>),
+    RParen(Option<Location>),
     LSqBracket(Option<Location>),
     RSqBracket(Option<Location>),
     Lbrace(Option<Location>),
@@ -101,10 +101,16 @@ impl Token {
 
     pub fn to_type(&self) -> Type {
         match self {
-            Token::Int(_) => Type::Int,
-            Token::Bool(_) => Type::Bool,
-            Token::Str(_) => Type::String,
-            Token::Function(_) => Type::Function,
+            Self::Int(_) | Self::Plus(_) | Self::Minus(_) => Type::Int,
+            Self::Bool(_)
+            | Self::Lt(_)
+            | Self::Gt(_)
+            | Self::Lte(_)
+            | Self::Gte(_)
+            | Self::Diff(_)
+            | Self::Eq(_) => Type::Bool,
+            Self::Str(_) => Type::String,
+            Self::Function(_) => Type::Function,
             _ => Type::Unknown,
         }
     }
@@ -218,7 +224,7 @@ impl Display for Token {
                     "let".to_string()
                 }
             }
-            Self::Lparen(pos) => {
+            Self::LParen(pos) => {
                 if let Some(pos) = pos {
                     format!("'(' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
@@ -246,7 +252,7 @@ impl Display for Token {
                     "ret".to_string()
                 }
             }
-            Self::Rparen(pos) => {
+            Self::RParen(pos) => {
                 if let Some(pos) = pos {
                     format!("')' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {

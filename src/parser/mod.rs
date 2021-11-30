@@ -49,7 +49,7 @@ impl Parser {
         prefix_parse_fns.insert(Token::True(None), Self::parse_bool_literal);
         prefix_parse_fns.insert(Token::False(None), Self::parse_bool_literal);
         prefix_parse_fns.insert(Token::String(None, None), Self::parse_string_literal);
-        prefix_parse_fns.insert(Token::Lparen(None), Self::parse_grouped_expression);
+        prefix_parse_fns.insert(Token::LParen(None), Self::parse_grouped_expression);
         prefix_parse_fns.insert(Token::If(None), Self::parse_if_expression);
 
         infix_parse_fns.insert(Token::Plus(None), Self::parse_infix_expression);
@@ -275,6 +275,7 @@ impl Parser {
     fn parse_prefix_expression(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
         let current_token = Rc::clone(&parser.current_token);
         let mut prefix_expr = PrefixExpr::new(Rc::clone(&current_token), current_token.literal());
+        prefix_expr.set_type(parser.current_token.to_type());
         parser.next_token();
 
         prefix_expr.right = match parser.parse_expression(Precedence::Prefix) {
@@ -354,6 +355,8 @@ impl Parser {
         let precedence = precedence::get_precedence(parser.current_token.as_ref());
         let mut infix_expr = InfixExpr::new(current_token, parser.current_token.literal());
         infix_expr.left = Some(left);
+        let typ = parser.current_token.to_type();
+        infix_expr.set_type(typ);
         parser.next_token();
         infix_expr.right = match parser.parse_expression(precedence) {
             Ok(expr) => Some(expr),
@@ -368,10 +371,10 @@ impl Parser {
 
         let expr = parser.parse_expression(Precedence::Lowest);
 
-        match parser.expected_peek(Token::Rparen(None)) {
+        match parser.expected_peek(Token::RParen(None)) {
             Ok(_) => {}
             Err(_) => {
-                let msg = format!("expected Lparen got, {}", parser.peek_token);
+                let msg = format!("expected LParen got, {}", parser.peek_token);
                 return Err(ParseError::Message(msg));
             }
         }

@@ -60,6 +60,14 @@ impl Expression for InfixExpr {
     }
 
     fn get_type(&self) -> Type {
-        todo!()
+        if let Some(typ) = self.typ {
+            typ
+        } else {
+            Type::Unknown
+        }
+    }
+
+    fn set_type(&mut self, typ: Type) {
+        self.typ = Some(typ)
     }
 }

@@ -39,6 +39,10 @@ impl Expression for ExpressionStatement {
     fn get_type(&self) -> Type {
         self.typ
     }
+
+    fn set_type(&mut self, typ: Type) {
+        self.typ = typ
+    }
 }
 
 impl Statement for ExpressionStatement {
