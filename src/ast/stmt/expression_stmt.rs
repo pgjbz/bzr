@@ -29,6 +29,9 @@ impl Node for ExpressionStatement {
     fn literal(&self) -> Box<dyn std::fmt::Display> {
         todo!()
     }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 impl Expression for ExpressionStatement {

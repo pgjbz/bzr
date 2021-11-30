@@ -48,6 +48,10 @@ impl Node for Var {
     fn literal(&self) -> Box<dyn Display> {
         Box::new("var".to_string())
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 impl Statement for Var {

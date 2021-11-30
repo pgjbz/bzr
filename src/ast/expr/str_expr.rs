@@ -19,6 +19,10 @@ impl Node for StrExpr {
     fn literal(&self) -> Box<dyn Display> {
         Box::new(self.value.to_string())
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 impl Expression for StrExpr {

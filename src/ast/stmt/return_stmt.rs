@@ -26,6 +26,9 @@ impl Node for Return {
     fn literal(&self) -> Box<dyn Display> {
         Box::new("ret".to_string())
     }
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 impl Statement for Return {

@@ -28,7 +28,11 @@ impl IfExpr {
 
 impl Node for IfExpr {
     fn literal(&self) -> Box<dyn std::fmt::Display> {
-        todo!()
+        Box::new("if".to_string())
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
     }
 }
 

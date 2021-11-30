@@ -27,6 +27,10 @@ impl Node for BlockStatement {
     fn literal(&self) -> Box<dyn std::fmt::Display> {
         Box::new(self.token.literal())
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 impl Display for BlockStatement {

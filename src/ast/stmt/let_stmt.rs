@@ -48,6 +48,10 @@ impl Node for Let {
     fn literal(&self) -> Box<dyn Display> {
         Box::new("let".to_string())
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 impl Statement for Let {

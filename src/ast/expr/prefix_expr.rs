@@ -30,6 +30,10 @@ impl Node for PrefixExpr {
     fn literal(&self) -> Box<dyn std::fmt::Display> {
         Box::new(self.token.to_string())
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 impl Display for PrefixExpr {

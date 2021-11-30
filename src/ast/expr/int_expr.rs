@@ -19,6 +19,10 @@ impl Node for IntExpr {
     fn literal(&self) -> Box<dyn Display> {
         Box::new(self.value)
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 impl Expression for IntExpr {

@@ -24,6 +24,10 @@ impl Node for Identifier {
     fn literal(&self) -> std::boxed::Box<dyn Display> {
         Box::new("identifier".to_string())
     }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
 }
 
 impl Expression for Identifier {
