@@ -35,7 +35,7 @@ impl PartialOrd for Precedence {
     }
 }
 
-pub fn get_precendence(token: &Token) -> Precedence {
+pub fn get_precedence(token: &Token) -> Precedence {
     match token {
         Token::Eq(_) | Token::Diff(_) => Precedence::Equals,
         Token::Lt(_) | Token::Gt(_) | Token::Lte(_) | Token::Gte(_) => Precedence::LessGreater,

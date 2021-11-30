@@ -206,13 +206,13 @@ impl Parser {
         let mut left_expr = match prefix {
             Some(prefix_fn) => prefix_fn(self)?,
             None => {
-                let msg = format!("error expeceted a prefix, got {}", self.current_token);
+                let msg = format!("error expected a prefix, got {}", self.current_token);
                 return Err(ParseError::Message(msg));
             }
         };
 
         while !self.current_token_is(Token::Semicolon(None))
-            && precedence < precedence::get_precendence(self.peek_token.as_ref())
+            && precedence < precedence::get_precedence(self.peek_token.as_ref())
         {
             let infix = if let Some(infix) = self.infix_parse_fns.get(self.peek_token.as_ref()) {
                 infix
@@ -229,7 +229,7 @@ impl Parser {
         let identifier_value = match current_token.as_ref() {
             Token::Ident(Some(ident), _) => Rc::clone(ident),
             tok => {
-                let msg = format!("expected indentifer, got {}", tok);
+                let msg = format!("expected identifier, got {}", tok);
                 return Err(ParseError::Message(msg));
             }
         };
@@ -295,7 +295,7 @@ impl Parser {
     ) -> Result<Box<dyn Expression>, ParseError> {
         parser.next_token();
         let current_token = Rc::clone(&parser.current_token);
-        let precedence = precedence::get_precendence(parser.current_token.as_ref());
+        let precedence = precedence::get_precedence(parser.current_token.as_ref());
         let mut infix_expr = InfixExpr::new(current_token, parser.current_token.literal());
         infix_expr.left = Some(left);
         parser.next_token();
