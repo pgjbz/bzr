@@ -16,13 +16,16 @@ use crate::{
         stmt::{
             expression_stmt::ExpressionStatement, let_stmt::Let, return_stmt::Return, var_stmt::Var,
         },
-        types::Type,
-        InfixParseFn, PrefixParseFn,
+        types::Type
     },
     lexer::{token::Token, Lexer},
 };
 
 use self::{errors::ParseError, precedence::Precedence};
+
+type PrefixParseFn = fn(&mut Parser) -> Result<Box<dyn Expression>, ParseError>;
+type InfixParseFn =
+    fn(&mut Parser, Box<dyn Expression>) -> Result<Box<dyn Expression>, ParseError>;
 
 pub struct Parser {
     lexer: Lexer,

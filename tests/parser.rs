@@ -1,5 +1,5 @@
 use bzr::ast::expression::Expression;
-use std::rc::Rc;
+use std::{rc::Rc};
 
 use bzr::{
     ast::{
@@ -195,4 +195,50 @@ fn test_program_to_string() {
     let program = Program::new(statements, vec![]);
     let program_str = program.to_string();
     assert_eq!("let my_var int = 10;", program_str);
+}
+
+#[test]
+fn test_parse_precedence() {
+    let source = "-a * b
+!-a
+a + b + c
+a + b - c
+a * b * c
+a * b / c
+a + b / c
+a + b * c + d / e - f
+3 + 4; -5 * 5
+5 > 4 == 3 < 4
+5 < 4 != 3 > 4
+3 + 4 * 5 == 3 * 1 + 4 * 5
+3 + 4 * 5 == 3 * 1 + 4 * 5
+10 >= 10
+20 <= 50".to_string();
+    let expected = "((-a) * b)
+(!(-a))
+((a + b) + c)
+((a + b) - c)
+((a * b) * c)
+((a * b) / c)
+(a + (b / c))
+(((a + (b * c)) + (d / e)) - f)
+(3 + 4)
+(-5 * 5)
+((5 > 4) == (3 < 4))
+((5 < 4) != (3 > 4))
+((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))
+((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))
+(10 >= 10)
+(20 <= 50)
+".to_string();
+
+    let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
+    let parser = Parser::new(lexer);
+    let mut output = String::new();
+    let program = parser.parse_program();
+    for stmt in program.statements {
+        output.push_str(&stmt.to_string());
+        output.push_str("\n");
+    }
+    assert_eq!(&expected, &output);
 }
