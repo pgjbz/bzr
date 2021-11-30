@@ -16,7 +16,7 @@ use crate::{
         stmt::{
             expression_stmt::ExpressionStatement, let_stmt::Let, return_stmt::Return, var_stmt::Var,
         },
-        types::Type
+        types::Type,
     },
     lexer::{token::Token, Lexer},
 };
@@ -24,8 +24,7 @@ use crate::{
 use self::{errors::ParseError, precedence::Precedence};
 
 type PrefixParseFn = fn(&mut Parser) -> Result<Box<dyn Expression>, ParseError>;
-type InfixParseFn =
-    fn(&mut Parser, Box<dyn Expression>) -> Result<Box<dyn Expression>, ParseError>;
+type InfixParseFn = fn(&mut Parser, Box<dyn Expression>) -> Result<Box<dyn Expression>, ParseError>;
 
 pub struct Parser {
     lexer: Lexer,
@@ -49,6 +48,7 @@ impl Parser {
         prefix_parse_fns.insert(Token::True(None), Self::parse_bool_literal);
         prefix_parse_fns.insert(Token::False(None), Self::parse_bool_literal);
         prefix_parse_fns.insert(Token::String(None, None), Self::parse_string_literal);
+        prefix_parse_fns.insert(Token::Lparen(None), Self::parse_grouped_expression);
 
         infix_parse_fns.insert(Token::Plus(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Minus(None), Self::parse_infix_expression);
@@ -80,7 +80,10 @@ impl Parser {
                 }
                 Err(e) => match e {
                     ParseError::Eof => break 'parse,
-                    ParseError::Unknown => self.next_token(),
+                    ParseError::Unknown(_) => {
+                        eprintln!("Unknown error {}", e);
+                        self.next_token()
+                    }
                     ParseError::Message(msg) => {
                         self.next_token();
                         self.errors.push(msg)
@@ -149,6 +152,9 @@ impl Parser {
                 }
             }
         }
+        if self.peek_token_is(&Token::Semicolon(None)) {
+            self.next_token();
+        }
         if is_let {
             Ok(Let::new(
                 current_token,
@@ -184,10 +190,12 @@ impl Parser {
     fn parse_expression_statement(&mut self) -> Result<Box<dyn Statement>, ParseError> {
         let current_token = Rc::clone(&self.current_token);
         let mut stmt = ExpressionStatement::new(Type::Unknown, Rc::clone(&current_token));
-        stmt.expression = if let Ok(expr) = self.parse_expression(Precedence::Lowest) {
-            Some(expr)
-        } else {
-            None
+        stmt.expression = match self.parse_expression(Precedence::Lowest) {
+            Ok(expr) => Some(expr),
+            Err(e) => match e {
+                ParseError::Message(_) => return Err(e),
+                _ => None,
+            },
         };
         if self.peek_token_is(&Token::Semicolon(None)) {
             self.next_token();
@@ -269,7 +277,10 @@ impl Parser {
 
         prefix_expr.right = match parser.parse_expression(Precedence::Prefix) {
             Ok(expr) => Some(expr),
-            Err(_) => None,
+            Err(e) => match e {
+                ParseError::Message(_) => return Err(e),
+                _ => None,
+            },
         };
 
         Ok(Box::new(prefix_expr))
@@ -305,6 +316,22 @@ impl Parser {
         };
 
         Ok(Box::new(infix_expr))
+    }
+
+    fn parse_grouped_expression(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
+        parser.next_token();
+
+        let expr = parser.parse_expression(Precedence::Lowest);
+
+        match parser.expected_peek(Token::Rparen(None)) {
+            Ok(_) => {}
+            Err(_) => {
+                let msg = format!("expected Lparen got, {}", parser.peek_token);
+                return Err(ParseError::Message(msg));
+            }
+        }
+
+        expr
     }
 
     fn expected_peek(&mut self, token: Token) -> Result<(), ParseError> {

@@ -1,5 +1,5 @@
 use bzr::ast::expression::Expression;
-use std::{rc::Rc};
+use std::rc::Rc;
 
 use bzr::{
     ast::{
@@ -15,9 +15,9 @@ fn test_parse_let_int_type() {
     let source = "let a int = 10;".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() <= 0);
-    assert!(progrma.statements.len() > 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() <= 0);
+    assert!(program.statements.len() > 0);
 }
 
 #[test]
@@ -25,9 +25,9 @@ fn test_parse_var_int_type() {
     let source = "var a int = 10;".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() <= 0);
-    assert!(progrma.statements.len() > 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() <= 0);
+    assert!(program.statements.len() > 0);
 }
 
 #[test]
@@ -35,9 +35,9 @@ fn test_parse_let_negative_int_type() {
     let source = "let a int = -10;".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() <= 0);
-    assert!(progrma.statements.len() > 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() <= 0);
+    assert!(program.statements.len() > 0);
 }
 
 #[test]
@@ -45,9 +45,9 @@ fn test_parse_var_negative_int_type() {
     let source = "var a int = -10;".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() <= 0);
-    assert!(progrma.statements.len() > 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() <= 0);
+    assert!(program.statements.len() > 0);
 }
 
 #[test]
@@ -55,9 +55,9 @@ fn test_parse_var_int_type_erros() {
     let source = "var a int = \"texto\"".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() > 0);
-    assert!(progrma.statements.len() <= 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() > 0);
+    assert!(program.statements.len() <= 0);
 }
 
 #[test]
@@ -65,9 +65,9 @@ fn test_parse_let_int_type_erros() {
     let source = "var a int = \"10\"".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() > 0);
-    assert!(progrma.statements.len() <= 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() > 0);
+    assert!(program.statements.len() <= 0);
 }
 
 #[test]
@@ -75,9 +75,9 @@ fn test_parse_var_int_letter_type_erros() {
     let source = "var a int = 10a".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() > 0);
-    assert!(progrma.statements.len() <= 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() > 0);
+    assert!(program.statements.len() <= 0);
 }
 
 #[test]
@@ -85,9 +85,9 @@ fn test_parse_let_int_letter_type_erros() {
     let source = "var a int = 10a".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() > 0);
-    assert!(progrma.statements.len() <= 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() > 0);
+    assert!(program.statements.len() <= 0);
 }
 
 #[test]
@@ -95,9 +95,9 @@ fn test_parse_str_int_type() {
     let source = "let a str = \"10\";".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() <= 0);
-    assert!(progrma.statements.len() > 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() <= 0);
+    assert!(program.statements.len() > 0);
 }
 
 #[test]
@@ -105,9 +105,9 @@ fn test_parse_var_str_type() {
     let source = "var a int = 10;".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() <= 0);
-    assert!(progrma.statements.len() > 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() <= 0);
+    assert!(program.statements.len() > 0);
 }
 
 #[test]
@@ -115,9 +115,9 @@ fn test_parse_var_str_type_erros() {
     let source = "var a str = 10".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() > 0);
-    assert!(progrma.statements.len() <= 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() > 0);
+    assert!(program.statements.len() <= 0);
 }
 
 #[test]
@@ -125,9 +125,9 @@ fn test_parse_let_str_type_erros() {
     let source = "var a int = \"10\"".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() > 0);
-    assert!(progrma.statements.len() <= 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() > 0);
+    assert!(program.statements.len() <= 0);
 }
 
 //
@@ -137,9 +137,9 @@ fn test_parse_bool_int_type() {
     let source = "let a str = \"10\";".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() <= 0);
-    assert!(progrma.statements.len() > 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() <= 0);
+    assert!(program.statements.len() > 0);
 }
 
 #[test]
@@ -147,9 +147,9 @@ fn test_parse_var_bool_type() {
     let source = "var a bool = false;".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() <= 0);
-    assert!(progrma.statements.len() > 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() <= 0);
+    assert!(program.statements.len() > 0);
 }
 
 #[test]
@@ -157,9 +157,9 @@ fn test_parse_var_bool_type_erros() {
     let source = "var a bool = 10".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() > 0);
-    assert!(progrma.statements.len() <= 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() > 0);
+    assert!(program.statements.len() <= 0);
 }
 
 #[test]
@@ -167,9 +167,9 @@ fn test_parse_let_bool_type_erros() {
     let source = "var a bool = \"false\"".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() > 0);
-    assert!(progrma.statements.len() <= 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() > 0);
+    assert!(program.statements.len() <= 0);
 }
 
 #[test]
@@ -177,9 +177,9 @@ fn test_parse_return_type() {
     let source = "ret false;".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
-    let progrma = parser.parse_program();
-    assert!(progrma.errors.len() <= 0);
-    assert!(progrma.statements.len() > 0);
+    let program = parser.parse_program();
+    assert!(program.errors.len() <= 0);
+    assert!(program.statements.len() > 0);
 }
 
 #[test]
@@ -199,21 +199,30 @@ fn test_program_to_string() {
 
 #[test]
 fn test_parse_precedence() {
-    let source = "-a * b
-!-a
-a + b + c
-a + b - c
-a * b * c
-a * b / c
-a + b / c
-a + b * c + d / e - f
-3 + 4; -5 * 5
-5 > 4 == 3 < 4
-5 < 4 != 3 > 4
-3 + 4 * 5 == 3 * 1 + 4 * 5
-3 + 4 * 5 == 3 * 1 + 4 * 5
-10 >= 10
-20 <= 50".to_string();
+    let source = "-a * b;
+    !-a;
+    a + b + c;
+    a + b - c;
+    a * b * c;
+    a * b / c;
+    a + b / c;
+    a + b * c + d / e - f;
+    3 + 4; -5 * 5;
+    5 > 4 == 3 < 4;
+    5 < 4 != 3 > 4;
+    3 + 4 * 5 == 3 * 1 + 4 * 5;
+    3 + 4 * 5 == 3 * 1 + 4 * 5;
+    10 >= 10;
+    20 <= 50;
+    10 + 2 * 3
+    3 > 5 == false
+    3 < 5 == true
+    true == true
+    false == false
+    false != true
+    false == true
+    !(true == true)"
+        .to_string();
     let expected = "((-a) * b)
 (!(-a))
 ((a + b) + c)
@@ -230,7 +239,16 @@ a + b * c + d / e - f
 ((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))
 (10 >= 10)
 (20 <= 50)
-".to_string();
+(10 + (2 * 3))
+((3 > 5) == false)
+((3 < 5) == true)
+(true == true)
+(false == false)
+(false != true)
+(false == true)
+(!(true == true))
+"
+    .to_string();
 
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
