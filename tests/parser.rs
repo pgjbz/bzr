@@ -270,6 +270,18 @@ fn test_if_expression() {
     let parser = Parser::new(lexer);
     let program = parser.parse_program();
     assert_eq!(1, program.statements.len());
+    let stmt = program.statements.first().unwrap();
+    let expr_stmt = stmt.as_any().downcast_ref::<ExpressionStatement>().unwrap();
+    let exists = expr_stmt
+        .expression
+        .as_ref()
+        .unwrap()
+        .as_any()
+        .downcast_ref::<IfExpr>()
+        .unwrap()
+        .consequence
+        .is_some();
+    assert!(exists);
 }
 
 #[test]
