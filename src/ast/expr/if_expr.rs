@@ -11,8 +11,8 @@ use crate::{
 pub struct IfExpr {
     pub token: Rc<Token>,
     pub condition: Box<dyn Expression>,
-    pub consequence: Option<BlockStatement>,
-    pub alternative: Option<BlockStatement>,
+    pub consequence: Option<Box<BlockStatement>>,
+    pub alternative: Option<Box<BlockStatement>>,
 }
 
 impl IfExpr {

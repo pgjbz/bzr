@@ -313,3 +313,12 @@ fn test_if_else_if_expression() {
     let program = parser.parse_program();
     assert_eq!(1, program.statements.len());
 }
+
+#[test]
+fn test_function_literal_parsing() {
+    let source = "fn sum(a int, b int) { a + b; }".to_string();
+    let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
+    let parser = Parser::new(lexer);
+    let program = parser.parse_program();
+    assert_eq!(1, program.statements.len());
+}

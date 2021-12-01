@@ -16,7 +16,7 @@ fn assert_true() {
 fn test_tokens() {
     let source = Rc::new("{}(),; ,".to_string());
     let tokens = vec![
-        Token::Lbrace(Some(Location::new(0, 1, Rc::new(FILENAME.to_string())))),
+        Token::LBrace(Some(Location::new(0, 1, Rc::new(FILENAME.to_string())))),
         Token::Rbrace(Some(Location::new(1, 1, Rc::new(FILENAME.to_string())))),
         Token::LParen(Some(Location::new(2, 1, Rc::new(FILENAME.to_string())))),
         Token::RParen(Some(Location::new(3, 1, Rc::new(FILENAME.to_string())))),

@@ -6,8 +6,8 @@ use std::{collections::HashMap, mem, rc::Rc};
 use crate::{
     ast::{
         expr::{
-            bool_expr::BoolExpr, if_expr::IfExpr, infix_expr::InfixExpr, int_expr::IntExpr,
-            prefix_expr::PrefixExpr, str_expr::StrExpr,
+            bool_expr::BoolExpr, function_expr::FunctionLiteral, if_expr::IfExpr,
+            infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
         },
         expression::Expression,
         identifier::Identifier,
@@ -51,6 +51,7 @@ impl Parser {
         prefix_parse_fns.insert(Token::String(None, None), Self::parse_string_literal);
         prefix_parse_fns.insert(Token::LParen(None), Self::parse_grouped_expression);
         prefix_parse_fns.insert(Token::If(None), Self::parse_if_expression);
+        prefix_parse_fns.insert(Token::Function(None), Self::parse_function_literal);
 
         infix_parse_fns.insert(Token::Plus(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Minus(None), Self::parse_infix_expression);
@@ -235,15 +236,28 @@ impl Parser {
     }
 
     fn parse_identifier(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
-        let current_token = Rc::clone(&parser.current_token);
-        let identifier_value = match current_token.as_ref() {
+        let identifier_expr = parser.create_identifier(false)?;
+        Ok(Box::new(identifier_expr))
+    }
+
+    fn create_identifier(&mut self, skip_type: bool) -> Result<Identifier, ParseError> {
+        let current_token = Rc::clone(&self.current_token);
+        let identifier_value = match self.current_token.as_ref() {
             Token::Ident(Some(ident), _) => Rc::clone(ident),
             tok => {
                 let msg = format!("expected identifier, got {}", tok);
                 return Err(ParseError::Message(msg));
             }
         };
-        Ok(Box::new(Identifier::new(identifier_value, current_token)))
+        let mut identifier_expr = Identifier::new(identifier_value, current_token);
+        if self.has_type() {
+            let typ = self.peek_token.to_type();
+            if skip_type {
+                self.next_token();
+            }
+            identifier_expr.set_type(typ);
+        }
+        Ok(identifier_expr)
     }
 
     fn parse_number_literal(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
@@ -270,6 +284,41 @@ impl Parser {
         };
         let bool_expr = BoolExpr::new(boolean, current_token);
         Ok(Box::new(bool_expr))
+    }
+
+    fn parse_function_literal(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
+        let current_token = Rc::clone(&parser.current_token);
+        parser.next_token();
+        let identifier = Self::parse_identifier(parser)?;
+        let mut function_expr = FunctionLiteral::new(current_token, identifier);
+        parser.expected_peek(Token::LParen(None))?;
+        function_expr.parameters = parser.parse_function_parameters()?;
+        parser.expected_peek(Token::LBrace(None))?;
+        function_expr.body = parser.parse_block_statement();
+        Ok(Box::new(function_expr))
+    }
+
+    fn parse_function_parameters(&mut self) -> Result<Vec<Identifier>, ParseError> {
+        let mut identifiers = Vec::<Identifier>::with_capacity(5);
+        if self.peek_token_is(&Token::RParen(None)) {
+            self.next_token();
+            return Ok(identifiers);
+        }
+
+        self.next_token();
+        let identifier = self.create_identifier(true)?;
+        identifiers.push(identifier);
+
+        while self.peek_token_is(&Token::Comma(None)) {
+            self.next_token();
+            self.next_token();
+            let identifier = self.create_identifier(true)?;
+            identifiers.push(identifier);
+        }
+        // self.next_token();
+        self.expected_peek(Token::RParen(None))?;
+
+        Ok(identifiers)
     }
 
     fn parse_prefix_expression(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
@@ -309,7 +358,7 @@ impl Parser {
 
         let expr = parser.parse_expression(Precedence::Lowest)?;
 
-        parser.expected_peek(Token::Lbrace(None))?;
+        parser.expected_peek(Token::LBrace(None))?;
 
         let consequence_block = parser.parse_block_statement();
 
@@ -318,7 +367,7 @@ impl Parser {
 
         if parser.peek_token_is(&Token::Else(None)) {
             parser.next_token();
-            match parser.expected_peek(Token::Lbrace(None)) {
+            match parser.expected_peek(Token::LBrace(None)) {
                 Ok(_) => {}
                 Err(_) => parser.expected_peek(Token::If(None))?,
             }
@@ -329,7 +378,7 @@ impl Parser {
         Ok(Box::new(if_expr))
     }
 
-    fn parse_block_statement(&mut self) -> Option<BlockStatement> {
+    fn parse_block_statement(&mut self) -> Option<Box<BlockStatement>> {
         let mut block_stmt = BlockStatement::new(Rc::clone(&self.current_token));
 
         while !self.current_token_is(Token::Rbrace(None))
@@ -342,7 +391,7 @@ impl Parser {
             self.next_token();
         }
 
-        Some(block_stmt)
+        Some(Box::new(block_stmt))
     }
 
     //TODO: add type checking

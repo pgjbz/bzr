@@ -6,11 +6,16 @@ use std::{fmt::Display, rc::Rc};
 pub struct Identifier {
     pub token: Rc<Token>,
     pub value: Rc<String>,
+    pub typ: Option<Type>,
 }
 
 impl Identifier {
     pub fn new(value: Rc<String>, token: Rc<Token>) -> Self {
-        Self { value, token }
+        Self {
+            value,
+            token,
+            typ: None,
+        }
     }
 }
 
@@ -36,5 +41,9 @@ impl Expression for Identifier {
     }
     fn get_type(&self) -> Type {
         Type::Unknown
+    }
+
+    fn set_type(&mut self, typ: Type) {
+        self.typ = Some(typ);
     }
 }

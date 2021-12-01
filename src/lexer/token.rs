@@ -14,7 +14,7 @@ pub enum Token {
     RParen(Option<Location>),
     LSqBracket(Option<Location>),
     RSqBracket(Option<Location>),
-    Lbrace(Option<Location>),
+    LBrace(Option<Location>),
     Rbrace(Option<Location>),
     String(Option<Rc<String>>, Option<Location>),
     Function(Option<Location>),
@@ -210,7 +210,7 @@ impl Display for Token {
                     "[".to_string()
                 }
             }
-            Self::Lbrace(pos) => {
+            Self::LBrace(pos) => {
                 if let Some(pos) = pos {
                     format!("'{{' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
