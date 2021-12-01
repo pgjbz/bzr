@@ -6,7 +6,7 @@ use std::{collections::HashMap, mem, rc::Rc};
 use crate::{
     ast::{
         expr::{
-            bool_expr::BoolExpr, function_expr::FunctionLiteral, if_expr::IfExpr,
+            bool_expr::BoolExpr, function_expr::FunctionExpr, if_expr::IfExpr,
             infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
         },
         expression::Expression,
@@ -290,7 +290,7 @@ impl Parser {
         let current_token = Rc::clone(&parser.current_token);
         parser.next_token();
         let identifier = Self::parse_identifier(parser)?;
-        let mut function_expr = FunctionLiteral::new(current_token, identifier);
+        let mut function_expr = FunctionExpr::new(current_token, identifier);
         parser.expected_peek(Token::LParen(None))?;
         function_expr.parameters = parser.parse_function_parameters()?;
         parser.expected_peek(Token::LBrace(None))?;

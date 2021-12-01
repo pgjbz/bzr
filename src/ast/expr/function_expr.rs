@@ -10,14 +10,14 @@ use crate::{
     lexer::token::Token,
 };
 
-pub struct FunctionLiteral {
+pub struct FunctionExpr {
     pub token: Rc<Token>,
     pub parameters: Vec<Identifier>,
     pub name: Box<dyn Expression>,
     pub body: Option<Box<BlockStatement>>,
 }
 
-impl FunctionLiteral {
+impl FunctionExpr {
     pub fn new(token: Rc<Token>, name: Box<dyn Expression>) -> Self {
         Self {
             token,
@@ -28,7 +28,7 @@ impl FunctionLiteral {
     }
 }
 
-impl Node for FunctionLiteral {
+impl Node for FunctionExpr {
     fn literal(&self) -> Box<dyn std::fmt::Display> {
         Box::new("fn".to_string())
     }
@@ -38,7 +38,7 @@ impl Node for FunctionLiteral {
     }
 }
 
-impl Display for FunctionLiteral {
+impl Display for FunctionExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buffer = String::new();
         let mut parameters = Vec::new();
@@ -58,7 +58,7 @@ impl Display for FunctionLiteral {
     }
 }
 
-impl Expression for FunctionLiteral {
+impl Expression for FunctionExpr {
     fn expression(&self) {
         todo!()
     }
