@@ -10,7 +10,7 @@ pub enum Precedence {
     Sum = 4,
     Product = 5,
     Prefix = 6,
-    _Call = 7,
+    Call = 7,
 }
 
 impl PartialEq for Precedence {
@@ -41,6 +41,7 @@ pub fn get_precedence(token: &Token) -> Precedence {
         Token::Lt(_) | Token::Gt(_) | Token::Lte(_) | Token::Gte(_) => Precedence::LessGreater,
         Token::Plus(_) | Token::Minus(_) => Precedence::Sum,
         Token::Slash(_) | Token::Asterisk(_) => Precedence::Product,
+        Token::LParen(_) => Precedence::Call,
         _ => Precedence::Lowest,
     }
 }

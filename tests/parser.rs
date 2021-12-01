@@ -322,3 +322,22 @@ fn test_function_literal_parsing() {
     let program = parser.parse_program();
     assert_eq!(1, program.statements.len());
 }
+
+
+#[test]
+fn test_function_call_with_args_parsing() {
+    let source = "sum (1, 2 * 3);".to_string();
+    let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
+    let parser = Parser::new(lexer);
+    let program = parser.parse_program();
+    assert_eq!(1, program.statements.len());
+}
+
+#[test]
+fn test_function_call_without_args_parsing() {
+    let source = "eqo ();".to_string();
+    let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
+    let parser = Parser::new(lexer);
+    let program = parser.parse_program();
+    assert_eq!(1, program.statements.len());
+}

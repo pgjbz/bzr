@@ -234,7 +234,7 @@ impl Lexer {
                             || ch == ';'
                             || ch == '{'
                             || ch == '&'
-                            || ch == '\0' //TODO: check if this is necessary
+                            || ch == '\0'
                             || ch == '!'
                             || ch == ','
                             || ch == ']'

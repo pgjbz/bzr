@@ -7,7 +7,7 @@ use crate::{
     ast::{
         expr::{
             bool_expr::BoolExpr, function_expr::FunctionExpr, if_expr::IfExpr,
-            infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
+            infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr, call_expr::CallExpr,
         },
         expression::Expression,
         identifier::Identifier,
@@ -63,6 +63,7 @@ impl Parser {
         infix_parse_fns.insert(Token::Gt(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Gte(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Lte(None), Self::parse_infix_expression);
+        infix_parse_fns.insert(Token::LParen(None), Self::parse_call_expression);
         Self {
             lexer,
             current_token,
@@ -178,15 +179,9 @@ impl Parser {
 
     fn parse_return(&mut self) -> Result<Box<dyn Statement>, ParseError> {
         let current_token = Rc::clone(&self.current_token);
-        let ret = Return::new(None, current_token);
-        //TODO: we're skipping expression until found a semicolon
-        while !self.current_token_is(Token::Semicolon(None)) {
-            self.next_token();
-            if self.current_token_is(Token::EOF(None)) {
-                let msg = format!("expected semicolon, got {}", self.current_token);
-                return Err(ParseError::Message(msg));
-            }
-        }
+        let mut ret = Return::new(None, current_token);
+        self.next_token();
+        ret.return_value = Some(self.parse_expression(Precedence::Lowest)?);
         Ok(Box::new(ret))
     }
 
@@ -207,7 +202,6 @@ impl Parser {
         Ok(Box::new(stmt))
     }
 
-    //TODO: improve parse expression to really parse expression
     fn parse_expression(
         &mut self,
         precedence: Precedence,
@@ -394,7 +388,6 @@ impl Parser {
         Some(Box::new(block_stmt))
     }
 
-    //TODO: add type checking
     fn parse_infix_expression(
         parser: &mut Self,
         left: Box<dyn Expression>,
@@ -414,6 +407,39 @@ impl Parser {
 
         Ok(Box::new(infix_expr))
     }
+
+    fn parse_call_expression(parser: &mut Self,
+        function: Box<dyn Expression>,
+    ) -> Result<Box<dyn Expression>, ParseError> {
+        let mut call_expr = CallExpr::new(Rc::clone(&parser.current_token), function);
+        parser.next_token();
+        call_expr.arguments = parser.parse_call_arguments()?;
+        Ok(Box::new(call_expr))
+    }
+    
+    fn parse_call_arguments(&mut self) -> Result<Vec<Box<dyn Expression>>, ParseError> {
+        let mut arguments = Vec::new();
+        
+        if self.peek_token_is(&Token::RParen(None)) {
+            self.next_token();
+            return Ok(arguments);
+        }
+        self.next_token();
+        
+        arguments.push(self.parse_expression(Precedence::Lowest)?);
+        
+        while self.peek_token_is(&Token::Comma(None)) {
+            self.next_token();
+            self.next_token();
+            arguments.push(self.parse_expression(Precedence::Lowest)?);
+        }
+
+        self.expected_peek(Token::RParen(None))?;
+
+        Ok(arguments)
+    }
+
+    
 
     fn parse_grouped_expression(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
         parser.next_token();
