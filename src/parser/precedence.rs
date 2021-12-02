@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use crate::lexer::token::Token;
 
 #[derive(Clone, Copy)]
-pub enum Precedence {
+pub(super) enum Precedence {
     Lowest = 1,
     Equals = 2,
     LessGreater = 3,
@@ -35,7 +35,7 @@ impl PartialOrd for Precedence {
     }
 }
 
-pub fn get_precedence(token: &Token) -> Precedence {
+pub(super) fn get_precedence(token: &Token) -> Precedence {
     match token {
         Token::Eq(_) | Token::Diff(_) => Precedence::Equals,
         Token::Lt(_) | Token::Gt(_) | Token::Lte(_) | Token::Gte(_) => Precedence::LessGreater,

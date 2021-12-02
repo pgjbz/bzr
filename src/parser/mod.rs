@@ -86,10 +86,6 @@ impl Parser {
                 }
                 Err(e) => match e {
                     ParseError::Eof => break 'parse,
-                    ParseError::Unknown(_) => {
-                        eprintln!("Unknown error {}", e);
-                        self.next_token()
-                    }
                     ParseError::Message(msg) => {
                         self.next_token();
                         self.errors.push(msg)
