@@ -1,5 +1,5 @@
-pub mod errors;
-pub mod precedence;
+mod errors;
+mod precedence;
 
 use std::{collections::HashMap, mem, rc::Rc};
 
@@ -172,7 +172,6 @@ impl Parser {
                 expression,
             ))
         }
-        // todo!("Rewrite this method to improve type checking and parse let")
     }
 
     fn parse_return(&mut self) -> Result<Box<dyn Statement>, ParseError> {
