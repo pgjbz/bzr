@@ -73,7 +73,7 @@ impl Lexer {
                     if Self::is_number(Some(next_char)) {
                         self.read_char();
                         let ident: &str = self.read_number();
-                        if Self::valid_number_sufix(Some(next_char)) {
+                        if Self::valid_number_suffix(Some(next_char)) {
                             token = Token::Number(
                                 Some(Rc::new(format!("-{}", ident))),
                                 Some(Location::new(line_position, line, filename)),
@@ -200,7 +200,7 @@ impl Lexer {
                             Some(Rc::new(String::from(ident))),
                             Some(Location::new(line_position, line, Rc::clone(&filename))),
                         );
-                        if Self::valid_number_sufix(Some(next_char)) {
+                        if Self::valid_number_suffix(Some(next_char)) {
                             token = Token::Number(
                                 Some(Rc::new(String::from(ident))),
                                 Some(Location::new(line_position, line, filename)),
@@ -227,9 +227,9 @@ impl Lexer {
         Rc::new(token)
     }
 
-    fn valid_number_sufix(ch: Option<char>) -> bool {
+    fn valid_number_suffix(ch: Option<char>) -> bool {
         if let Some(ch) = ch {
-            Self::is_math_simbol(ch)
+            Self::is_math_symbol(ch)
                 || Self::is_whitespace(Some(ch))
                 || ch == ';'
                 || ch == '{'
@@ -341,7 +341,7 @@ impl Lexer {
         }
     }
 
-    fn is_math_simbol(ch: char) -> bool {
+    fn is_math_symbol(ch: char) -> bool {
         ch == '*'
             || ch == '/'
             || ch == '+'
