@@ -3,32 +3,30 @@ use std::{fmt::Display, rc::Rc};
 use crate::{
     ast::{
         expression::{Expression, Node},
-        stmt::block_stmt::BlockStatement,
+        stmt::block_stmt::BlockStatement, types::Type,
     },
     lexer::token::Token,
 };
 
-pub struct IfExpr {
+pub struct WhileExpr {
     pub token: Rc<Token>,
     pub condition: Box<dyn Expression>,
     pub consequence: Option<Box<BlockStatement>>,
-    pub alternative: Option<Box<BlockStatement>>,
 }
 
-impl IfExpr {
+impl WhileExpr {
     pub fn new(token: Rc<Token>, condition: Box<dyn Expression>) -> Self {
         Self {
             token,
             condition,
             consequence: None,
-            alternative: None,
         }
     }
 }
 
-impl Node for IfExpr {
+impl Node for WhileExpr {
     fn literal(&self) -> Box<dyn std::fmt::Display> {
-        Box::new("if".to_string())
+        Box::new("while".to_string())
     }
 
     fn as_any(&self) -> &dyn std::any::Any {
@@ -36,7 +34,7 @@ impl Node for IfExpr {
     }
 }
 
-impl Display for IfExpr {
+impl Display for WhileExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buffer = String::new();
         buffer.push_str(&format!("{} ", self.literal()));
@@ -46,19 +44,16 @@ impl Display for IfExpr {
         } else {
             "".to_string()
         });
-        if let Some(ref alternative) = self.alternative {
-            buffer.push_str(&format!(" else {}", alternative.to_string()))
-        };
         write!(f, "{}", buffer)
     }
 }
 
-impl Expression for IfExpr {
+impl Expression for WhileExpr {
     fn expression(&self) {
         todo!()
     }
 
-    fn get_type(&self) -> crate::ast::types::Type {
-        crate::ast::types::Type::Expression
+    fn get_type(&self) -> Type {
+        Type::Expression
     }
 }

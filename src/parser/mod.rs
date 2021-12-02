@@ -7,7 +7,7 @@ use crate::{
     ast::{
         expr::{
             bool_expr::BoolExpr, function_expr::FunctionExpr, if_expr::IfExpr,
-            infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr, call_expr::CallExpr,
+            infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr, call_expr::CallExpr, while_expr::WhileExpr,
         },
         expression::Expression,
         identifier::Identifier,
@@ -51,6 +51,7 @@ impl Parser {
         prefix_parse_fns.insert(Token::String(None, None), Self::parse_string_literal);
         prefix_parse_fns.insert(Token::LParen(None), Self::parse_grouped_expression);
         prefix_parse_fns.insert(Token::If(None), Self::parse_if_expression);
+        prefix_parse_fns.insert(Token::While(None), Self::parse_while_expression);
         prefix_parse_fns.insert(Token::Function(None), Self::parse_function_literal);
 
         infix_parse_fns.insert(Token::Plus(None), Self::parse_infix_expression);
@@ -182,6 +183,7 @@ impl Parser {
         let mut ret = Return::new(None, current_token);
         self.next_token();
         ret.return_value = Some(self.parse_expression(Precedence::Lowest)?);
+        self.next_token();
         Ok(Box::new(ret))
     }
 
@@ -370,6 +372,18 @@ impl Parser {
         }
 
         Ok(Box::new(if_expr))
+    }
+
+    fn parse_while_expression(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
+
+        let current_token = Rc::clone(&parser.current_token);
+        parser.next_token();
+        let expr = parser.parse_expression(Precedence::Lowest)?;
+        parser.expected_peek(Token::LBrace(None))?;
+        let consequence_block = parser.parse_block_statement();
+        let mut while_expr = WhileExpr::new(current_token, expr);
+        while_expr.consequence = consequence_block;
+        Ok(Box::new(while_expr))
     }
 
     fn parse_block_statement(&mut self) -> Option<Box<BlockStatement>> {

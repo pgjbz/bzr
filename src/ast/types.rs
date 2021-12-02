@@ -8,6 +8,7 @@ pub enum Type {
     Function,
     Prefix,
     Unknown,
+    Expression,
 }
 
 impl Display for Type {
@@ -18,6 +19,7 @@ impl Display for Type {
             Self::Bool => "bool",
             Self::Function => "function",
             Self::Prefix => "prefix",
+            Self::Expression => "expression",
             Self::Unknown => "unk",
         };
         write!(f, "{}", val)
