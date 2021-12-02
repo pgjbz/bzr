@@ -1,6 +1,6 @@
 use std::{fmt::Display, hash::Hash, rc::Rc};
 
-use crate::{ast::types::Type};
+use crate::ast::types::Type;
 
 #[derive(Debug)]
 pub enum Token {
@@ -63,7 +63,10 @@ impl Location {
 }
 
 impl Token {
-    pub(super) fn get_keyword_token(ident: &str, location: Option<Location>) -> Result<Token, String> {
+    pub(super) fn get_keyword_token(
+        ident: &str,
+        location: Option<Location>,
+    ) -> Result<Token, String> {
         let identifier: String = String::from(ident);
         match &identifier[..] {
             "if" => Ok(Token::If(location)),
