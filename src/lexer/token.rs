@@ -214,7 +214,7 @@ impl Display for Token {
                 if let Some(pos) = pos {
                     format!("'{{' in {}:{}:{}", pos.filename, pos.line, pos.position)
                 } else {
-                    "{{".to_string()
+                    "{".to_string()
                 }
             }
             Self::Let(pos) => {
@@ -326,6 +326,12 @@ impl Display for Token {
                     )
                 }
                 (_, _) => "String".to_string(),
+            },
+            Self::If(pos) => match pos {
+                Some(pos) => {
+                    format!("'if'in {}:{}:{}", pos.filename, pos.line, pos.position)
+                }
+                _ => "if".to_string(),
             },
             _ => String::from("another thing, found it"),
         };

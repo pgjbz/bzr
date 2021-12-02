@@ -323,7 +323,6 @@ fn test_function_literal_parsing() {
     assert_eq!(1, program.statements.len());
 }
 
-
 #[test]
 fn test_function_call_with_args_parsing() {
     let source = "sum (1, 2 * 3);".to_string();

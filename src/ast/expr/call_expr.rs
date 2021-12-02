@@ -1,6 +1,9 @@
-use std::{rc::Rc, fmt::Display};
+use std::{fmt::Display, rc::Rc};
 
-use crate::{lexer::token::Token, ast::expression::{Expression, Node}};
+use crate::{
+    ast::expression::{Expression, Node},
+    lexer::token::Token,
+};
 
 pub struct CallExpr {
     pub token: Rc<Token>,
@@ -13,7 +16,7 @@ impl CallExpr {
         Self {
             token,
             function,
-            arguments: vec![]
+            arguments: vec![],
         }
     }
 }

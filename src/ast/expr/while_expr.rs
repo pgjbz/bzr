@@ -3,7 +3,8 @@ use std::{fmt::Display, rc::Rc};
 use crate::{
     ast::{
         expression::{Expression, Node},
-        stmt::block_stmt::BlockStatement, types::Type,
+        stmt::block_stmt::BlockStatement,
+        types::Type,
     },
     lexer::token::Token,
 };

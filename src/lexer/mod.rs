@@ -230,15 +230,15 @@ impl Lexer {
     fn valid_number_sufix(ch: Option<char>) -> bool {
         if let Some(ch) = ch {
             Self::is_math_simbol(ch)
-                            || Self::is_whitespace(Some(ch))
-                            || ch == ';'
-                            || ch == '{'
-                            || ch == '&'
-                            || ch == '\0'
-                            || ch == '!'
-                            || ch == ','
-                            || ch == ']'
-                            || Self::is_number(Some(ch))
+                || Self::is_whitespace(Some(ch))
+                || ch == ';'
+                || ch == '{'
+                || ch == '&'
+                || ch == '\0'
+                || ch == '!'
+                || ch == ','
+                || ch == ']'
+                || Self::is_number(Some(ch))
         } else {
             false
         }

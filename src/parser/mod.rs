@@ -6,8 +6,9 @@ use std::{collections::HashMap, mem, rc::Rc};
 use crate::{
     ast::{
         expr::{
-            bool_expr::BoolExpr, function_expr::FunctionExpr, if_expr::IfExpr,
-            infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr, call_expr::CallExpr, while_expr::WhileExpr,
+            bool_expr::BoolExpr, call_expr::CallExpr, function_expr::FunctionExpr, if_expr::IfExpr,
+            infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
+            while_expr::WhileExpr,
         },
         expression::Expression,
         identifier::Identifier,
@@ -375,7 +376,6 @@ impl Parser {
     }
 
     fn parse_while_expression(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
-
         let current_token = Rc::clone(&parser.current_token);
         parser.next_token();
         let expr = parser.parse_expression(Precedence::Lowest)?;
@@ -422,7 +422,8 @@ impl Parser {
         Ok(Box::new(infix_expr))
     }
 
-    fn parse_call_expression(parser: &mut Self,
+    fn parse_call_expression(
+        parser: &mut Self,
         function: Box<dyn Expression>,
     ) -> Result<Box<dyn Expression>, ParseError> {
         let mut call_expr = CallExpr::new(Rc::clone(&parser.current_token), function);
@@ -430,18 +431,18 @@ impl Parser {
         call_expr.arguments = parser.parse_call_arguments()?;
         Ok(Box::new(call_expr))
     }
-    
+
     fn parse_call_arguments(&mut self) -> Result<Vec<Box<dyn Expression>>, ParseError> {
         let mut arguments = Vec::new();
-        
+
         if self.peek_token_is(&Token::RParen(None)) {
             self.next_token();
             return Ok(arguments);
         }
         self.next_token();
-        
+
         arguments.push(self.parse_expression(Precedence::Lowest)?);
-        
+
         while self.peek_token_is(&Token::Comma(None)) {
             self.next_token();
             self.next_token();
@@ -452,8 +453,6 @@ impl Parser {
 
         Ok(arguments)
     }
-
-    
 
     fn parse_grouped_expression(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
         parser.next_token();
