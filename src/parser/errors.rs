@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, num::ParseIntError};
 
 pub(super) enum ParseError {
     Eof,
@@ -12,5 +12,11 @@ impl Display for ParseError {
             Self::Message(msg) => msg,
         };
         write!(f, "{}", message)
+    }
+}
+
+impl From<ParseIntError> for ParseError {
+    fn from(e: ParseIntError) -> Self {
+        Self::Message(e.to_string())
     }
 }

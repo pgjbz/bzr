@@ -254,11 +254,12 @@ impl Parser {
 
     fn parse_number_literal(parser: &mut Self) -> Result<Box<dyn Expression>, ParseError> {
         let current_token = Rc::clone(&parser.current_token);
-        let number = if let Token::Number(Some(val), _) = parser.current_token.as_ref() {
-            val.trim().parse().unwrap()
-        } else {
-            let msg = format!("fail on parse value: {}", current_token);
-            return Err(ParseError::Message(msg));
+        let number = match parser.current_token.as_ref() {
+            Token::Number(Some(val), _) => val.trim().parse()?,
+            _ => {
+                let msg = format!("fail on parse value: {}", current_token);
+                return Err(ParseError::Message(msg));
+            }
         };
         let int_expr = IntExpr::new(number, current_token);
         Ok(Box::new(int_expr))
