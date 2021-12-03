@@ -7,7 +7,7 @@ pub mod boolean;
 pub mod string;
 pub mod null;
 
-trait Object {
+pub trait Object {
     fn get_type(&self) -> Type;
     fn inspect(&self) -> String;
     fn as_any(&self) -> &dyn Any;
