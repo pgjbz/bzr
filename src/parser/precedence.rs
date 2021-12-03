@@ -21,16 +21,11 @@ impl PartialEq for Precedence {
 
 impl PartialOrd for Precedence {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        if self == other {
-            return Some(Ordering::Equal);
-        }
-        let cur = *self as usize;
-        let oth = *other as usize;
-
-        if cur > oth {
-            Some(Ordering::Greater)
-        } else {
-            Some(Ordering::Less)
+        match (self, other) {
+            (cur, other) if cur == other => Some(Ordering::Equal),
+            (cur, other) if (*cur as usize) > (*other as usize) => Some(Ordering::Greater),
+            (cur, other) if (*cur as usize) < (*other as usize) => Some(Ordering::Less),
+            _ => Some(Ordering::Less),
         }
     }
 }
