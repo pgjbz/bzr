@@ -8,6 +8,12 @@ pub struct Str {
     pub val: String,
 }
 
+impl Str {
+    pub fn new(val: String) -> Self {
+        Self { val }
+    }
+}
+
 impl Object for Str {
     fn get_type(&self) -> Type {
         Type::Int
