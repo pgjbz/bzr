@@ -8,6 +8,12 @@ pub struct Boolean {
     pub val: bool,
 }
 
+impl Boolean {
+    pub fn new(val: bool) -> Self {
+        Self { val }
+    }
+}
+
 impl Object for Boolean {
     fn get_type(&self) -> Type {
         Type::Int

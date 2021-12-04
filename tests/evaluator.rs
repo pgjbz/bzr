@@ -4,7 +4,7 @@ use bzr::{
     ast::expression::Node,
     evaluator,
     lexer::Lexer,
-    object::{integer::Integer, Object},
+    object::{integer::Integer, Object, boolean::Boolean},
     parser::Parser,
 };
 
@@ -20,6 +20,20 @@ fn test_eval_integer() {
         assert_eq!(expected, evaluated.val)
     }
 }
+#[test]
+fn test_eval_boolean() {
+    let mut tests: Vec<(String, bool)> = Vec::new();
+    tests.push(("false".to_string(), false));
+    tests.push(("true".to_string(), true));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Boolean>().unwrap();
+        assert_eq!(expected, evaluated.val)
+    }
+}
+
+
 
 fn test_eval(source: String) -> Box<dyn Object> {
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
