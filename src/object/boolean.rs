@@ -5,7 +5,7 @@ use crate::ast::types::Type;
 use super::Object;
 
 pub struct Boolean {
-    pub val: bool
+    pub val: bool,
 }
 
 impl Object for Boolean {

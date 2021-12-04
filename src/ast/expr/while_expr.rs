@@ -39,7 +39,7 @@ impl Display for WhileExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buffer = String::new();
         buffer.push_str(&format!("{} ", self.literal()));
-        buffer.push_str(&format!("{} ", self.condition.to_string()));
+        buffer.push_str(&format!("{} ", self.condition));
         buffer.push_str(&if let Some(ref consequence) = self.consequence {
             consequence.to_string()
         } else {

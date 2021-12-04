@@ -1,4 +1,4 @@
-use super::statement::Statement;
+use super::{expression::Node, statement::Statement};
 use std::fmt::Display;
 
 pub struct Program {
@@ -19,5 +19,19 @@ impl Display for Program {
             program.push_str(&stmt.to_string())
         }
         write!(f, "{}", program)
+    }
+}
+
+impl Node for Program {
+    fn literal(&self) -> Box<dyn Display> {
+        if let Some(stmt) = self.statements.first() {
+            Box::new(stmt.to_string())
+        } else {
+            Box::new(String::new())
+        }
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
     }
 }

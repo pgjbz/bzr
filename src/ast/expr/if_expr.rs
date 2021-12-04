@@ -40,14 +40,14 @@ impl Display for IfExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buffer = String::new();
         buffer.push_str(&format!("{} ", self.literal()));
-        buffer.push_str(&format!("{} ", self.condition.to_string()));
+        buffer.push_str(&format!("{} ", self.condition));
         buffer.push_str(&if let Some(ref consequence) = self.consequence {
             consequence.to_string()
         } else {
             "".to_string()
         });
         if let Some(ref alternative) = self.alternative {
-            buffer.push_str(&format!(" else {}", alternative.to_string()))
+            buffer.push_str(&format!(" else {}", alternative))
         };
         write!(f, "{}", buffer)
     }

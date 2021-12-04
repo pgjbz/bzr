@@ -2,10 +2,10 @@ use std::any::Any;
 
 use crate::ast::types::Type;
 
-pub mod integer;
 pub mod boolean;
-pub mod string;
+pub mod integer;
 pub mod null;
+pub mod string;
 
 pub trait Object {
     fn get_type(&self) -> Type;

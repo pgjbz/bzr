@@ -5,7 +5,7 @@ use crate::ast::types::Type;
 use super::Object;
 
 pub struct Str {
-    pub val: String
+    pub val: String,
 }
 
 impl Object for Str {
