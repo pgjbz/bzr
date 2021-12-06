@@ -1,4 +1,4 @@
-use std::any::Any;
+use std::{any::Any, fmt::Display};
 
 use crate::ast::types::Type;
 
@@ -17,5 +17,11 @@ impl Object for Null {
 
     fn as_any(&self) -> &dyn Any {
         self
+    }
+}
+
+impl Display for Null {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "null")
     }
 }

@@ -1,4 +1,4 @@
-use std::any::Any;
+use std::{any::Any, fmt::Display};
 
 use crate::ast::types::Type;
 
@@ -7,7 +7,7 @@ pub mod integer;
 pub mod null;
 pub mod string;
 
-pub trait Object {
+pub trait Object: Display {
     fn get_type(&self) -> Type;
     fn inspect(&self) -> String;
     fn as_any(&self) -> &dyn Any;

@@ -71,7 +71,7 @@ fn test_eval(source: String) -> Box<dyn Object> {
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
     let program: Box<dyn Node> = parser.parse_program();
-    evaluator::eval(program.as_ref()).unwrap()
+    evaluator::eval(Some(program.as_ref())).unwrap()
 }
 
 #[test]
@@ -85,6 +85,22 @@ fn test_bang_operator_boolean() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Boolean>().unwrap();
+        let value = *evaluated.val.borrow_mut();
+        assert_eq!(expected, value)
+    }
+}
+
+#[test]
+fn test_eval_infix_number_expr() {
+    let mut tests: Vec<(String, i64)> = Vec::new();
+    tests.push(("5".to_string(), 5));
+    tests.push(("-5".to_string(), -5));
+    tests.push(("10".to_string(), 10));
+    tests.push(("-10".to_string(), -10));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
         let value = *evaluated.val.borrow_mut();
         assert_eq!(expected, value)
     }

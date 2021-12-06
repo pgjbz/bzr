@@ -1,6 +1,6 @@
 use std::{env, fs, rc::Rc};
 
-use bzr::{lexer::Lexer, parser::Parser};
+use bzr::{evaluator, lexer::Lexer, parser::Parser};
 
 fn main() {
     let filename = env::args().nth(1).expect("Expected filename");
@@ -13,9 +13,7 @@ fn main() {
     let program = parse.parse_program();
 
     if program.errors.is_empty() {
-        for sts in program.statements {
-            println!("{}", sts);
-        }
+        evaluator::eval(Some(program.as_ref()));
     } else {
         for error in program.errors {
             println!("{}", error);
