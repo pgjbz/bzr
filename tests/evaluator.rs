@@ -116,6 +116,9 @@ fn test_eval_infix_bool_expr() {
     tests.push(("true != false;".to_string(), true));
     tests.push(("true != true;".to_string(), false));
     tests.push(("true == true;".to_string(), true));
+    tests.push(("true || false;".to_string(), true));
+    tests.push(("true && true;".to_string(), true));
+    tests.push(("true && false;".to_string(), false));
     tests.push(("10 == 10;".to_string(), true));
     tests.push(("10 != 10;".to_string(), false));
     tests.push(("10 > 10;".to_string(), false));
@@ -127,6 +130,9 @@ fn test_eval_infix_bool_expr() {
     tests.push(("(2 < 1) == false;".to_string(), true));
     tests.push(("(1 < 2) == true;".to_string(), true));
     tests.push(("(1 > 2) == false;".to_string(), true));
+    tests.push(("(1 > 2) || false;".to_string(), false));
+    tests.push(("(1 > 2) || true;".to_string(), true));
+    tests.push(("(1 > 2) || (2 < 1);".to_string(), false));
 
     for (source, expected) in tests {
         let evaluated = test_eval(source);

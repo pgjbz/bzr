@@ -33,7 +33,12 @@ impl PartialOrd for Precedence {
 pub(super) fn get_precedence(token: &Token) -> Precedence {
     match token {
         Token::Eq(_) | Token::Diff(_) => Precedence::Equals,
-        Token::Lt(_) | Token::Gt(_) | Token::Lte(_) | Token::Gte(_) => Precedence::LessGreater,
+        Token::Lt(_)
+        | Token::Gt(_)
+        | Token::Lte(_)
+        | Token::Gte(_)
+        | Token::And(_)
+        | Token::Or(_) => Precedence::LessGreater,
         Token::Plus(_) | Token::Minus(_) => Precedence::Sum,
         Token::Slash(_) | Token::Asterisk(_) => Precedence::Product,
         Token::LParen(_) => Precedence::Call,

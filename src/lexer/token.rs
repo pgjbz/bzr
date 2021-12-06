@@ -98,6 +98,8 @@ impl Token {
             Self::Lte(_) => "<=".to_string(),
             Self::Slash(_) => "/".to_string(),
             Self::Asterisk(_) => "*".to_string(),
+            Self::Or(_) => "||".to_string(),
+            Self::And(_) => "&&".to_string(),
             _ => "unknown".to_string(),
         }
     }
@@ -111,6 +113,8 @@ impl Token {
             | Self::Lte(_)
             | Self::Gte(_)
             | Self::Diff(_)
+            | Self::And(_)
+            | Self::Or(_)
             | Self::Eq(_) => Type::Bool,
             Self::Str(_) => Type::String,
             Self::Function(_) => Type::Function,
@@ -333,6 +337,12 @@ impl Display for Token {
             Self::If(pos) => match pos {
                 Some(pos) => {
                     format!("'if'in {}:{}:{}", pos.filename, pos.line, pos.position)
+                }
+                _ => "if".to_string(),
+            },
+            Self::Or(pos) => match pos {
+                Some(pos) => {
+                    format!("'||'in {}:{}:{}", pos.filename, pos.line, pos.position)
                 }
                 _ => "if".to_string(),
             },

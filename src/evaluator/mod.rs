@@ -13,7 +13,9 @@ use crate::{
             block_stmt::BlockStatement, expression_stmt::ExpressionStatement, return_stmt::Return,
         },
     },
-    object::{boolean::Boolean, integer::Integer, null::Null, ret::Ret, string::Str, Object},
+    object::{
+        boolean::Boolean, error::Error, integer::Integer, null::Null, ret::Ret, string::Str, Object,
+    },
 };
 
 pub fn eval(node: Option<&dyn Node>) -> Option<Rc<dyn Object>> {
@@ -56,10 +58,7 @@ fn eval_prefix_expr(right: Rc<dyn Object>, operator: &str) -> Option<Rc<dyn Obje
     match operator {
         "!" => eval_bang_operator(right),
         "-" => eval_minus_prefix_operator(right),
-        _ => {
-            eprintln!("invalid expression {}", right);
-            None
-        }
+        _ => Some(Rc::new(Error::new(format!("invalid expression {}", right)))),
     }
 }
 
@@ -108,6 +107,8 @@ fn eval_infix_expr(
                 "<=" => Some(Rc::new(Boolean::new(left <= right))),
                 ">" => Some(Rc::new(Boolean::new(left & !right))),
                 "<" => Some(Rc::new(Boolean::new(!left & right))),
+                "||" => Some(Rc::new(Boolean::new(left || right))),
+                "&&" => Some(Rc::new(Boolean::new(left && right))),
                 _ => None,
             }
         } else {
@@ -123,19 +124,23 @@ fn eval_bang_operator(right: Rc<dyn Object>) -> Option<Rc<dyn Object>> {
         let mut val = boolean.val.borrow_mut();
         *val = !*val;
     } else {
-        eprintln!("invalid expression '!{}'", right);
-        return None;
+        return Some(Rc::new(Error::new(format!(
+            "invalid expression '!{}'",
+            right
+        ))));
     }
     Some(right)
 }
 
 fn eval_minus_prefix_operator(right: Rc<dyn Object>) -> Option<Rc<dyn Object>> {
-    if let Some(boolean) = right.as_any().downcast_ref::<Integer>() {
-        let mut val = boolean.val.borrow_mut();
+    if let Some(integer) = right.as_any().downcast_ref::<Integer>() {
+        let mut val = integer.val.borrow_mut();
         *val = !*val;
     } else {
-        eprintln!("invalid expression '-{}'", right);
-        return None;
+        return Some(Rc::new(Error::new(format!(
+            "invalid expression '-{}'",
+            right
+        ))));
     }
     Some(right)
 }

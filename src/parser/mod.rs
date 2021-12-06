@@ -65,6 +65,8 @@ impl Parser {
         infix_parse_fns.insert(Token::Gt(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Gte(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Lte(None), Self::parse_infix_expression);
+        infix_parse_fns.insert(Token::And(None), Self::parse_infix_expression);
+        infix_parse_fns.insert(Token::Or(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::LParen(None), Self::parse_call_expression);
         Self {
             lexer,
