@@ -3,7 +3,8 @@ use std::process;
 use crate::{
     ast::{
         expr::{
-            bool_expr::BoolExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
+            bool_expr::BoolExpr, infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr,
+            str_expr::StrExpr,
         },
         expression::Node,
         program::Program,
@@ -31,6 +32,10 @@ pub fn eval(node: Option<&dyn Node>) -> Option<Box<dyn Object>> {
         } else if let Some(prefix) = node.as_any().downcast_ref::<PrefixExpr>() {
             let right = eval(Some(prefix.right.as_ref().unwrap().as_ref()));
             eval_prefix_expr(right.unwrap(), &prefix.operator)
+        } else if let Some(infix) = node.as_any().downcast_ref::<InfixExpr>() {
+            let right = eval(Some(infix.right.as_ref().unwrap().as_ref()));
+            let left = eval(Some(infix.left.as_ref().unwrap().as_ref()));
+            eval_infix_expr(left.unwrap(), right.unwrap(), &infix.operator)
         } else {
             Some(Box::new(Null))
         }
@@ -47,6 +52,61 @@ fn eval_prefix_expr(right: Box<dyn Object>, operator: &str) -> Option<Box<dyn Ob
             eprintln!("invalid expression {}", right);
             None
         }
+    }
+}
+
+fn eval_infix_expr(
+    left: Box<dyn Object>,
+    right: Box<dyn Object>,
+    operator: &str,
+) -> Option<Box<dyn Object>> {
+    if left.get_type() != right.get_type() {
+        eprintln!(
+            "incompatible types {} and {}",
+            right.get_type(),
+            left.get_type()
+        );
+        return None;
+    }
+    if let Some(left) = left.as_any().downcast_ref::<Integer>() {
+        if let Some(right) = right.as_any().downcast_ref::<Integer>() {
+            let left = *left.val.borrow();
+            let right = *right.val.borrow();
+
+            match operator {
+                "+" => Some(Box::new(Integer::new(left + right))),
+                "-" => Some(Box::new(Integer::new(left - right))),
+                "*" => Some(Box::new(Integer::new(left * right))),
+                "/" => Some(Box::new(Integer::new(left / right))),
+                "!=" => Some(Box::new(Boolean::new(left != right))),
+                "==" => Some(Box::new(Boolean::new(left == right))),
+                ">=" => Some(Box::new(Boolean::new(left >= right))),
+                "<=" => Some(Box::new(Boolean::new(left <= right))),
+                ">" => Some(Box::new(Boolean::new(left > right))),
+                "<" => Some(Box::new(Boolean::new(left < right))),
+                _ => None,
+            }
+        } else {
+            None
+        }
+    } else if let Some(left) = left.as_any().downcast_ref::<Boolean>() {
+        if let Some(right) = right.as_any().downcast_ref::<Boolean>() {
+            let left = *left.val.borrow();
+            let right = *right.val.borrow();
+            match operator {
+                "!=" => Some(Box::new(Boolean::new(left != right))),
+                "==" => Some(Box::new(Boolean::new(left == right))),
+                ">=" => Some(Box::new(Boolean::new(left >= right))),
+                "<=" => Some(Box::new(Boolean::new(left <= right))),
+                ">" => Some(Box::new(Boolean::new(left & !right))),
+                "<" => Some(Box::new(Boolean::new(!left & right))),
+                _ => None,
+            }
+        } else {
+            None
+        }
+    } else {
+        None
     }
 }
 
