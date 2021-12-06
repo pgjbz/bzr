@@ -17,9 +17,27 @@ fn test_eval_integer() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        assert_eq!(expected, evaluated.val)
+        let value = *evaluated.val.borrow_mut();
+        assert_eq!(expected, value)
     }
 }
+
+#[test]
+fn test_eval_integer_minus_operator() {
+    let mut tests: Vec<(String, i64)> = Vec::new();
+    tests.push(("5".to_string(), 5));
+    tests.push(("-5".to_string(), -5));
+    tests.push(("10".to_string(), 10));
+    tests.push(("-10".to_string(), -10));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
+        let value = *evaluated.val.borrow_mut();
+        assert_eq!(expected, value)
+    }
+}
+
 #[test]
 fn test_eval_boolean() {
     let mut tests: Vec<(String, bool)> = Vec::new();

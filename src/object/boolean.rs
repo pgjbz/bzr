@@ -1,17 +1,17 @@
-use std::{any::Any, cell::RefCell, rc::Rc};
+use std::{any::Any, cell::RefCell};
 
 use crate::ast::types::Type;
 
 use super::Object;
 
 pub struct Boolean {
-    pub val: Rc<RefCell<bool>>,
+    pub val: RefCell<bool>,
 }
 
 impl Boolean {
     pub fn new(val: bool) -> Self {
         Self {
-            val: Rc::new(RefCell::new(val)),
+            val: RefCell::new(val),
         }
     }
 }

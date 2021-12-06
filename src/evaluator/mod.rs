@@ -36,12 +36,23 @@ pub fn eval(node: &dyn Node) -> Option<Box<dyn Object>> {
 fn eval_prefix_expr(right: Box<dyn Object>, operator: &str) -> Option<Box<dyn Object>> {
     match operator {
         "!" => eval_bang_operator(right),
+        "-" => eval_minus_prefix_operator(right),
         _ => None,
     }
 }
 
 fn eval_bang_operator(right: Box<dyn Object>) -> Option<Box<dyn Object>> {
     if let Some(boolean) = right.as_any().downcast_ref::<Boolean>() {
+        let mut val = boolean.val.borrow_mut();
+        *val = !*val;
+    } else {
+        return None;
+    }
+    Some(right)
+}
+
+fn eval_minus_prefix_operator(right: Box<dyn Object>) -> Option<Box<dyn Object>> {
+    if let Some(boolean) = right.as_any().downcast_ref::<Integer>() {
         let mut val = boolean.val.borrow_mut();
         *val = !*val;
     } else {
