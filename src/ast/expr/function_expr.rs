@@ -15,7 +15,7 @@ pub struct FunctionExpr {
     pub parameters: Vec<Identifier>,
     pub name: Box<dyn Expression>,
     pub body: Option<Box<BlockStatement>>,
-    pub ret_typ: Type
+    pub ret_typ: Type,
 }
 
 impl FunctionExpr {
@@ -25,7 +25,7 @@ impl FunctionExpr {
             parameters: vec![],
             body: None,
             name,
-            ret_typ: Type::Unknown
+            ret_typ: Type::Unknown,
         }
     }
 }
@@ -45,7 +45,7 @@ impl Display for FunctionExpr {
         let mut buffer = String::new();
         let mut parameters = Vec::new();
         for param in self.parameters.iter() {
-            parameters.push(format!("{}",param))
+            parameters.push(format!("{}", param))
         }
 
         buffer.push_str(&format!("fn {} (", self.name));
@@ -53,7 +53,7 @@ impl Display for FunctionExpr {
         buffer.push_str(") ");
         buffer.push_str(&match self.ret_typ {
             Type::Bool | Type::Int | Type::String => format!("{} ", self.ret_typ),
-            _ => "".to_string()
+            _ => "".to_string(),
         });
         buffer.push_str(&if let Some(ref body) = self.body {
             body.to_string()

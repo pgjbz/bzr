@@ -292,7 +292,7 @@ impl Parser {
                 Token::Bool(_) => Type::Bool,
                 Token::Int(_) => Type::Int,
                 Token::Str(_) => Type::String,
-                _ => Type::Unknown
+                _ => Type::Unknown,
             };
         }
         parser.expected_peek(Token::LBrace(None))?;

@@ -1,16 +1,18 @@
-use std::any::Any;
+use std::{any::Any, cell::RefCell, rc::Rc};
 
 use crate::ast::types::Type;
 
 use super::Object;
 
 pub struct Boolean {
-    pub val: bool,
+    pub val: Rc<RefCell<bool>>,
 }
 
 impl Boolean {
     pub fn new(val: bool) -> Self {
-        Self { val }
+        Self {
+            val: Rc::new(RefCell::new(val)),
+        }
     }
 }
 
@@ -20,7 +22,7 @@ impl Object for Boolean {
     }
 
     fn inspect(&self) -> String {
-        self.val.to_string()
+        self.val.take().to_string()
     }
 
     fn as_any(&self) -> &dyn Any {
