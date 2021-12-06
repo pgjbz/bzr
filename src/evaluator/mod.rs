@@ -159,7 +159,9 @@ fn eval_if_expression(if_expr: &IfExpr) -> Option<Box<dyn Object>> {
                     None
                 }
             } else {
-                if let Some(ref alternative) = if_expr.alternative {
+                if let Some(ref el_if) = if_expr.el_if {
+                    eval(Some(el_if.as_ref()))
+                } else if let Some(ref alternative) = if_expr.alternative {
                     eval(Some(alternative.as_ref()))
                 } else {
                     None

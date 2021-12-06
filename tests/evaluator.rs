@@ -143,9 +143,16 @@ fn test_eval_if_expr() {
     tests.push(("if 1 < 2 { 10 } else { 1 }".to_string(), 10));
     tests.push(("if true { 10 }".to_string(), 10));
     tests.push(("if 1 > 2 { 10 } else { 100 }".to_string(), 100));
+    tests.push((
+        "if 1 > 2 { 10; } else if 10 == 10 { 100; } else { 45; }".to_string(),
+        100,
+    ));
+    tests.push((
+        "if 1 > 2 { 10; } else if 10 != 10 { 100; } else { 45; }".to_string(),
+        45,
+    ));
 
     for (source, expected) in tests {
-        println!("{}", source);
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
         let value = *evaluated.val.borrow_mut();

@@ -13,6 +13,7 @@ pub struct IfExpr {
     pub condition: Box<dyn Expression>,
     pub consequence: Option<Box<BlockStatement>>,
     pub alternative: Option<Box<BlockStatement>>,
+    pub el_if: Option<Box<dyn Expression>>,
 }
 
 impl IfExpr {
@@ -22,6 +23,7 @@ impl IfExpr {
             condition,
             consequence: None,
             alternative: None,
+            el_if: None,
         }
     }
 }
