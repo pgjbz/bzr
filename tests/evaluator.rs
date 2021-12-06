@@ -181,3 +181,19 @@ fn test_eval_return_expr() {
         assert_eq!(expected, value)
     }
 }
+
+#[test]
+fn test_errors() {
+    let mut tests: Vec<(String, &str)> = Vec::new();
+    tests.push(("5 + true;".to_string(), "incompatible types bool and int"));
+    tests.push(("-true;".to_string(), "invalid expression '-true'"));
+    tests.push(("true + false;".to_string(), "unsuported operation true + false"));
+    tests.push(("5; true + false;".to_string(), "unsuported operation true + false"));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<bzr::object::error::Error>().unwrap();
+        let value = evaluated.val.clone();
+        assert_eq!(expected, value)
+    }
+}

@@ -2,12 +2,13 @@ use std::fmt::Display;
 
 #[derive(Debug, Copy, Clone)]
 pub enum Type {
-    String,
     Int,
     Bool,
-    Function,
+    Error,
     Prefix,
+    String,
     Unknown,
+    Function,
     Expression,
 }
 
@@ -17,6 +18,7 @@ impl Display for Type {
             Self::Int => "int",
             Self::Bool => "bool",
             Self::String => "str",
+            Self::Error => "Error",
             Self::Unknown => "unk",
             Self::Prefix => "prefix",
             Self::Function => "function",

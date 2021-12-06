@@ -12,6 +12,7 @@ use crate::{
         stmt::{
             block_stmt::BlockStatement, expression_stmt::ExpressionStatement, return_stmt::Return,
         },
+        types::Type,
     },
     object::{
         boolean::Boolean, error::Error, integer::Integer, null::Null, ret::Ret, string::Str, Object,
@@ -35,10 +36,19 @@ pub fn eval(node: Option<&dyn Node>) -> Option<Rc<dyn Object>> {
             Some(Rc::new(Str::new(string.value.clone())))
         } else if let Some(prefix) = node.as_any().downcast_ref::<PrefixExpr>() {
             let right = eval(Some(prefix.right.as_ref().unwrap().as_ref()));
+            if is_error(&right) {
+                return right;
+            }
             eval_prefix_expr(right.unwrap(), &prefix.operator)
         } else if let Some(infix) = node.as_any().downcast_ref::<InfixExpr>() {
             let right = eval(Some(infix.right.as_ref().unwrap().as_ref()));
+            if is_error(&right) {
+                return right;
+            }
             let left = eval(Some(infix.left.as_ref().unwrap().as_ref()));
+            if is_error(&left) {
+                return left;
+            }
             eval_infix_expr(left.unwrap(), right.unwrap(), &infix.operator)
         } else if let Some(if_expr) = node.as_any().downcast_ref::<IfExpr>() {
             eval_if_expression(if_expr)
@@ -68,12 +78,11 @@ fn eval_infix_expr(
     operator: &str,
 ) -> Option<Rc<dyn Object>> {
     if left.get_type() != right.get_type() {
-        eprintln!(
+        return Some(Rc::new(Error::new(format!(
             "incompatible types {} and {}",
             right.get_type(),
             left.get_type()
-        );
-        return None;
+        ))));
     }
     if let Some(left) = left.as_any().downcast_ref::<Integer>() {
         if let Some(right) = right.as_any().downcast_ref::<Integer>() {
@@ -91,10 +100,16 @@ fn eval_infix_expr(
                 "<=" => Some(Rc::new(Boolean::new(left <= right))),
                 ">" => Some(Rc::new(Boolean::new(left > right))),
                 "<" => Some(Rc::new(Boolean::new(left < right))),
-                _ => None,
+                _ => Some(Rc::new(Error::new(format!(
+                    "unknown operator {}",
+                    operator
+                )))),
             }
         } else {
-            None
+            Some(Rc::new(Error::new(format!(
+                "miss right operator {}",
+                left
+            ))))
         }
     } else if let Some(left) = left.as_any().downcast_ref::<Boolean>() {
         if let Some(right) = right.as_any().downcast_ref::<Boolean>() {
@@ -109,13 +124,26 @@ fn eval_infix_expr(
                 "<" => Some(Rc::new(Boolean::new(!left & right))),
                 "||" => Some(Rc::new(Boolean::new(left || right))),
                 "&&" => Some(Rc::new(Boolean::new(left && right))),
-                _ => None,
+                _ => Some(Rc::new(Error::new(format!(
+                    "unsuported operation {} {} {}",
+                    left,
+                    operator,
+                    right
+                )))),
             }
         } else {
-            None
+            Some(Rc::new(Error::new(format!(
+                "miss right operator {}",
+                left
+            ))))
         }
     } else {
-        None
+        Some(Rc::new(Error::new(format!(
+            "unsuported operation {} {} {}",
+            left,
+            operator,
+            right
+        ))))
     }
 }
 
@@ -165,6 +193,9 @@ fn eval_statements(stmts: &[Box<dyn Statement>]) -> Rc<dyn Object> {
 
 fn eval_if_expression(if_expr: &IfExpr) -> Option<Rc<dyn Object>> {
     let condition = eval(Some(if_expr.condition.as_ref()));
+    if is_error(&condition) {
+        return condition;
+    }
     match condition {
         Some(condition) => match condition.as_any().downcast_ref::<Boolean>() {
             Some(condition) => {
@@ -193,10 +224,18 @@ fn eval_ret_stmt(ret: &Return) -> Option<Rc<dyn Object>> {
         Some(expr) => {
             let val = eval(Some(expr.as_ref()));
             match val {
+                _ if is_error(&val) => val,
                 Some(val) => Some(Rc::new(Ret::new(val))),
                 None => None,
             }
         }
         None => None,
+    }
+}
+
+fn is_error(to_check: &Option<Rc<dyn Object>>) -> bool {
+    match to_check {
+        Some(check) if check.get_type() == Type::Error => true,
+        _ => false,
     }
 }
