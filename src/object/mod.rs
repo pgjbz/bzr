@@ -5,6 +5,7 @@ use crate::ast::types::Type;
 pub mod boolean;
 pub mod integer;
 pub mod null;
+pub mod ret;
 pub mod string;
 
 pub trait Object: Display {

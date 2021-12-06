@@ -67,7 +67,7 @@ fn test_eval_str() {
     }
 }
 
-fn test_eval(source: String) -> Box<dyn Object> {
+fn test_eval(source: String) -> Rc<dyn Object> {
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
     let program: Box<dyn Node> = parser.parse_program();
@@ -151,6 +151,22 @@ fn test_eval_if_expr() {
         "if 1 > 2 { 10; } else if 10 != 10 { 100; } else { 45; }".to_string(),
         45,
     ));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
+        let value = *evaluated.val.borrow_mut();
+        assert_eq!(expected, value)
+    }
+}
+
+#[test]
+fn test_eval_return_expr() {
+    let mut tests: Vec<(String, i64)> = Vec::new();
+    tests.push(("ret 10;".to_string(), 10));
+    tests.push(("ret 10; 9;".to_string(), 10));
+    tests.push(("ret 2 * 5; 9;".to_string(), 10));
+    tests.push(("5 * 5 * 5; ret 10; 10 * 10;".to_string(), 10));
 
     for (source, expected) in tests {
         let evaluated = test_eval(source);
