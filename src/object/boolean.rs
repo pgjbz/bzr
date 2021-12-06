@@ -18,7 +18,7 @@ impl Boolean {
 
 impl Object for Boolean {
     fn get_type(&self) -> Type {
-        Type::Int
+        Type::Bool
     }
 
     fn inspect(&self) -> String {

@@ -16,7 +16,7 @@ impl Str {
 
 impl Object for Str {
     fn get_type(&self) -> Type {
-        Type::Int
+        Type::String
     }
 
     fn inspect(&self) -> String {
