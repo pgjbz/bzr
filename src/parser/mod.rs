@@ -286,6 +286,15 @@ impl Parser {
         let mut function_expr = FunctionExpr::new(current_token, identifier);
         parser.expected_peek(Token::LParen(None))?;
         function_expr.parameters = parser.parse_function_parameters()?;
+        if parser.has_type() {
+            parser.next_token();
+            function_expr.ret_typ = match parser.current_token.as_ref() {
+                Token::Bool(_) => Type::Bool,
+                Token::Int(_) => Type::Int,
+                Token::Str(_) => Type::String,
+                _ => Type::Unknown
+            };
+        }
         parser.expected_peek(Token::LBrace(None))?;
         function_expr.body = parser.parse_block_statement();
         Ok(Box::new(function_expr))
