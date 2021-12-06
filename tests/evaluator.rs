@@ -123,6 +123,10 @@ fn test_eval_infix_bool_expr() {
     tests.push(("10 >= 5;".to_string(), true));
     tests.push(("5 <= 10;".to_string(), true));
     tests.push(("1 != 2;".to_string(), true));
+    tests.push(("(2 > 1) == true;".to_string(), true));
+    tests.push(("(2 < 1) == false;".to_string(), true));
+    tests.push(("(1 < 2) == true;".to_string(), true));
+    tests.push(("(1 > 2) == false;".to_string(), true));
 
     for (source, expected) in tests {
         println!("{}", source);
