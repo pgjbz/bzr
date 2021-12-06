@@ -3,13 +3,13 @@ use std::process;
 use crate::{
     ast::{
         expr::{
-            bool_expr::BoolExpr, infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr,
-            str_expr::StrExpr,
+            bool_expr::BoolExpr, if_expr::IfExpr, infix_expr::InfixExpr, int_expr::IntExpr,
+            prefix_expr::PrefixExpr, str_expr::StrExpr,
         },
         expression::Node,
         program::Program,
         statement::Statement,
-        stmt::expression_stmt::ExpressionStatement,
+        stmt::{block_stmt::BlockStatement, expression_stmt::ExpressionStatement},
     },
     object::{boolean::Boolean, integer::Integer, null::Null, string::Str, Object},
 };
@@ -17,7 +17,7 @@ use crate::{
 pub fn eval(node: Option<&dyn Node>) -> Option<Box<dyn Object>> {
     if let Some(node) = node {
         if let Some(program) = node.as_any().downcast_ref::<Program>() {
-            Some(parse_statements(&program.statements))
+            Some(eval_statements(&program.statements))
         } else if let Some(stmt) = node.as_any().downcast_ref::<ExpressionStatement>() {
             match &stmt.expression {
                 Some(expr) => eval(Some(expr.as_ref())),
@@ -36,6 +36,10 @@ pub fn eval(node: Option<&dyn Node>) -> Option<Box<dyn Object>> {
             let right = eval(Some(infix.right.as_ref().unwrap().as_ref()));
             let left = eval(Some(infix.left.as_ref().unwrap().as_ref()));
             eval_infix_expr(left.unwrap(), right.unwrap(), &infix.operator)
+        } else if let Some(if_expr) = node.as_any().downcast_ref::<IfExpr>() {
+            eval_if_expression(if_expr)
+        } else if let Some(block_stmt) = node.as_any().downcast_ref::<BlockStatement>() {
+            Some(eval_statements(&block_stmt.statements))
         } else {
             Some(Box::new(Null))
         }
@@ -132,7 +136,7 @@ fn eval_minus_prefix_operator(right: Box<dyn Object>) -> Option<Box<dyn Object>>
     Some(right)
 }
 
-fn parse_statements(stmts: &[Box<dyn Statement>]) -> Box<dyn Object> {
+fn eval_statements(stmts: &[Box<dyn Statement>]) -> Box<dyn Object> {
     let mut result = None;
     for stmt in stmts.iter() {
         result = eval(Some(stmt.as_ref()))
@@ -141,5 +145,30 @@ fn parse_statements(stmts: &[Box<dyn Statement>]) -> Box<dyn Object> {
         result
     } else {
         process::exit(1)
+    }
+}
+
+fn eval_if_expression(if_expr: &IfExpr) -> Option<Box<dyn Object>> {
+    let condition = eval(Some(if_expr.condition.as_ref()));
+    if let Some(condition) = condition {
+        if let Some(condition) = condition.as_any().downcast_ref::<Boolean>() {
+            if *condition.val.borrow_mut() {
+                if let Some(ref consequence) = if_expr.consequence {
+                    eval(Some(consequence.as_ref()))
+                } else {
+                    None
+                }
+            } else {
+                if let Some(ref alternative) = if_expr.alternative {
+                    eval(Some(alternative.as_ref()))
+                } else {
+                    None
+                }
+            }
+        } else {
+            None
+        }
+    } else {
+        None
     }
 }
