@@ -3,6 +3,7 @@ use std::{any::Any, fmt::Display};
 use crate::ast::types::Type;
 
 pub mod boolean;
+pub mod environment;
 pub mod error;
 pub mod integer;
 pub mod null;

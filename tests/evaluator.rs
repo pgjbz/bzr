@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use bzr::{
     ast::expression::Node,
-    evaluator,
+    evaluator::Evaluator,
     lexer::Lexer,
     object::{boolean::Boolean, integer::Integer, string::Str, Object},
     parser::Parser,
@@ -71,7 +71,8 @@ fn test_eval(source: String) -> Rc<dyn Object> {
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
     let program: Box<dyn Node> = parser.parse_program();
-    evaluator::eval(Some(program.as_ref())).unwrap()
+    let mut eval = Evaluator::default();
+    eval.eval(Some(program.as_ref())).unwrap()
 }
 
 #[test]
@@ -187,13 +188,39 @@ fn test_errors() {
     let mut tests: Vec<(String, &str)> = Vec::new();
     tests.push(("5 + true;".to_string(), "incompatible types bool and int"));
     tests.push(("-true;".to_string(), "invalid expression '-true'"));
-    tests.push(("true + false;".to_string(), "unsuported operation true + false"));
-    tests.push(("5; true + false;".to_string(), "unsuported operation true + false"));
+    tests.push((
+        "true + false;".to_string(),
+        "unsupported operation true + false",
+    ));
+    tests.push((
+        "5; true + false;".to_string(),
+        "unsupported operation true + false",
+    ));
+    tests.push(("foobar".to_string(), "unknown word 'foobar'"));
 
     for (source, expected) in tests {
         let evaluated = test_eval(source);
-        let evaluated = evaluated.as_any().downcast_ref::<bzr::object::error::Error>().unwrap();
+        let evaluated = evaluated
+            .as_any()
+            .downcast_ref::<bzr::object::error::Error>()
+            .unwrap();
         let value = evaluated.val.clone();
+        assert_eq!(expected, value)
+    }
+}
+
+#[test]
+fn test_let_statement() {
+    let mut tests: Vec<(String, i64)> = Vec::new();
+    tests.push(("let a int = 5; a;".to_string(), 5));
+    tests.push(("let a = 5; a;".to_string(), 5));
+    tests.push(("let a = 5; let b = 10; a;".to_string(), 5));
+    tests.push(("let a int = 5; let b = 20; a;".to_string(), 5));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
+        let value = *evaluated.val.borrow_mut();
         assert_eq!(expected, value)
     }
 }
