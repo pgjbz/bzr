@@ -4,7 +4,10 @@ use bzr::{
     ast::expression::Node,
     evaluator::Evaluator,
     lexer::Lexer,
-    object::{boolean::Boolean, environment::Environment, integer::Integer, string::Str, Object},
+    object::{
+        boolean::Boolean, environment::Environment, function::Function, integer::Integer,
+        string::Str, Object,
+    },
     parser::Parser,
 };
 
@@ -252,4 +255,13 @@ fn test_var_statement() {
         let value = *evaluated.val.borrow_mut();
         assert_eq!(expected, value)
     }
+}
+
+#[test]
+fn test_function_expr() {
+    let source = "fn x_plus_two(x) { x + 2; }".to_string();
+
+    let evaluated = test_eval(source);
+    let evaluated = evaluated.as_any().downcast_ref::<Function>();
+    assert!(evaluated.is_some());
 }

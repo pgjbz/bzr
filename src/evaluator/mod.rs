@@ -3,8 +3,8 @@ use std::{process, rc::Rc};
 use crate::{
     ast::{
         expr::{
-            bool_expr::BoolExpr, if_expr::IfExpr, infix_expr::InfixExpr, int_expr::IntExpr,
-            prefix_expr::PrefixExpr, str_expr::StrExpr,
+            bool_expr::BoolExpr, function_expr::FunctionExpr, if_expr::IfExpr,
+            infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
         },
         expression::Node,
         identifier::Identifier,
@@ -95,6 +95,8 @@ impl Evaluator {
                 val
             } else if let Some(identifier) = node.as_any().downcast_ref::<Identifier>() {
                 self.eval_identifier(identifier, env)
+            } else if let Some(_function) = node.as_any().downcast_ref::<FunctionExpr>() {
+                todo!()
             } else {
                 Some(Rc::new(Null))
             }
