@@ -216,8 +216,34 @@ fn test_let_statement() {
     tests.push(("let a = 5; a;".to_string(), 5));
     tests.push(("let a = 5; let b = 10; a;".to_string(), 5));
     tests.push(("let a int = 5; let b = 20; a;".to_string(), 5));
-    tests.push(("let a int = 5; let b = 20;
-    if a > b { 10; } else { 5; }".to_string(), 5));
+    tests.push((
+        "let a int = 5; let b = 20;
+    if a > b { 10; } else { 5; }"
+            .to_string(),
+        5,
+    ));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
+        let value = *evaluated.val.borrow_mut();
+        assert_eq!(expected, value)
+    }
+}
+
+#[test]
+fn test_var_statement() {
+    let mut tests: Vec<(String, i64)> = Vec::new();
+    tests.push(("var a int = 5; a;".to_string(), 5));
+    tests.push(("var a = 5; a;".to_string(), 5));
+    tests.push(("var a = 5; var b = 10; a;".to_string(), 5));
+    tests.push(("var a int = 5; var b = 20; a;".to_string(), 5));
+    tests.push((
+        "var a int = 5; var b = 20;
+    if a > b { 10; } else { 5; }"
+            .to_string(),
+        5,
+    ));
 
     for (source, expected) in tests {
         let evaluated = test_eval(source);

@@ -12,7 +12,7 @@ use crate::{
         statement::Statement,
         stmt::{
             block_stmt::BlockStatement, expression_stmt::ExpressionStatement, let_stmt::Let,
-            return_stmt::Return,
+            return_stmt::Return, var_stmt::Var,
         },
         types::Type,
     },
@@ -84,6 +84,14 @@ impl Evaluator {
                     return val;
                 }
                 self.set(let_stmt.name.to_string(), Rc::clone(val.as_ref().unwrap()));
+                val
+            } else if let Some(var) = node.as_any().downcast_ref::<Var>() {
+                //TODO: make var immutable
+                let val = self.eval(Some(var.value.as_ref()));
+                if self.is_error(&val) {
+                    return val;
+                }
+                self.set(var.name.to_string(), Rc::clone(val.as_ref().unwrap()));
                 val
             } else if let Some(identifier) = node.as_any().downcast_ref::<Identifier>() {
                 self.eval_identifier(identifier)
