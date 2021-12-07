@@ -4,7 +4,7 @@ use bzr::{
     ast::expression::Node,
     evaluator::Evaluator,
     lexer::Lexer,
-    object::{boolean::Boolean, integer::Integer, string::Str, Object},
+    object::{boolean::Boolean, environment::Environment, integer::Integer, string::Str, Object},
     parser::Parser,
 };
 
@@ -71,8 +71,9 @@ fn test_eval(source: String) -> Rc<dyn Object> {
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
     let program: Box<dyn Node> = parser.parse_program();
-    let mut eval = Evaluator::default();
-    eval.eval(Some(program.as_ref())).unwrap()
+    let eval = Evaluator::default();
+    let mut env = Environment::default();
+    eval.eval(Some(program.as_ref()), &mut env).unwrap()
 }
 
 #[test]
