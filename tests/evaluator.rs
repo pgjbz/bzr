@@ -216,6 +216,8 @@ fn test_let_statement() {
     tests.push(("let a = 5; a;".to_string(), 5));
     tests.push(("let a = 5; let b = 10; a;".to_string(), 5));
     tests.push(("let a int = 5; let b = 20; a;".to_string(), 5));
+    tests.push(("let a int = 5; let b = 20;
+    if a > b { 10; } else { 5; }".to_string(), 5));
 
     for (source, expected) in tests {
         let evaluated = test_eval(source);
