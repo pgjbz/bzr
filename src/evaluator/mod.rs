@@ -75,6 +75,7 @@ impl Evaluator {
             } else if let Some(ret) = node.as_any().downcast_ref::<Return>() {
                 self.eval_ret_stmt(ret, env)
             } else if let Some(let_stmt) = node.as_any().downcast_ref::<Let>() {
+                //TODO: make let immutable
                 let val = self.eval(Some(let_stmt.value.as_ref()), env);
                 if self.is_error(&val) {
                     return val;
@@ -86,7 +87,6 @@ impl Evaluator {
                 );
                 val
             } else if let Some(var) = node.as_any().downcast_ref::<Var>() {
-                //TODO: make var immutable
                 let val = self.eval(Some(var.value.as_ref()), env);
                 if self.is_error(&val) {
                     return val;
