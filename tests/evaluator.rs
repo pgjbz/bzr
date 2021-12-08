@@ -259,9 +259,35 @@ fn test_var_statement() {
 
 #[test]
 fn test_function_expr() {
-    let source = "fn x_plus_two(x) { x + 2; }".to_string();
+    let source = "fn x_plus_two(x int) { x + 2; }".to_string();
 
     let evaluated = test_eval(source);
     let evaluated = evaluated.as_any().downcast_ref::<Function>();
     assert!(evaluated.is_some());
+}
+
+#[test]
+fn test_function_apply() {
+    let mut tests: Vec<(String, i64)> = Vec::new();
+    tests.push((
+        "fn x_plus_two(x int) { x + 2; } x_plus_two(10);".to_string(),
+        12,
+    ));
+    tests.push(("fn identity(x int) { x; } identity(10);".to_string(), 10));
+    tests.push((
+        "fn identity(x int) { ret x; } identity(10);".to_string(),
+        10,
+    ));
+    tests.push(("fn add(a int, b int) { a + b; } add(5, 5);".to_string(), 10));
+    tests.push((
+        "fn add(a int, b int) { ret a + b; } add(10);".to_string(),
+        10,
+    ));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
+        let value = *evaluated.val.borrow_mut();
+        assert_eq!(expected, value)
+    }
 }

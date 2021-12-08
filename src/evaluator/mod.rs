@@ -3,7 +3,7 @@ use std::{cell::RefCell, process, rc::Rc};
 use crate::{
     ast::{
         expr::{
-            bool_expr::BoolExpr, function_expr::FunctionExpr, if_expr::IfExpr,
+            bool_expr::BoolExpr, call_expr::CallExpr, function_expr::FunctionExpr, if_expr::IfExpr,
             infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
         },
         expression::{Expression, Node},
@@ -117,12 +117,39 @@ impl Evaluator {
                 let function =
                     Function::new(parameters, Rc::clone(&function.name), body, Rc::clone(&env));
                 Some(Rc::new(function))
+            } else if let Some(call) = node.as_any().downcast_ref::<CallExpr>() {
+                let function = self.eval(Some(call.function.as_ref()), Rc::clone(&env));
+                if self.is_error(&function) {
+                    return function;
+                }
+                let arguments = self.eval_expressions(&call.arguments, Rc::clone(&env));
+
+                if arguments.len() == 1 && self.is_error(arguments.first().unwrap()) {
+                    return function;
+                }
+                todo!()
             } else {
                 Some(Rc::new(Null))
             }
         } else {
             None
         }
+    }
+
+    fn eval_expressions(
+        &self,
+        args: &[Rc<dyn Expression>],
+        env: Rc<RefCell<Environment>>,
+    ) -> Vec<Option<Rc<dyn Object>>> {
+        let mut evaluated_args = Vec::new();
+        for arg in args {
+            let evaluated = self.eval(Some(arg.as_ref()), Rc::clone(&env));
+            if self.is_error(&evaluated) {
+                return vec![evaluated];
+            }
+            evaluated_args.push(evaluated)
+        }
+        evaluated_args
     }
 
     fn eval_prefix_expr(&self, right: Rc<dyn Object>, operator: &str) -> Option<Rc<dyn Object>> {
