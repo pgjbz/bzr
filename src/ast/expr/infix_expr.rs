@@ -11,8 +11,8 @@ use crate::{
 pub struct InfixExpr {
     pub token: Rc<Token>,
     pub operator: String,
-    pub left: Option<Box<dyn Expression>>,
-    pub right: Option<Box<dyn Expression>>,
+    pub left: Option<Rc<dyn Expression>>,
+    pub right: Option<Rc<dyn Expression>>,
     pub typ: Option<Type>,
 }
 

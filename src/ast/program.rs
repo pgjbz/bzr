@@ -1,13 +1,13 @@
 use super::{expression::Node, statement::Statement};
-use std::fmt::Display;
+use std::{fmt::Display, rc::Rc};
 
 pub struct Program {
-    pub statements: Vec<Box<dyn Statement>>,
+    pub statements: Vec<Rc<dyn Statement>>,
     pub errors: Vec<String>,
 }
 
 impl Program {
-    pub fn new(statements: Vec<Box<dyn Statement>>, errors: Vec<String>) -> Box<Self> {
+    pub fn new(statements: Vec<Rc<dyn Statement>>, errors: Vec<String>) -> Box<Self> {
         Box::new(Self { statements, errors })
     }
 }

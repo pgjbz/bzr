@@ -1,4 +1,4 @@
-use std::{process, rc::Rc};
+use std::{cell::RefCell, process, rc::Rc};
 
 use crate::{
     ast::{
@@ -6,7 +6,7 @@ use crate::{
             bool_expr::BoolExpr, function_expr::FunctionExpr, if_expr::IfExpr,
             infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
         },
-        expression::Node,
+        expression::{Expression, Node},
         identifier::Identifier,
         program::Program,
         statement::Statement,
@@ -17,8 +17,8 @@ use crate::{
         types::Type,
     },
     object::{
-        boolean::Boolean, environment::Environment, error::Error, integer::Integer, null::Null,
-        ret::Ret, string::Str, Object,
+        boolean::Boolean, environment::Environment, error::Error, function::Function,
+        integer::Integer, null::Null, ret::Ret, string::Str, Object,
     },
 };
 
@@ -29,18 +29,22 @@ impl Evaluator {
         Self
     }
 
-    pub fn set(&self, name: String, obj: Rc<dyn Object>, env: &mut Environment) {
-        env.set(name, obj)
+    pub fn set(&self, name: String, obj: Rc<dyn Object>, env: Rc<RefCell<Environment>>) {
+        env.borrow_mut().set(name, obj)
     }
 
-    pub fn get(&self, name: String, env: &mut Environment) -> Option<Rc<dyn Object>> {
-        env.get(name)
+    pub fn get(&self, name: String, env: Rc<RefCell<Environment>>) -> Option<Rc<dyn Object>> {
+        env.borrow_mut().get(name)
     }
 
-    pub fn eval(&self, node: Option<&dyn Node>, env: &mut Environment) -> Option<Rc<dyn Object>> {
+    pub fn eval(
+        &self,
+        node: Option<&dyn Node>,
+        env: Rc<RefCell<Environment>>,
+    ) -> Option<Rc<dyn Object>> {
         if let Some(node) = node {
             if let Some(program) = node.as_any().downcast_ref::<Program>() {
-                Some(self.eval_statements(&program.statements, env))
+                Some(self.eval_statements(&program.statements, Rc::clone(&env)))
             } else if let Some(stmt) = node.as_any().downcast_ref::<ExpressionStatement>() {
                 match &stmt.expression {
                     Some(expr) => self.eval(Some(expr.as_ref()), env),
@@ -53,50 +57,66 @@ impl Evaluator {
             } else if let Some(string) = node.as_any().downcast_ref::<StrExpr>() {
                 Some(Rc::new(Str::new(string.value.clone())))
             } else if let Some(prefix) = node.as_any().downcast_ref::<PrefixExpr>() {
-                let right = self.eval(Some(prefix.right.as_ref().unwrap().as_ref()), env);
+                let right = self.eval(
+                    Some(prefix.right.as_ref().unwrap().as_ref()),
+                    Rc::clone(&env),
+                );
                 if self.is_error(&right) {
                     return right;
                 }
                 self.eval_prefix_expr(right.unwrap(), &prefix.operator)
             } else if let Some(infix) = node.as_any().downcast_ref::<InfixExpr>() {
-                let right = self.eval(Some(infix.right.as_ref().unwrap().as_ref()), env);
+                let right = self.eval(
+                    Some(infix.right.as_ref().unwrap().as_ref()),
+                    Rc::clone(&env),
+                );
                 if self.is_error(&right) {
                     return right;
                 }
-                let left = self.eval(Some(infix.left.as_ref().unwrap().as_ref()), env);
+                let left = self.eval(Some(infix.left.as_ref().unwrap().as_ref()), Rc::clone(&env));
                 if self.is_error(&left) {
                     return left;
                 }
                 self.eval_infix_expr(left.unwrap(), right.unwrap(), &infix.operator)
             } else if let Some(if_expr) = node.as_any().downcast_ref::<IfExpr>() {
-                self.eval_if_expression(if_expr, env)
+                self.eval_if_expression(if_expr, Rc::clone(&env))
             } else if let Some(block_stmt) = node.as_any().downcast_ref::<BlockStatement>() {
                 Some(self.eval_statements(&block_stmt.statements, env))
             } else if let Some(ret) = node.as_any().downcast_ref::<Return>() {
-                self.eval_ret_stmt(ret, env)
+                self.eval_ret_stmt(ret, Rc::clone(&env))
             } else if let Some(let_stmt) = node.as_any().downcast_ref::<Let>() {
                 //TODO: make let immutable
-                let val = self.eval(Some(let_stmt.value.as_ref()), env);
+                let val = self.eval(Some(let_stmt.value.as_ref()), Rc::clone(&env));
                 if self.is_error(&val) {
                     return val;
                 }
                 self.set(
                     let_stmt.name.to_string(),
                     Rc::clone(val.as_ref().unwrap()),
-                    env,
+                    Rc::clone(&env),
                 );
                 val
             } else if let Some(var) = node.as_any().downcast_ref::<Var>() {
-                let val = self.eval(Some(var.value.as_ref()), env);
+                let val = self.eval(Some(var.value.as_ref()), Rc::clone(&env));
                 if self.is_error(&val) {
                     return val;
                 }
-                self.set(var.name.to_string(), Rc::clone(val.as_ref().unwrap()), env);
+                self.set(
+                    var.name.to_string(),
+                    Rc::clone(val.as_ref().unwrap()),
+                    Rc::clone(&env),
+                );
                 val
             } else if let Some(identifier) = node.as_any().downcast_ref::<Identifier>() {
                 self.eval_identifier(identifier, env)
-            } else if let Some(_function) = node.as_any().downcast_ref::<FunctionExpr>() {
-                todo!()
+            } else if let Some(function) = node.as_any().downcast_ref::<FunctionExpr>() {
+                let env = Rc::clone(&env);
+                let body = function.body.as_ref().map(Rc::clone);
+                let parameters: Vec<Rc<dyn Expression>> =
+                    function.parameters.iter().map(|p| Rc::clone(p)).collect();
+                let function =
+                    Function::new(parameters, Rc::clone(&function.name), body, Rc::clone(&env));
+                Some(Rc::new(function))
             } else {
                 Some(Rc::new(Null))
             }
@@ -207,12 +227,12 @@ impl Evaluator {
 
     fn eval_statements(
         &self,
-        stmts: &[Box<dyn Statement>],
-        env: &mut Environment,
+        stmts: &[Rc<dyn Statement>],
+        env: Rc<RefCell<Environment>>,
     ) -> Rc<dyn Object> {
         let mut result = None;
         for stmt in stmts.iter() {
-            result = self.eval(Some(stmt.as_ref()), env);
+            result = self.eval(Some(stmt.as_ref()), Rc::clone(&env));
             if let Some(ref res) = result {
                 if let Some(ret) = res.as_any().downcast_ref::<Ret>() {
                     let return_value = Rc::clone(&ret.val);
@@ -230,9 +250,9 @@ impl Evaluator {
     fn eval_if_expression(
         &self,
         if_expr: &IfExpr,
-        env: &mut Environment,
+        env: Rc<RefCell<Environment>>,
     ) -> Option<Rc<dyn Object>> {
-        let condition = self.eval(Some(if_expr.condition.as_ref()), env);
+        let condition = self.eval(Some(if_expr.condition.as_ref()), Rc::clone(&env));
         if self.is_error(&condition) {
             return condition;
         }
@@ -241,7 +261,7 @@ impl Evaluator {
                 Some(condition) => {
                     if *condition.val.borrow_mut() {
                         if let Some(ref consequence) = if_expr.consequence {
-                            self.eval(Some(consequence.as_ref()), env)
+                            self.eval(Some(consequence.as_ref()), Rc::clone(&env))
                         } else {
                             None
                         }
@@ -259,7 +279,7 @@ impl Evaluator {
         }
     }
 
-    fn eval_ret_stmt(&self, ret: &Return, env: &mut Environment) -> Option<Rc<dyn Object>> {
+    fn eval_ret_stmt(&self, ret: &Return, env: Rc<RefCell<Environment>>) -> Option<Rc<dyn Object>> {
         match &ret.return_value {
             Some(expr) => {
                 let val = self.eval(Some(expr.as_ref()), env);
@@ -280,7 +300,7 @@ impl Evaluator {
     fn eval_identifier(
         &self,
         identifier: &Identifier,
-        env: &mut Environment,
+        env: Rc<RefCell<Environment>>,
     ) -> Option<Rc<dyn Object>> {
         let val = self.get(identifier.to_string(), env);
         if val.is_some() {

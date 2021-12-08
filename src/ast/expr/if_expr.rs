@@ -10,14 +10,14 @@ use crate::{
 
 pub struct IfExpr {
     pub token: Rc<Token>,
-    pub condition: Box<dyn Expression>,
-    pub consequence: Option<Box<BlockStatement>>,
-    pub alternative: Option<Box<BlockStatement>>,
-    pub el_if: Option<Box<dyn Expression>>,
+    pub condition: Rc<dyn Expression>,
+    pub consequence: Option<Rc<BlockStatement>>,
+    pub alternative: Option<Rc<BlockStatement>>,
+    pub el_if: Option<Rc<dyn Expression>>,
 }
 
 impl IfExpr {
-    pub fn new(token: Rc<Token>, condition: Box<dyn Expression>) -> Self {
+    pub fn new(token: Rc<Token>, condition: Rc<dyn Expression>) -> Self {
         Self {
             token,
             condition,

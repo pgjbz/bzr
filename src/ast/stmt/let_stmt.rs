@@ -9,8 +9,8 @@ use crate::{
 pub struct Let {
     pub token: Rc<Token>,
     typ: Type,
-    pub name: Box<dyn Expression>,
-    pub value: Box<dyn Expression>,
+    pub name: Rc<dyn Expression>,
+    pub value: Rc<dyn Expression>,
 }
 
 impl Display for Let {
@@ -30,10 +30,10 @@ impl Let {
     pub fn new(
         token: Rc<Token>,
         typ: Type,
-        name: Box<dyn Expression>,
-        value: Box<dyn Expression>,
-    ) -> Box<Self> {
-        Box::new({
+        name: Rc<dyn Expression>,
+        value: Rc<dyn Expression>,
+    ) -> Rc<Self> {
+        Rc::new({
             Self {
                 token,
                 typ,

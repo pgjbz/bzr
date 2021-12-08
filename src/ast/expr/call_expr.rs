@@ -7,12 +7,12 @@ use crate::{
 
 pub struct CallExpr {
     pub token: Rc<Token>,
-    pub function: Box<dyn Expression>,
-    pub arguments: Vec<Box<dyn Expression>>,
+    pub function: Rc<dyn Expression>,
+    pub arguments: Vec<Rc<dyn Expression>>,
 }
 
 impl CallExpr {
-    pub fn new(token: Rc<Token>, function: Box<dyn Expression>) -> Self {
+    pub fn new(token: Rc<Token>, function: Rc<dyn Expression>) -> Self {
         Self {
             token,
             function,

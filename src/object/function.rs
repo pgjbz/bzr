@@ -1,24 +1,22 @@
-use std::{fmt::Display, rc::Rc};
+use std::{cell::RefCell, fmt::Display, rc::Rc};
 
-use crate::ast::{
-    expression::Expression, identifier::Identifier, stmt::block_stmt::BlockStatement, types::Type,
-};
+use crate::ast::{expression::Expression, stmt::block_stmt::BlockStatement, types::Type};
 
 use super::{environment::Environment, Object};
 
 pub struct Function {
-    pub parameters: Vec<Identifier>,
+    pub parameters: Vec<Rc<dyn Expression>>,
     pub name: Rc<dyn Expression>,
-    pub body: BlockStatement,
-    pub env: Rc<Environment>,
+    pub body: Option<Rc<BlockStatement>>,
+    pub env: Rc<RefCell<Environment>>,
 }
 
 impl Function {
     pub fn new(
-        parameters: Vec<Identifier>,
+        parameters: Vec<Rc<dyn Expression>>,
         name: Rc<dyn Expression>,
-        body: BlockStatement,
-        env: Rc<Environment>,
+        body: Option<Rc<BlockStatement>>,
+        env: Rc<RefCell<Environment>>,
     ) -> Self {
         Self {
             parameters,
@@ -53,7 +51,11 @@ impl Display for Function {
         buffer.push_str("fn (");
         buffer.push_str(&args.join(","));
         buffer.push_str(") {\n");
-        buffer.push_str(&self.body.to_string());
+        buffer.push_str(&if let Some(ref body) = self.body {
+            body.to_string()
+        } else {
+            String::new()
+        });
         buffer.push_str("\n}");
         write!(f, "{}", buffer)
     }

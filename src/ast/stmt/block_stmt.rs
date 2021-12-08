@@ -7,7 +7,7 @@ use crate::{
 
 pub struct BlockStatement {
     pub token: Rc<Token>,
-    pub statements: Vec<Box<dyn Statement>>,
+    pub statements: Vec<Rc<dyn Statement>>,
 }
 
 impl BlockStatement {
@@ -18,7 +18,7 @@ impl BlockStatement {
         }
     }
 
-    pub fn push_stmt(&mut self, stmt: Box<dyn Statement>) {
+    pub fn push_stmt(&mut self, stmt: Rc<dyn Statement>) {
         self.statements.push(stmt)
     }
 }

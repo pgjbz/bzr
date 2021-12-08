@@ -11,12 +11,12 @@ use crate::{
 
 pub struct WhileExpr {
     pub token: Rc<Token>,
-    pub condition: Box<dyn Expression>,
-    pub consequence: Option<Box<BlockStatement>>,
+    pub condition: Rc<dyn Expression>,
+    pub consequence: Option<Rc<BlockStatement>>,
 }
 
 impl WhileExpr {
-    pub fn new(token: Rc<Token>, condition: Box<dyn Expression>) -> Self {
+    pub fn new(token: Rc<Token>, condition: Rc<dyn Expression>) -> Self {
         Self {
             token,
             condition,

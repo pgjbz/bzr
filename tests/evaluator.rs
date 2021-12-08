@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::{cell::RefCell, rc::Rc};
 
 use bzr::{
     ast::expression::Node,
@@ -75,8 +75,8 @@ fn test_eval(source: String) -> Rc<dyn Object> {
     let parser = Parser::new(lexer);
     let program: Box<dyn Node> = parser.parse_program();
     let eval = Evaluator::default();
-    let mut env = Environment::default();
-    eval.eval(Some(program.as_ref()), &mut env).unwrap()
+    let env = RefCell::new(Environment::default());
+    eval.eval(Some(program.as_ref()), Rc::new(env)).unwrap()
 }
 
 #[test]

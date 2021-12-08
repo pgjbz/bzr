@@ -10,7 +10,7 @@ use crate::{
 };
 
 pub struct ExpressionStatement {
-    pub expression: Option<Box<dyn Expression>>,
+    pub expression: Option<Rc<dyn Expression>>,
     pub typ: Type,
     pub token: Rc<Token>,
 }
