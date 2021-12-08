@@ -113,27 +113,84 @@ impl Evaluator {
                 let env = Rc::clone(&env);
                 let body = function.body.as_ref().map(Rc::clone);
                 let parameters: Vec<Rc<dyn Expression>> =
-                    function.parameters.iter().map(|p| Rc::clone(p)).collect();
+                    function.parameters.iter().map(Rc::clone).collect();
                 let function =
                     Function::new(parameters, Rc::clone(&function.name), body, Rc::clone(&env));
-                Some(Rc::new(function))
+                let function_name = function.name.to_string();
+                let function_ref: Rc<dyn Object> = Rc::new(function);
+                self.set(function_name, Rc::clone(&function_ref), Rc::clone(&env));
+                Some(function_ref)
             } else if let Some(call) = node.as_any().downcast_ref::<CallExpr>() {
                 let function = self.eval(Some(call.function.as_ref()), Rc::clone(&env));
                 if self.is_error(&function) {
                     return function;
                 }
                 let arguments = self.eval_expressions(&call.arguments, Rc::clone(&env));
-
                 if arguments.len() == 1 && self.is_error(arguments.first().unwrap()) {
                     return function;
                 }
-                todo!()
+                self.apply_function(function.unwrap(), arguments)
             } else {
                 Some(Rc::new(Null))
             }
         } else {
             None
         }
+    }
+
+    fn apply_function(
+        &self,
+        function: Rc<dyn Object>,
+        args: Vec<Option<Rc<dyn Object>>>,
+    ) -> Option<Rc<dyn Object>> {
+        if let Some(function) = function.as_any().downcast_ref::<Function>() {
+            if function.parameters.len() != args.len() {
+                return Some(Rc::new(Error::new(format!(
+                    "invalid parameters quantity in function {} call",
+                    function.name
+                ))));
+            }
+            let new_env = self.create_function_environment(function, &args);
+            let evaluated = self.eval(
+                Some(function.body.as_ref().unwrap().as_ref()),
+                Rc::clone(&new_env),
+            );
+            if self.is_error(&evaluated) {
+                return evaluated;
+            }
+            self.extract_ret_val(evaluated)
+        } else {
+            eprintln!("type {}", function.get_type());
+            Some(Rc::new(Error::new(format!(
+                "not a function {}",
+                function.get_type()
+            ))))
+        }
+    }
+
+    fn extract_ret_val(&self, evaluated: Option<Rc<dyn Object>>) -> Option<Rc<dyn Object>> {
+        if let Some(ret) = evaluated.as_ref().unwrap().as_any().downcast_ref::<Ret>() {
+            Some(Rc::clone(&ret.val))
+        } else {
+            evaluated
+        }
+    }
+
+    fn create_function_environment(
+        &self,
+        function: &Function,
+        args: &[Option<Rc<dyn Object>>],
+    ) -> Rc<RefCell<Environment>> {
+        let env = Rc::new(RefCell::new(Environment::new(Some(Rc::clone(
+            &function.env,
+        )))));
+        for (idx, arg) in args.iter().enumerate() {
+            env.borrow_mut().set(
+                function.parameters.get(idx).unwrap().to_string(),
+                Rc::clone(arg.as_ref().unwrap()),
+            )
+        }
+        env
     }
 
     fn eval_expressions(
