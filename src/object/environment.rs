@@ -38,10 +38,10 @@ impl Environment {
             None
         }
     }
-    
-    fn exists_in_outer(&mut self, name: &String) -> bool{
+
+    fn exists_in_outer(&mut self, name: &str) -> bool {
         if let Some(ref outer) = self.outer {
-            outer.borrow_mut().get(name.clone()).is_some()
+            outer.borrow_mut().get(name.to_string()).is_some()
         } else {
             false
         }

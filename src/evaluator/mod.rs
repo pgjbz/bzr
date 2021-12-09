@@ -7,6 +7,7 @@ use crate::{
         expr::{
             bool_expr::BoolExpr, call_expr::CallExpr, function_expr::FunctionExpr, if_expr::IfExpr,
             infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
+            while_expr::WhileExpr,
         },
         expression::{Expression, Node},
         identifier::Identifier,
@@ -104,6 +105,8 @@ impl Evaluator {
                 }
             } else if let Some(if_expr) = node.as_any().downcast_ref::<IfExpr>() {
                 self.eval_if_expression(if_expr, Rc::clone(&env))
+            } else if let Some(while_expr) = node.as_any().downcast_ref::<WhileExpr>() {
+                self.eval_while_expression(while_expr, Rc::clone(&env))
             } else if let Some(block_stmt) = node.as_any().downcast_ref::<BlockStatement>() {
                 Some(self.eval_statements(&block_stmt.statements, env))
             } else if let Some(ret) = node.as_any().downcast_ref::<Return>() {
@@ -400,6 +403,43 @@ impl Evaluator {
             },
             None => None,
         }
+    }
+
+    fn eval_while_expression(
+        &self,
+        while_expr: &WhileExpr,
+        env: Rc<RefCell<Environment>>,
+    ) -> Option<Rc<dyn Object>> {
+        let mut original_condition =
+            self.eval(Some(while_expr.condition.as_ref()), Rc::clone(&env));
+        if self.is_error(&original_condition) {
+            return original_condition;
+        }
+        let mut obj: Option<Rc<dyn Object>> = None;
+        loop {
+            obj = match original_condition {
+                Some(ref condition) => match condition.as_any().downcast_ref::<Boolean>() {
+                    Some(condition) => {
+                        let new_env =
+                            Rc::new(RefCell::new(Environment::new(Some(Rc::clone(&env)))));
+                        if *condition.val.borrow_mut() {
+                            let ret = self.eval(
+                                Some(while_expr.consequence.as_ref().unwrap().as_ref()),
+                                Rc::clone(&env),
+                            );
+                            original_condition =
+                                self.eval(Some(while_expr.condition.as_ref()), Rc::clone(&new_env));
+                            ret
+                        } else {
+                            break;
+                        }
+                    }
+                    None => None,
+                },
+                None => None,
+            }
+        }
+        obj
     }
 
     fn eval_ret_stmt(&self, ret: &Return, env: Rc<RefCell<Environment>>) -> Option<Rc<dyn Object>> {
