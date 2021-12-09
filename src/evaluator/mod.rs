@@ -1,4 +1,6 @@
-use std::{cell::RefCell, process, rc::Rc};
+use std::{cell::RefCell, collections::HashMap, process, rc::Rc};
+
+mod built_in_fns;
 
 use crate::{
     ast::{
@@ -17,16 +19,24 @@ use crate::{
         types::Type,
     },
     object::{
-        boolean::Boolean, environment::Environment, error::Error, function::Function,
-        integer::Integer, null::Null, ret::Ret, string::Str, Object,
+        boolean::Boolean, built_in::BuiltIn, environment::Environment, error::Error,
+        function::Function, integer::Integer, null::Null, ret::Ret, string::Str, Object,
     },
 };
 
-pub struct Evaluator;
+pub struct Evaluator {
+    pub build_in_fns: HashMap<String, Rc<dyn Object>>,
+}
 
 impl Evaluator {
     pub fn new() -> Self {
-        Self
+        let mut build_in_fns: HashMap<String, Rc<dyn Object>> = HashMap::new();
+        build_in_fns.insert("len".to_string(), Rc::new(BuiltIn::new(built_in_fns::len)));
+        build_in_fns.insert(
+            "puts".to_string(),
+            Rc::new(BuiltIn::new(built_in_fns::print)),
+        );
+        Self { build_in_fns }
     }
 
     pub fn set(&self, name: String, obj: Rc<dyn Object>, env: Rc<RefCell<Environment>>) {
@@ -144,12 +154,6 @@ impl Evaluator {
         args: Vec<Option<Rc<dyn Object>>>,
     ) -> Option<Rc<dyn Object>> {
         if let Some(function) = function.as_any().downcast_ref::<Function>() {
-            if function.parameters.len() != args.len() {
-                return Some(Rc::new(Error::new(format!(
-                    "invalid parameters quantity in function {} call",
-                    function.name
-                ))));
-            }
             let new_env = self.create_function_environment(function, &args);
             let evaluated = self.eval(
                 Some(function.body.as_ref().unwrap().as_ref()),
@@ -159,6 +163,13 @@ impl Evaluator {
                 return evaluated;
             }
             self.extract_ret_val(evaluated)
+        } else if let Some(built_in) = function.as_any().downcast_ref::<BuiltIn>() {
+            let mut arguments = Vec::with_capacity(5);
+            for arg in args {
+                arguments.push(arg.unwrap());
+            }
+            let func = built_in.function;
+            Some(func(&arguments))
         } else {
             Some(Rc::new(Error::new(format!(
                 "not a function {}",
@@ -404,10 +415,15 @@ impl Evaluator {
         if val.is_some() {
             val
         } else {
-            Some(Rc::new(Error::new(format!(
-                "unknown word '{}'",
-                identifier
-            ))))
+            let built_in = self.build_in_fns.get(&identifier.to_string());
+            if let Some(built_in) = built_in {
+                Some(Rc::clone(built_in))
+            } else {
+                Some(Rc::new(Error::new(format!(
+                    "unknown word '{}'",
+                    identifier
+                ))))
+            }
         }
     }
 }

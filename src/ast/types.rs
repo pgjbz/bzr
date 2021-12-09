@@ -7,6 +7,7 @@ pub enum Type {
     Error,
     Prefix,
     String,
+    BuiltIn,
     Unknown,
     Function,
     Expression,
@@ -22,6 +23,7 @@ impl Display for Type {
             Self::Unknown => "unk",
             Self::Prefix => "prefix",
             Self::Function => "function",
+            Self::BuiltIn => "built in function",
             Self::Expression => "expression",
         };
         write!(f, "{}", val)

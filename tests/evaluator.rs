@@ -372,3 +372,16 @@ fn test_string_concatenation() {
     assert!(evaluated.is_some(), "Not a string");
     assert_eq!("Paulo Gabriel".to_string(), evaluated.unwrap().val)
 }
+
+#[test]
+fn test_built_in() {
+    let mut tests: Vec<(String, i64)> = Vec::new();
+    tests.push(("len(\"abc\")".to_string(), 3));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
+        let value = *evaluated.val.borrow_mut();
+        assert_eq!(expected, value)
+    }
+}
