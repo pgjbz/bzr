@@ -299,18 +299,33 @@ fn test_function_apply() {
 
 #[test]
 fn test_factorial() {
-    let source = "fn factorial(x int) int {
-        if x == 1 {
-            ret x;
+    let mut tests: Vec<(String, i64)> = Vec::new();
+    tests.push((
+        "fn factorial(x int) int {
+            if x <= 1 {
+                ret 1;
+            } else {
+                ret x * factorial(x - 1);
+            }
+        }
+        
+        factorial(4);".to_string(),
+        24,
+    ));
+    tests.push(("fn factorial(x int) int {
+        if x <= 1 {
+            ret 1;
         } else {
             ret x * factorial(x - 1);
         }
     }
     
-    factorial(4);"
-        .to_string();
-    let evaluated = test_eval(source);
-    let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-    let value = *evaluated.val.borrow_mut();
-    assert_eq!(24, value)
+    factorial(0);".to_string(), 1));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
+        let value = *evaluated.val.borrow_mut();
+        assert_eq!(expected, value)
+    }
 }
