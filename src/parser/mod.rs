@@ -7,8 +7,9 @@ use crate::{
     ast::{
         expr::{
             arr_expr::ArrayExpr, bool_expr::BoolExpr, call_expr::CallExpr,
-            function_expr::FunctionExpr, if_expr::IfExpr, infix_expr::InfixExpr, int_expr::IntExpr,
-            prefix_expr::PrefixExpr, str_expr::StrExpr, while_expr::WhileExpr, index_expr::IndexExpr,
+            function_expr::FunctionExpr, if_expr::IfExpr, index_expr::IndexExpr,
+            infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
+            while_expr::WhileExpr,
         },
         expression::Expression,
         identifier::Identifier,

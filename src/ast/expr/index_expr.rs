@@ -1,7 +1,10 @@
 use std::{fmt::Display, rc::Rc};
 
 use crate::{
-    ast::{expression::{Expression, Node}, types::Type},
+    ast::{
+        expression::{Expression, Node},
+        types::Type,
+    },
     lexer::token::Token,
 };
 
@@ -13,11 +16,7 @@ pub struct IndexExpr {
 
 impl IndexExpr {
     pub fn new(token: Rc<Token>, left: Rc<dyn Expression>, index: Rc<dyn Expression>) -> Self {
-        Self {
-            token,
-            left,
-            index
-        }
+        Self { token, left, index }
     }
 }
 

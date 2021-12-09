@@ -5,9 +5,9 @@ mod built_in_fns;
 use crate::{
     ast::{
         expr::{
-            bool_expr::BoolExpr, call_expr::CallExpr, function_expr::FunctionExpr, if_expr::IfExpr,
-            infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
-            while_expr::WhileExpr,
+            arr_expr::ArrayExpr, bool_expr::BoolExpr, call_expr::CallExpr,
+            function_expr::FunctionExpr, if_expr::IfExpr, infix_expr::InfixExpr, int_expr::IntExpr,
+            prefix_expr::PrefixExpr, str_expr::StrExpr, while_expr::WhileExpr,
         },
         expression::{Expression, Node},
         identifier::Identifier,
@@ -20,7 +20,7 @@ use crate::{
         types::Type,
     },
     object::{
-        boolean::Boolean, built_in::BuiltIn, environment::Environment, error::Error,
+        array::Array, boolean::Boolean, built_in::BuiltIn, environment::Environment, error::Error,
         function::Function, integer::Integer, null::Null, ret::Ret, string::Str, Object,
     },
 };
@@ -40,7 +40,7 @@ impl Evaluator {
         build_in_fns.insert(
             "puts".to_string(),
             Rc::new(BuiltIn::new(built_in_fns::puts)),
-        ); 
+        );
         build_in_fns.insert(
             "putsln".to_string(),
             Rc::new(BuiltIn::new(built_in_fns::putsln)),
@@ -152,6 +152,13 @@ impl Evaluator {
                 val
             } else if let Some(identifier) = node.as_any().downcast_ref::<Identifier>() {
                 self.eval_identifier(identifier, env)
+            } else if let Some(array) = node.as_any().downcast_ref::<ArrayExpr>() {
+                let elements = self.eval_expressions(&array.value, Rc::clone(&env));
+                let mut elems = Vec::with_capacity(10);
+                for elem in elements {
+                    elems.push(elem.unwrap());
+                }
+                Some(Rc::new(Array::new(elems)))
             } else if let Some(function) = node.as_any().downcast_ref::<FunctionExpr>() {
                 let env = Rc::clone(&env);
                 let body = function.body.as_ref().map(Rc::clone);

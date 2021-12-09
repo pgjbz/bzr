@@ -1,12 +1,12 @@
 use std::{cell::RefCell, rc::Rc};
 
 use bzr::{
-    ast::expression::Node,
+    ast::{expr::index_expr::IndexExpr, expression::Node},
     evaluator::Evaluator,
     lexer::Lexer,
     object::{
-        boolean::Boolean, environment::Environment, function::Function, integer::Integer,
-        string::Str, Object,
+        array::Array, boolean::Boolean, environment::Environment, function::Function,
+        integer::Integer, string::Str, Object,
     },
     parser::Parser,
 };
@@ -400,14 +400,10 @@ fn test_set_value() {
 }
 
 #[test]
-fn test_array_index_value() {
-    let mut tests: Vec<(String, i64)> = Vec::new();
-    tests.push(("[1,2,3][1 + 1];".to_string(), 3));
-
-    for (source, expected) in tests {
-        let evaluated = test_eval(source);
-        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
-        assert_eq!(expected, value)
-    }
+fn test_eval_array() {
+    let source = "[1, 2 * 2, 3 + 3]".to_string();
+    let evaluated = test_eval(source);
+    let evaluated = evaluated.as_any().downcast_ref::<Array>();
+    assert!(evaluated.is_some(), "Not a array");
+    assert_eq!(evaluated.unwrap().elements.len(), 3, "Wrong size");
 }

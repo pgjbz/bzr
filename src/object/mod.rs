@@ -2,6 +2,7 @@ use std::{any::Any, fmt::Display};
 
 use crate::ast::types::Type;
 
+pub mod array;
 pub mod boolean;
 pub mod built_in;
 pub mod environment;
