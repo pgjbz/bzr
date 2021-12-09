@@ -1,0 +1,9 @@
+fn calculate(a int, b int, p int) int {
+    ret p(a, b);
+}
+
+fn add(a int, b int) int {
+    ret a + b;
+}
+
+calculate(5, 5, add);

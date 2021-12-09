@@ -329,3 +329,27 @@ fn test_factorial() {
         assert_eq!(expected, value)
     }
 }
+
+#[test]
+fn test_closure() {
+    let mut tests: Vec<(String, i64)> = Vec::new();
+    tests.push((
+        "fn calculate(a int, b int, p int) int {
+            ret p(a, b);
+        }
+        
+        fn add(a int, b int) int {
+            ret a + b;
+        }
+        
+        calculate(5, 5, add);".to_string(),
+        10,
+    ));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
+        let value = *evaluated.val.borrow_mut();
+        assert_eq!(expected, value)
+    }
+}
