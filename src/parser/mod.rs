@@ -441,30 +441,8 @@ impl Parser {
     ) -> Result<Rc<dyn Expression>, ParseError> {
         let mut call_expr = CallExpr::new(Rc::clone(&parser.current_token), function);
         parser.next_token();
-        call_expr.arguments = parser.parse_call_arguments()?;
+        call_expr.arguments = parser.parse_expr_list(Token::RParen(None))?;
         Ok(Rc::new(call_expr))
-    }
-
-    fn parse_call_arguments(&mut self) -> Result<Vec<Rc<dyn Expression>>, ParseError> {
-        let mut arguments = Vec::new();
-
-        if self.peek_token_is(&Token::RParen(None)) {
-            self.next_token();
-            return Ok(arguments);
-        }
-        self.next_token();
-
-        arguments.push(self.parse_expression(Precedence::Lowest)?);
-
-        while self.peek_token_is(&Token::Comma(None)) {
-            self.next_token();
-            self.next_token();
-            arguments.push(self.parse_expression(Precedence::Lowest)?);
-        }
-
-        self.expected_peek(Token::RParen(None))?;
-
-        Ok(arguments)
     }
 
     fn parse_grouped_expression(parser: &mut Self) -> Result<Rc<dyn Expression>, ParseError> {

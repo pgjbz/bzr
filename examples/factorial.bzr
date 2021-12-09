@@ -6,4 +6,5 @@ fn factorial(x int) int {
     }
 }
 
-factorial(4);
+let fact = factorial(4);
+puts("Fact = ", fact);
