@@ -37,7 +37,7 @@ impl Expression for CallExpr {
     }
 
     fn get_type(&self) -> crate::ast::types::Type {
-        todo!()
+        self.function.get_type()
     }
 }
 
