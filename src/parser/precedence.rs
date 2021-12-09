@@ -12,6 +12,7 @@ pub(super) enum Precedence {
     Product = 6,
     Prefix = 7,
     Call = 8,
+    Index = 9,
 }
 
 impl PartialEq for Precedence {
@@ -41,6 +42,7 @@ pub(super) fn get_precedence(token: &Token) -> Precedence {
         Token::Plus(_) | Token::Minus(_) => Precedence::Sum,
         Token::Slash(_) | Token::Asterisk(_) => Precedence::Product,
         Token::LParen(_) => Precedence::Call,
+        Token::LSqBracket(_) => Precedence::Index,
         _ => Precedence::Lowest,
     }
 }

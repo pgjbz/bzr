@@ -1,5 +1,5 @@
 use bzr::ast::{
-    expr::if_expr::IfExpr, expression::Expression, stmt::expression_stmt::ExpressionStatement,
+    expr::{if_expr::IfExpr, index_expr::IndexExpr}, expression::Expression, stmt::expression_stmt::ExpressionStatement,
 };
 use std::rc::Rc;
 
@@ -356,9 +356,7 @@ fn test_if_while_expression() {
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
     let program = parser.parse_program();
-    for stmt in &program.statements {
-        println!("{}", stmt);
-    }
+
     assert_eq!(1, program.statements.len());
     assert_eq!(0, program.errors.len());
 }

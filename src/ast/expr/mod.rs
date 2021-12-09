@@ -8,3 +8,4 @@ pub mod int_expr;
 pub mod prefix_expr;
 pub mod str_expr;
 pub mod while_expr;
+pub mod index_expr;

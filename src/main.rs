@@ -7,11 +7,10 @@ fn main() {
     let input = fs::read_to_string(&filename).unwrap();
 
     let lexer = Lexer::new(Rc::new(input), Rc::new(filename));
-
+        
     let parse = Parser::new(lexer);
 
     let program = parse.parse_program();
-    println!("{}", program);
     let eval = Evaluator::default();
     if program.errors.is_empty() {
         eval.eval(

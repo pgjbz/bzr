@@ -26,6 +26,7 @@ impl Node for ArrayExpr {
                 buffer.push_str(&format!(", {}", val))
             }
         }
+        buffer.push(']');
         Box::new(buffer)
     }
 

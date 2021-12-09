@@ -398,3 +398,16 @@ fn test_set_value() {
         assert_eq!(expected, value)
     }
 }
+
+#[test]
+fn test_array_index_value() {
+    let mut tests: Vec<(String, i64)> = Vec::new();
+    tests.push(("[1,2,3][1 + 1];".to_string(), 3));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
+        let value = *evaluated.val.borrow_mut();
+        assert_eq!(expected, value)
+    }
+}

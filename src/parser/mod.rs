@@ -8,7 +8,7 @@ use crate::{
         expr::{
             arr_expr::ArrayExpr, bool_expr::BoolExpr, call_expr::CallExpr,
             function_expr::FunctionExpr, if_expr::IfExpr, infix_expr::InfixExpr, int_expr::IntExpr,
-            prefix_expr::PrefixExpr, str_expr::StrExpr, while_expr::WhileExpr,
+            prefix_expr::PrefixExpr, str_expr::StrExpr, while_expr::WhileExpr, index_expr::IndexExpr,
         },
         expression::Expression,
         identifier::Identifier,
@@ -70,6 +70,7 @@ impl Parser {
         infix_parse_fns.insert(Token::And(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Assign(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::LParen(None), Self::parse_call_expression);
+        infix_parse_fns.insert(Token::LSqBracket(None), Self::parse_index_expression);
         Self {
             lexer,
             current_token,
@@ -433,6 +434,17 @@ impl Parser {
         };
 
         Ok(Rc::new(infix_expr))
+    }
+
+    fn parse_index_expression(
+        parser: &mut Self,
+        left: Rc<dyn Expression>,
+    ) -> Result<Rc<dyn Expression>, ParseError> {
+        let current_token = Rc::clone(&parser.current_token);
+        parser.next_token();
+        let idx_expr = parser.parse_expression(Precedence::Lowest)?;
+        // parser.expected_peek(Token::RSqBracket(None))?; //TODO: check why this broke code
+        Ok(Rc::new(IndexExpr::new(current_token, left, idx_expr)))
     }
 
     fn parse_call_expression(
