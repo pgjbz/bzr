@@ -2,15 +2,16 @@ use std::cmp::Ordering;
 
 use crate::lexer::token::Token;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub(super) enum Precedence {
     Lowest = 1,
-    Equals = 2,
-    LessGreater = 3,
-    Sum = 4,
-    Product = 5,
-    Prefix = 6,
-    Call = 7,
+    AndOr = 2,
+    Equals = 3,
+    LessGreater = 4,
+    Sum = 5,
+    Product = 6,
+    Prefix = 7,
+    Call = 8,
 }
 
 impl PartialEq for Precedence {
@@ -33,13 +34,10 @@ impl PartialOrd for Precedence {
 pub(super) fn get_precedence(token: &Token) -> Precedence {
     match token {
         Token::Eq(_) | Token::Diff(_) => Precedence::Equals,
-        Token::Lt(_)
-        | Token::Gt(_)
-        | Token::Lte(_)
-        | Token::Gte(_)
-        | Token::And(_)
-        | Token::Assign(_)
-        | Token::Or(_) => Precedence::LessGreater,
+        Token::Or(_) | Token::And(_) => Precedence::AndOr,
+        Token::Lt(_) | Token::Gt(_) | Token::Lte(_) | Token::Gte(_) | Token::Assign(_) => {
+            Precedence::LessGreater
+        }
         Token::Plus(_) | Token::Minus(_) => Precedence::Sum,
         Token::Slash(_) | Token::Asterisk(_) => Precedence::Product,
         Token::LParen(_) => Precedence::Call,

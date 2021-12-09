@@ -1,3 +1,5 @@
-while 1 > 0 {
-    x + x
+let x = 0;
+while x < 1000000 {
+    x = x + 1;
+    puts(x);
 }

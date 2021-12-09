@@ -137,6 +137,18 @@ impl Lexer {
                     }
                     token
                 }
+                '|' => {
+                    let mut token = Token::Illegal(
+                        Some(Rc::new(String::from(self.ch.unwrap()))),
+                        Some(Location::new(line_position, line, Rc::clone(&filename))),
+                    );
+                    let next_char = Self::peek_next_char(self, None);
+                    if next_char == '|' {
+                        self.read_char();
+                        token = Token::Or(Some(Location::new(line_position, line, filename)));
+                    }
+                    token
+                }
                 ';' => Token::Semicolon(Some(Location::new(line_position, line, filename))),
                 '(' => Token::LParen(Some(Location::new(line_position, line, filename))),
                 ')' => Token::RParen(Some(Location::new(line_position, line, filename))),
@@ -167,18 +179,6 @@ impl Lexer {
                             Some(Location::new(line_position, line, filename)),
                         ),
                     }
-                }
-                '|' => {
-                    let mut token = Token::Illegal(
-                        Some(Rc::new(String::from(self.ch.unwrap()))),
-                        Some(Location::new(line_position, line, Rc::clone(&filename))),
-                    );
-                    let next_char = Self::peek_next_char(self, None);
-                    if next_char == '|' {
-                        self.read_char();
-                        token = Token::Or(Some(Location::new(line_position, line, filename)));
-                    }
-                    token
                 }
                 _ => {
                     if Self::is_letter(Some(*ch)) {
@@ -233,6 +233,7 @@ impl Lexer {
                 || Self::is_whitespace(Some(ch))
                 || ch == ';'
                 || ch == '{'
+                || ch == '|'
                 || ch == '&'
                 || ch == '\0'
                 || ch == '!'

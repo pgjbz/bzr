@@ -11,6 +11,7 @@ fn main() {
     let parse = Parser::new(lexer);
 
     let program = parse.parse_program();
+    println!("{}", program);
     let eval = Evaluator::default();
     if program.errors.is_empty() {
         eval.eval(

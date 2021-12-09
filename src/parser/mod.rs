@@ -63,11 +63,11 @@ impl Parser {
         infix_parse_fns.insert(Token::Eq(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Diff(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Lt(None), Self::parse_infix_expression);
+        infix_parse_fns.insert(Token::Or(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Gt(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Gte(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Lte(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::And(None), Self::parse_infix_expression);
-        infix_parse_fns.insert(Token::Or(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Assign(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::LParen(None), Self::parse_call_expression);
         Self {
@@ -82,14 +82,14 @@ impl Parser {
 
     pub fn parse_program(mut self) -> Box<Program> {
         let mut statements = vec![];
-        'parse: loop {
+        loop {
             match self.parse_statement() {
                 Ok(sts) => {
                     self.next_token();
                     statements.push(sts)
                 }
                 Err(e) => match e {
-                    ParseError::Eof => break 'parse,
+                    ParseError::Eof => break,
                     ParseError::Message(msg) => {
                         self.next_token();
                         self.errors.push(msg)
