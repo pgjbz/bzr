@@ -20,4 +20,60 @@ For now only have 3 types:
 
 ### Examples
 
-Examples are in [examples folder](./examples)
+## Hello world
+
+```bzr
+puts("Hello World!");
+```
+
+## If
+
+```bzr
+if 34 + 35 == 68 {
+    puts("Ok");
+} else {
+    puts("Not ok");
+}
+```
+
+## If else if
+
+```bzr
+if 34 + 35 == 68 {
+    puts("Ok");
+} else if 34 + 35 == 69{
+    puts("very ok ok");
+} else {
+    puts("not ok");
+}
+```
+
+## Function
+
+```bzr
+fn add(a int, b int) int {
+    ret a + b;
+}
+```
+
+## let
+
+```bzr
+let a int = 10;
+puts("a = ", a);
+```
+
+But for store function return cannot inform type
+
+```bzr
+fn factorial(x int) int {
+    if x <= 1 {
+        ret 1;
+    } else {
+        ret x * factorial(x - 1);
+    }
+}
+
+let fact = factorial(4);
+puts("Fact = ", fact);
+```
