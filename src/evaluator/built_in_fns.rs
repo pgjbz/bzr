@@ -23,3 +23,11 @@ pub fn print(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     let string = Str::new(buffer);
     Rc::new(string)
 }
+
+pub fn to_str(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+    let mut buffer = String::new();
+    for arg in args {
+        buffer.push_str(&arg.to_string())
+    }
+    Rc::new(Str::new(buffer))
+}

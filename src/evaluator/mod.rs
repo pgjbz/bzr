@@ -33,6 +33,7 @@ impl Evaluator {
     pub fn new() -> Self {
         let mut build_in_fns: HashMap<String, Rc<dyn Object>> = HashMap::new();
         build_in_fns.insert("len".to_string(), Rc::new(BuiltIn::new(built_in_fns::len)));
+        build_in_fns.insert("to_str".to_string(), Rc::new(BuiltIn::new(built_in_fns::to_str)));
         build_in_fns.insert(
             "puts".to_string(),
             Rc::new(BuiltIn::new(built_in_fns::print)),

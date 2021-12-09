@@ -3,3 +3,6 @@ while a < 10 {
     puts(a);
     a = a + 1;
 }
+
+let string = "aa" + to_str(1);
+puts(string);
