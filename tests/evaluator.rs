@@ -385,3 +385,16 @@ fn test_built_in() {
         assert_eq!(expected, value)
     }
 }
+
+#[test]
+fn test_set_value() {
+    let mut tests: Vec<(String, i64)> = Vec::new();
+    tests.push(("let a int = 10; a = 0; a;".to_string(), 0));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
+        let value = *evaluated.val.borrow_mut();
+        assert_eq!(expected, value)
+    }
+}

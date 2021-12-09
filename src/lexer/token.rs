@@ -100,6 +100,7 @@ impl Token {
             Self::Asterisk(_) => "*".to_string(),
             Self::Or(_) => "||".to_string(),
             Self::And(_) => "&&".to_string(),
+            Self::Assign(_) => "=".to_string(),
             _ => "unknown".to_string(),
         }
     }

@@ -83,11 +83,25 @@ impl Evaluator {
                 if self.is_error(&right) {
                     return right;
                 }
-                let left = self.eval(Some(infix.left.as_ref().unwrap().as_ref()), Rc::clone(&env));
-                if self.is_error(&left) {
-                    return left;
+                if infix.operator == "=" {
+                    let right = self.eval(
+                        Some(infix.right.as_ref().unwrap().as_ref()),
+                        Rc::clone(&env),
+                    );
+                    self.set(
+                        infix.left.as_ref().unwrap().to_string(),
+                        Rc::clone(right.as_ref().unwrap()),
+                        Rc::clone(&env),
+                    );
+                    right
+                } else {
+                    let left =
+                        self.eval(Some(infix.left.as_ref().unwrap().as_ref()), Rc::clone(&env));
+                    if self.is_error(&left) {
+                        return left;
+                    }
+                    self.eval_infix_expr(left.unwrap(), right.unwrap(), &infix.operator)
                 }
-                self.eval_infix_expr(left.unwrap(), right.unwrap(), &infix.operator)
             } else if let Some(if_expr) = node.as_any().downcast_ref::<IfExpr>() {
                 self.eval_if_expression(if_expr, Rc::clone(&env))
             } else if let Some(block_stmt) = node.as_any().downcast_ref::<BlockStatement>() {
