@@ -202,6 +202,10 @@ fn test_errors() {
         "unsupported operation true + false",
     ));
     tests.push(("foobar".to_string(), "unknown word 'foobar'"));
+    tests.push((
+        "if 1 == 1 { let a = 10; } a;".to_string(),
+        "unknown word 'a'",
+    ));
 
     for (source, expected) in tests {
         let evaluated = test_eval(source);

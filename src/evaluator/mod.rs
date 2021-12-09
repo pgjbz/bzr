@@ -342,16 +342,17 @@ impl Evaluator {
         match condition {
             Some(condition) => match condition.as_any().downcast_ref::<Boolean>() {
                 Some(condition) => {
+                    let new_env = Rc::new(RefCell::new(Environment::new(Some(Rc::clone(&env)))));
                     if *condition.val.borrow_mut() {
                         if let Some(ref consequence) = if_expr.consequence {
-                            self.eval(Some(consequence.as_ref()), Rc::clone(&env))
+                            self.eval(Some(consequence.as_ref()), Rc::clone(&new_env))
                         } else {
                             None
                         }
                     } else if let Some(ref el_if) = if_expr.el_if {
-                        self.eval(Some(el_if.as_ref()), env)
+                        self.eval(Some(el_if.as_ref()), Rc::clone(&new_env))
                     } else if let Some(ref alternative) = if_expr.alternative {
-                        self.eval(Some(alternative.as_ref()), env)
+                        self.eval(Some(alternative.as_ref()), Rc::clone(&new_env))
                     } else {
                         None
                     }
