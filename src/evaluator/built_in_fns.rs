@@ -14,12 +14,42 @@ pub fn len(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     Rc::new(Integer::new(len as i64))
 }
 
-pub fn print(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+pub fn puts(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+    let mut buffer = String::new();
+    for arg in args {
+        buffer.push_str(&arg.to_string())
+    }
+    print!("{}", buffer);
+    let string = Str::new(buffer);
+    Rc::new(string)
+}
+
+pub fn putsln(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     let mut buffer = String::new();
     for arg in args {
         buffer.push_str(&arg.to_string())
     }
     println!("{}", buffer);
+    let string = Str::new(buffer);
+    Rc::new(string)
+}
+
+pub fn eputs(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+    let mut buffer = String::new();
+    for arg in args {
+        buffer.push_str(&arg.to_string())
+    }
+    eprint!("{}", buffer);
+    let string = Str::new(buffer);
+    Rc::new(string)
+}
+
+pub fn eputsln(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+    let mut buffer = String::new();
+    for arg in args {
+        buffer.push_str(&arg.to_string())
+    }
+    eprintln!("{}", buffer);
     let string = Str::new(buffer);
     Rc::new(string)
 }

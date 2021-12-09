@@ -39,7 +39,19 @@ impl Evaluator {
         );
         build_in_fns.insert(
             "puts".to_string(),
-            Rc::new(BuiltIn::new(built_in_fns::print)),
+            Rc::new(BuiltIn::new(built_in_fns::puts)),
+        ); 
+        build_in_fns.insert(
+            "putsln".to_string(),
+            Rc::new(BuiltIn::new(built_in_fns::putsln)),
+        );
+        build_in_fns.insert(
+            "eputs".to_string(),
+            Rc::new(BuiltIn::new(built_in_fns::eputs)),
+        );
+        build_in_fns.insert(
+            "eputsln".to_string(),
+            Rc::new(BuiltIn::new(built_in_fns::eputsln)),
         );
         Self { build_in_fns }
     }
