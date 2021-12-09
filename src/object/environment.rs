@@ -16,7 +16,13 @@ impl Environment {
     }
 
     pub fn set(&mut self, name: String, obj: Rc<dyn Object>) {
-        self.store.insert(name, obj);
+        if self.exists_in_outer(&name) {
+            if let Some(ref out) = self.outer {
+                out.borrow_mut().set(name, obj);
+            }
+        } else {
+            self.store.insert(name, obj);
+        }
     }
 
     pub fn get(&mut self, name: String) -> Option<Rc<dyn Object>> {
@@ -30,6 +36,14 @@ impl Environment {
             }
         } else {
             None
+        }
+    }
+    
+    fn exists_in_outer(&mut self, name: &String) -> bool{
+        if let Some(ref outer) = self.outer {
+            outer.borrow_mut().get(name.clone()).is_some()
+        } else {
+            false
         }
     }
 }
