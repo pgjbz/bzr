@@ -1,3 +1,7 @@
 let a int = 20;
 a = 0;
-puts("a = ", a);
+let a = a + 1;
+if a == 1 {
+    a = a + 1;
+    puts(a);
+}

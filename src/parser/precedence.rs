@@ -38,8 +38,9 @@ pub(super) fn get_precedence(token: &Token) -> Precedence {
         | Token::Lte(_)
         | Token::Gte(_)
         | Token::And(_)
+        | Token::Assign(_)
         | Token::Or(_) => Precedence::LessGreater,
-        Token::Plus(_) | Token::Minus(_) | Token::Assign(_) => Precedence::Sum,
+        Token::Plus(_) | Token::Minus(_)  => Precedence::Sum,
         Token::Slash(_) | Token::Asterisk(_) => Precedence::Product,
         Token::LParen(_) => Precedence::Call,
         _ => Precedence::Lowest,
