@@ -1,3 +1,4 @@
+pub mod arr_expr;
 pub mod bool_expr;
 pub mod call_expr;
 pub mod function_expr;

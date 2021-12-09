@@ -6,9 +6,9 @@ use std::{collections::HashMap, mem, rc::Rc};
 use crate::{
     ast::{
         expr::{
-            bool_expr::BoolExpr, call_expr::CallExpr, function_expr::FunctionExpr, if_expr::IfExpr,
-            infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
-            while_expr::WhileExpr,
+            arr_expr::ArrayExpr, bool_expr::BoolExpr, call_expr::CallExpr,
+            function_expr::FunctionExpr, if_expr::IfExpr, infix_expr::InfixExpr, int_expr::IntExpr,
+            prefix_expr::PrefixExpr, str_expr::StrExpr, while_expr::WhileExpr,
         },
         expression::Expression,
         identifier::Identifier,
@@ -51,6 +51,7 @@ impl Parser {
         prefix_parse_fns.insert(Token::False(None), Self::parse_bool_literal);
         prefix_parse_fns.insert(Token::String(None, None), Self::parse_string_literal);
         prefix_parse_fns.insert(Token::LParen(None), Self::parse_grouped_expression);
+        prefix_parse_fns.insert(Token::LSqBracket(None), Self::parse_array);
         prefix_parse_fns.insert(Token::If(None), Self::parse_if_expression);
         prefix_parse_fns.insert(Token::While(None), Self::parse_while_expression);
         prefix_parse_fns.insert(Token::Function(None), Self::parse_function_literal);
@@ -482,6 +483,31 @@ impl Parser {
         expr
     }
 
+    fn parse_array(parser: &mut Self) -> Result<Rc<dyn Expression>, ParseError> {
+        let current_token = Rc::clone(&parser.current_token);
+        let exprs = parser.parse_expr_list(Token::RSqBracket(None))?;
+        let array_expr = ArrayExpr::new(exprs, current_token);
+        Ok(Rc::new(array_expr))
+    }
+
+    fn parse_expr_list(&mut self, end: Token) -> Result<Vec<Rc<dyn Expression>>, ParseError> {
+        let mut exprs = Vec::new();
+        if self.peek_token_is(&end) {
+            self.next_token();
+            return Ok(exprs);
+        }
+
+        self.next_token();
+        exprs.push(self.parse_expression(Precedence::Lowest)?);
+        while self.peek_token_is(&Token::Comma(None)) {
+            self.next_token();
+            self.next_token();
+            exprs.push(self.parse_expression(Precedence::Lowest)?);
+        }
+        self.expected_peek(end)?;
+        Ok(exprs)
+    }
+
     fn expected_peek(&mut self, token: Token) -> Result<(), ParseError> {
         if self.peek_token_is(&token) {
             self.next_token();
@@ -504,5 +530,6 @@ impl Parser {
         self.peek_token_is(&Token::Int(None))
             || self.peek_token_is(&Token::Str(None))
             || self.peek_token_is(&Token::Bool(None))
+            || self.peek_token_is(&Token::Array(None))
     }
 }

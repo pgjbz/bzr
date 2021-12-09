@@ -4,6 +4,7 @@ use std::fmt::Display;
 pub enum Type {
     Int,
     Bool,
+    Array,
     Error,
     Prefix,
     String,
@@ -19,12 +20,13 @@ impl Display for Type {
             Self::Int => "int",
             Self::Bool => "bool",
             Self::String => "str",
+            Self::Array => "array",
             Self::Error => "Error",
             Self::Unknown => "unk",
             Self::Prefix => "prefix",
             Self::Function => "function",
-            Self::BuiltIn => "built in function",
             Self::Expression => "expression",
+            Self::BuiltIn => "built in function",
         };
         write!(f, "{}", val)
     }

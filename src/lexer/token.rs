@@ -43,6 +43,7 @@ pub enum Token {
     Diff(Option<Location>),
     And(Option<Location>),
     Or(Option<Location>),
+    Array(Option<Location>),
 }
 
 #[derive(PartialEq, Debug, Clone, Hash)]
@@ -81,6 +82,7 @@ impl Token {
             "str" => Ok(Token::Str(location)),
             "bool" => Ok(Token::Bool(location)),
             "while" => Ok(Token::While(location)),
+            "array" => Ok(Token::Array(location)),
             _ => Err(String::from("Not a keyword")),
         }
     }
@@ -101,6 +103,7 @@ impl Token {
             Self::Or(_) => "||".to_string(),
             Self::And(_) => "&&".to_string(),
             Self::Assign(_) => "=".to_string(),
+            Self::Array(_) => "array".to_string(),
             _ => "unknown".to_string(),
         }
     }
@@ -108,6 +111,7 @@ impl Token {
     pub fn to_type(&self) -> Type {
         match self {
             Self::Int(_) | Self::Plus(_) | Self::Minus(_) => Type::Int,
+            Self::Array(_) => Type::Array,
             Self::Bool(_)
             | Self::Lt(_)
             | Self::Gt(_)
@@ -344,6 +348,12 @@ impl Display for Token {
             Self::Or(pos) => match pos {
                 Some(pos) => {
                     format!("'||'in {}:{}:{}", pos.filename, pos.line, pos.position)
+                }
+                _ => "if".to_string(),
+            },
+            Self::Array(pos) => match pos {
+                Some(pos) => {
+                    format!("'array'in {}:{}:{}", pos.filename, pos.line, pos.position)
                 }
                 _ => "if".to_string(),
             },

@@ -352,9 +352,13 @@ fn test_function_call_without_args_parsing() {
 
 #[test]
 fn test_if_while_expression() {
-    let source = "while x < y { x }".to_string();
+    let source = "let a array = [1,2,3]".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
     let program = parser.parse_program();
+    for stmt in &program.statements {
+        println!("{}", stmt);
+    }
     assert_eq!(1, program.statements.len());
+    assert_eq!(0, program.errors.len());
 }
