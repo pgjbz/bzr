@@ -23,9 +23,6 @@ impl Environment {
         if let Some(obj) = self.store.get(&name) {
             Some(Rc::clone(obj))
         } else if let Some(ref outer) = self.outer {
-            for (key, val) in outer.borrow_mut().store.iter() {
-                eprintln!("{} = {}", key, val);
-            }
             if let Some(obj) = outer.borrow_mut().get(name) {
                 Some(Rc::clone(&obj))
             } else {

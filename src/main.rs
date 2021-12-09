@@ -19,7 +19,7 @@ fn main() {
         );
     } else {
         for error in program.errors {
-            println!("{}", error);
+            eprintln!("{}", error);
         }
     }
 }

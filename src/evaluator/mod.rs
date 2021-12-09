@@ -160,7 +160,6 @@ impl Evaluator {
             }
             self.extract_ret_val(evaluated)
         } else {
-            eprintln!("type {}", function.get_type());
             Some(Rc::new(Error::new(format!(
                 "not a function {}",
                 function.get_type()

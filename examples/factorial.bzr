@@ -1,0 +1,9 @@
+fn factorial(x int) int {
+    if x == 1 {
+        ret x;
+    } else {
+        ret x * factorial(x - 1);
+    }
+}
+
+factorial(4);

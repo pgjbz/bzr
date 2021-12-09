@@ -154,6 +154,7 @@ fn test_eval_if_expr() {
     tests.push(("if 1 < 2 { 10 } else { 1 }".to_string(), 10));
     tests.push(("if true { 10 }".to_string(), 10));
     tests.push(("if 1 > 2 { 10 } else { 100 }".to_string(), 100));
+    tests.push(("let x = 10; if 1 > x { 10 } else { 100 }".to_string(), 100));
     tests.push((
         "if 1 > 2 { 10; } else if 10 == 10 { 100; } else { 45; }".to_string(),
         100,
@@ -285,10 +286,27 @@ fn test_function_apply() {
     ));
 
     for (source, expected) in tests {
-        eprintln!("{}", source);
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
         let value = *evaluated.val.borrow_mut();
         assert_eq!(expected, value)
     }
+}
+
+#[test]
+fn test_factorial() {
+    let source = "fn factorial(x int) int {
+        if x == 1 {
+            ret x;
+        } else {
+            ret x * factorial(x - 1);
+        }
+    }
+    
+    factorial(4);"
+        .to_string();
+    let evaluated = test_eval(source);
+    let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
+    let value = *evaluated.val.borrow_mut();
+    assert_eq!(24, value)
 }
