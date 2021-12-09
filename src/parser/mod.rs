@@ -345,7 +345,7 @@ impl Parser {
     fn parse_string_literal(parser: &mut Self) -> Result<Rc<dyn Expression>, ParseError> {
         let current_token = Rc::clone(&parser.current_token);
         let string = match parser.current_token.as_ref() {
-            Token::String(val, _) => val.as_ref().unwrap().as_ref().trim(),
+            Token::String(val, _) => val.as_ref().unwrap().as_ref(),
             tok => {
                 let msg = format!("expected boolean value got: {}", tok);
                 return Err(ParseError::Message(msg));

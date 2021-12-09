@@ -201,6 +201,10 @@ fn test_errors() {
         "5; true + false;".to_string(),
         "unsupported operation true + false",
     ));
+    tests.push((
+        "\"Hello\" - \" World\";".to_string(),
+        "unsupported operation Hello -  World",
+    ));
     tests.push(("foobar".to_string(), "unknown word 'foobar'"));
     tests.push((
         "if 1 == 1 { let a = 10; } a;".to_string(),
@@ -268,7 +272,7 @@ fn test_function_expr() {
 
     let evaluated = test_eval(source);
     let evaluated = evaluated.as_any().downcast_ref::<Function>();
-    assert!(evaluated.is_some());
+    assert!(evaluated.is_some(), "Not a function");
 }
 
 #[test]
@@ -309,10 +313,12 @@ fn test_factorial() {
             }
         }
         
-        factorial(4);".to_string(),
+        factorial(4);"
+            .to_string(),
         24,
     ));
-    tests.push(("fn factorial(x int) int {
+    tests.push((
+        "fn factorial(x int) int {
         if x <= 1 {
             ret 1;
         } else {
@@ -320,7 +326,10 @@ fn test_factorial() {
         }
     }
     
-    factorial(0);".to_string(), 1));
+    factorial(0);"
+            .to_string(),
+        1,
+    ));
 
     for (source, expected) in tests {
         let evaluated = test_eval(source);
@@ -342,7 +351,8 @@ fn test_closure() {
             ret a + b;
         }
         
-        calculate(5, 5, add);".to_string(),
+        calculate(5, 5, add);"
+            .to_string(),
         10,
     ));
 
@@ -352,4 +362,13 @@ fn test_closure() {
         let value = *evaluated.val.borrow_mut();
         assert_eq!(expected, value)
     }
+}
+
+#[test]
+fn test_string_concatenation() {
+    let source = "\"Paulo\" + \" \" + \"Gabriel\"".to_string();
+    let evaluated = test_eval(source);
+    let evaluated = evaluated.as_any().downcast_ref::<Str>();
+    assert!(evaluated.is_some(), "Not a string");
+    assert_eq!("Paulo Gabriel".to_string(), evaluated.unwrap().val)
 }

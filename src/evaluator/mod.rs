@@ -274,6 +274,20 @@ impl Evaluator {
             } else {
                 Some(Rc::new(Error::new(format!("miss right operator {}", left))))
             }
+        } else if let Some(left) = left.as_any().downcast_ref::<Str>() {
+            if let Some(right) = right.as_any().downcast_ref::<Str>() {
+                let left = &left.val;
+                let right = &right.val;
+                match operator {
+                    "+" => Some(Rc::new(Str::new(format!("{}{}", left, right)))),
+                    _ => Some(Rc::new(Error::new(format!(
+                        "unsupported operation {} {} {}",
+                        left, operator, right
+                    )))),
+                }
+            } else {
+                Some(Rc::new(Error::new(format!("miss right operator {}", left))))
+            }
         } else {
             Some(Rc::new(Error::new(format!(
                 "unsupported operation {} {} {}",
