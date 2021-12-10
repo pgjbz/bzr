@@ -49,6 +49,7 @@ pub enum Token {
     BitWiseOr(Option<Location>),
     Xor(Option<Location>),
     Array(Option<Location>),
+    Mod(Option<Location>),
 }
 
 #[derive(PartialEq, Debug, Clone, Hash)]
@@ -114,6 +115,7 @@ impl Token {
             Self::Xor(_) => "^".to_string(),
             Self::BitWiseAnd(_) => "&".to_string(),
             Self::BitWiseOr(_) => "|".to_string(),
+            Self::Mod(_) => "%".to_string(),
             _ => "unknown".to_string(),
         }
     }
@@ -121,11 +123,12 @@ impl Token {
     pub fn to_type(&self) -> Type {
         match self {
             Self::Int(_)
+            | Self::Mod(_)
             | Self::Plus(_)
             | Self::Minus(_)
-            | Self::BitWiseAnd(_)
             | Self::BitWiseOr(_)
             | Self::ShiftLeft(_)
+            | Self::BitWiseAnd(_)
             | Self::ShiftRight(_)
             | Self::Xor(_) => Type::Int,
             Self::Array(_) => Type::Array,
@@ -401,6 +404,12 @@ impl Display for Token {
             Self::Xor(pos) => match pos {
                 Some(pos) => {
                     format!("'^'in {}:{}:{}", pos.filename, pos.line, pos.position)
+                }
+                _ => "if".to_string(),
+            },
+            Self::Mod(pos) => match pos {
+                Some(pos) => {
+                    format!("'%'in {}:{}:{}", pos.filename, pos.line, pos.position)
                 }
                 _ => "if".to_string(),
             },

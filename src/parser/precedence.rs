@@ -41,6 +41,7 @@ pub(super) fn get_precedence(token: &Token) -> Precedence {
         }
         Token::Plus(_) | Token::Minus(_) => Precedence::Sum,
         Token::Slash(_)
+        | Token::Mod(_)
         | Token::Asterisk(_)
         | Token::BitWiseAnd(_)
         | Token::BitWiseOr(_)

@@ -1,4 +1,4 @@
-use std::{cell::RefCell, env, fs, rc::Rc, process};
+use std::{cell::RefCell, env, fs, process, rc::Rc};
 
 use bzr::{evaluator::Evaluator, lexer::Lexer, object::environment::Environment, parser::Parser};
 

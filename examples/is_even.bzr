@@ -1,0 +1,11 @@
+fn is_even(num int) bool {
+    ret num % 2 == 0;
+}
+
+if is_even(10) {
+    putsln("10 is even");
+} 
+
+if !is_even(11) {
+    putsln("11 is odd");
+} 

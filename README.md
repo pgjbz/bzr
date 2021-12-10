@@ -163,6 +163,7 @@ Name | Symbol | Example | Return |
 | minus |   -   |  1 - 1  |    0   |
 | multiply |   *   |  2 * 2  |    4   |
 | divide |   /   |  2 / 2  |    1   |
+| mod |   %   |  2 % 2  |    0   |
 | and |   &   |  7 & 5  |    5   |
 | or |   \|   |  7 | 5  |    7   |
 | xor |   ^   |  7 ^ 5  |    2   |

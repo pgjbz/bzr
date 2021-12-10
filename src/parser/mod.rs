@@ -66,6 +66,7 @@ impl Parser {
         infix_parse_fns.insert(Token::BitWiseOr(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Xor(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Asterisk(None), Self::parse_infix_expression);
+        infix_parse_fns.insert(Token::Mod(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Eq(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Diff(None), Self::parse_infix_expression);
         infix_parse_fns.insert(Token::Lt(None), Self::parse_infix_expression);

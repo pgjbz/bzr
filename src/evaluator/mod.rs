@@ -377,6 +377,7 @@ impl Evaluator {
                 let right = *right.val.borrow();
 
                 match operator {
+                    "%" => Some(Rc::new(Integer::new(left % right))),
                     "+" => Some(Rc::new(Integer::new(left + right))),
                     "-" => Some(Rc::new(Integer::new(left - right))),
                     "*" => Some(Rc::new(Integer::new(left * right))),

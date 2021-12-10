@@ -167,6 +167,7 @@ impl Lexer {
                 ',' => Token::Comma(Some(Location::new(line_position, line, filename))),
                 '{' => Token::LBrace(Some(Location::new(line_position, line, filename))),
                 '}' => Token::Rbrace(Some(Location::new(line_position, line, filename))),
+                '%' => Token::Mod(Some(Location::new(line_position, line, filename))),
                 '^' => Token::Xor(Some(Location::new(line_position, line, filename))),
                 '\"' => {
                     let string = Self::read_string(self);
