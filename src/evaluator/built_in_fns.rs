@@ -1,17 +1,19 @@
 use std::rc::Rc;
 
-use crate::object::{integer::Integer, string::Str, Object};
+use crate::object::{integer::Integer, string::Str, Object, error::Error, array::Array};
 
 pub fn len(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     let mut len = 0;
     if args.len() == 1 {
         if let Some(string) = args[0].as_any().downcast_ref::<Str>() {
             len = string.val.len()
-        } else {
-            len = args.len()
+        } else if let Some(arr) = args[0].as_any().downcast_ref::<Array>() {
+            len = arr.elements.len()
         }
+        Rc::new(Integer::new(len as i64))
+    } else {
+        Rc::new(Error::new("wrong number of arguments".to_string()))
     }
-    Rc::new(Integer::new(len as i64))
 }
 
 pub fn puts(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {

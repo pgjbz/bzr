@@ -162,7 +162,6 @@ impl Evaluator {
                 Some(Rc::new(Array::new(elems)))
             } else if let Some(idx_expr) = node.as_any().downcast_ref::<IndexExpr>() {
                 let left = self.eval(Some(idx_expr.left.as_ref()), Rc::clone(&env));
-                eprintln!("array = {}", left.as_ref().unwrap());
                 if self.is_error(&left) {
                     return left;
                 }
