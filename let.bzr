@@ -1,12 +1,3 @@
-fn next(input int) int {
-    if input == 9 {
-        ret 0;
-    } else {
-        ret input + 1;
-    }
-}
-
-let input = to_str(53590);
-putsln(input);
-let bf = append(input, 0);
-putsln(bf);
+let texto = "abc";
+let sl = slice(texto, 0, 2);
+putsln("slice = ", sl);

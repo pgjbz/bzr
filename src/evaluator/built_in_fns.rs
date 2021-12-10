@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::object::{array::Array, error::Error, integer::Integer, string::Str, Object};
+use crate::object::{array::Array, error::Error, integer::Integer, string::Str, Object, null::Null};
 
 pub fn len(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     let mut len = 0;
@@ -98,5 +98,19 @@ pub fn to_int(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
             "invalid value to parse int: {}",
             args[0]
         ))),
+    }
+}
+
+pub fn slice(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+    if args.len() != 3 {
+        return Rc::new(Error::new("invalid number of arguments, must be have string/arr, start, end".to_string()));
+    }
+    if let Some(string) = args[0].as_any().downcast_ref::<Str>() {
+        let start = *args[1].as_any().downcast_ref::<Integer>().unwrap().val.borrow_mut() as usize;
+        let end = *args[2].as_any().downcast_ref::<Integer>().unwrap().val.borrow_mut() as usize;
+        let slice = &string.val[start..end];
+        Rc::new(Str::new(slice.to_string()))
+    } else {
+        Rc::new(Null)
     }
 }
