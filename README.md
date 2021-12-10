@@ -110,6 +110,17 @@ slice(array/string, start, end);
 
 Read input for user
 
+## Append
+
+Append new item in final array or final string
+
+```bzr
+let arr array = [1, 2, 3];
+append(arr, 20);
+putsln(arr);
+```
+
+Display: [1, 2, 3, 20];
 ## is_erro
 
 Check if is error
@@ -124,6 +135,47 @@ if is_error(a) {
 ## to_int and to_str
 
 Parse to int or str
+
+## trim
+
+Remove spaces in string
+
+```bzr
+let a = "  bzr   ";
+let b = trim(a);
+putsln(b);
+```
+Display: bzr
+## print
+
+To print have `puts`, `putsln`, `eputs` and `eputsln`
+
+- puts = print in same line
+- putsln = print and put new line
+- eputs = print in stardard error
+- eputsln = print in stardard error and put new line
+
+## Operators:
+
+Name | Symbol | Example | Return |
+|----|--------|---------|--------|
+| plus |   +   |  1 + 1  |    2   |
+| minus |   -   |  1 - 1  |    0   |
+| multiply |   *   |  2 * 2  |    4   |
+| divide |   /   |  2 / 2  |    1   |
+| and |   &   |  7 & 5  |    5   |
+| or |   \|   |  7 | 5  |    7   |
+| xor |   ^   |  7 ^ 5  |    2   |
+| shift left |  <<   |  1 << 2  |    4   |
+| shift rigt |  >>   |  4 >> 1  |    2   |
+| equals |   ==   |  5 == 5  |    true   |
+| not equals |   =!   |  5 =! 5  |    false   |
+| greater than |   >   |  5 > 2  |    true   |
+| less than |   <   |  5 < 2  |    false   |
+| greater than equals |   >=   |  5 >= 2  |    true   |
+| less than equals |   <   |  2 <= 2  |    true   |
+| and |   &&   |  5 > 2 && true  |    true   |
+| or |   \|\|   |  5 < 2 \|\| true  |    true   |
 
 
 # Build
