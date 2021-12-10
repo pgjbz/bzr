@@ -78,6 +78,10 @@ impl Evaluator {
             "is_error".to_string(),
             Rc::new(BuiltIn::new(built_in_fns::is_error)),
         );
+        build_in_fns.insert(
+            "replace".to_string(),
+            Rc::new(BuiltIn::new(built_in_fns::replace)),
+        );
         Self { build_in_fns }
     }
 

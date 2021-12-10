@@ -159,10 +159,35 @@ pub fn read(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     Rc::new(Str::new(buffer))
 }
 
-
 pub fn trim(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     if args.len() != 1 {
-        return Rc::new(Error::new("invalid number of arguments, needs 1 arguments".to_string()));
+        return Rc::new(Error::new(
+            "invalid number of arguments, needs 1 arguments".to_string(),
+        ));
     }
     Rc::new(Str::new(args[0].to_string().trim().to_string()))
+}
+
+pub fn replace(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+    if args.len() != 3 {
+        Rc::new(Error::new(
+            "wrong number of arguments, needs 3 args, array, index, new value".to_string(),
+        ))
+    } else if let Some(arr) = args[0].as_any().downcast_ref::<Array>() {
+        let mut elements = arr.elements.borrow_mut();
+        let max = elements.len() - 1;
+        let pos = if let Some(val) = args[1].as_any().downcast_ref::<Integer>() {
+            *val.val.borrow_mut() as usize
+        } else {
+            return Rc::new(Error::new(format!("invalid array index {}", args[1])));
+        };
+        if pos > max {
+            return Rc::new(Error::new(format!("invalid array index {}", args[1])));
+        }
+        elements.remove(pos);
+        elements.insert(pos, Rc::clone(&args[2]));
+        Rc::clone(&args[0])
+    } else {
+        Rc::new(Error::new("first argument must be array".to_string()))
+    }
 }

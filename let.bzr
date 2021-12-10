@@ -1,2 +1,9 @@
-let in = read();
-putsln("Palabra digitada ", trim(in));
+let arr = [];
+let counter = 0;
+while counter < 30 {
+    append(arr, 0);
+    counter = counter + 1;
+}
+replace(arr, 1, "BANANA");
+
+putsln(arr);
