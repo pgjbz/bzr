@@ -24,6 +24,13 @@ pub fn append(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
             arr.elements.borrow_mut().push(Rc::clone(element))
         }
         Rc::clone(&args[0])
+    } else if let Some(str) = args[0].as_any().downcast_ref::<Str>() {
+        let mut buffer = String::new();
+        buffer.push_str(&str.val);
+        for arg in args[1..].iter() {
+            buffer.push_str(&format!("{}", arg));
+        }
+        Rc::new(Str::new(buffer))
     } else {
         Rc::new(Error::new("first argument must be array".to_string()))
     }

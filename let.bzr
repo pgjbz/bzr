@@ -1,3 +1,12 @@
-let string = "Banana";
-let char = string[len(string) - 1];
-putsln(char);
+fn next(input int) int {
+    if input == 9 {
+        ret 0;
+    } else {
+        ret input + 1;
+    }
+}
+
+let input = to_str(53590);
+putsln(input);
+let bf = append(input, 0);
+putsln(bf);
