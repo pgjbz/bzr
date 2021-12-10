@@ -1,5 +1,2 @@
-
-let error = is_error(to_int("abc"));
-if error {
-    putsln("banana");
-}
+let a = 7 ^ 5;
+putsln(a);

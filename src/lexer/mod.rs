@@ -109,6 +109,10 @@ impl Lexer {
                     if next_char == '=' {
                         self.read_char();
                         token = Token::Lte(Some(Location::new(line_position, line, filename)))
+                    } else if next_char == '<' {
+                        self.read_char();
+                        token =
+                            Token::ShiftLeft(Some(Location::new(line_position, line, filename)));
                     }
                     token
                 }
@@ -122,14 +126,19 @@ impl Lexer {
                     if next_char == '=' {
                         self.read_char();
                         token = Token::Gte(Some(Location::new(line_position, line, filename)));
+                    } else if next_char == '>' {
+                        self.read_char();
+                        token =
+                            Token::ShiftRight(Some(Location::new(line_position, line, filename)));
                     }
                     token
                 }
                 '&' => {
-                    let mut token = Token::Illegal(
-                        Some(Rc::new(String::from(self.ch.unwrap()))),
-                        Some(Location::new(line_position, line, Rc::clone(&filename))),
-                    );
+                    let mut token = Token::BitWiseAnd(Some(Location::new(
+                        line_position,
+                        line,
+                        Rc::clone(&filename),
+                    )));
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '&' {
                         self.read_char();
@@ -138,10 +147,11 @@ impl Lexer {
                     token
                 }
                 '|' => {
-                    let mut token = Token::Illegal(
-                        Some(Rc::new(String::from(self.ch.unwrap()))),
-                        Some(Location::new(line_position, line, Rc::clone(&filename))),
-                    );
+                    let mut token = Token::BitWiseOr(Some(Location::new(
+                        line_position,
+                        line,
+                        Rc::clone(&filename),
+                    )));
                     let next_char = Self::peek_next_char(self, None);
                     if next_char == '|' {
                         self.read_char();
@@ -157,6 +167,7 @@ impl Lexer {
                 ',' => Token::Comma(Some(Location::new(line_position, line, filename))),
                 '{' => Token::LBrace(Some(Location::new(line_position, line, filename))),
                 '}' => Token::Rbrace(Some(Location::new(line_position, line, filename))),
+                '^' => Token::Xor(Some(Location::new(line_position, line, filename))),
                 '\"' => {
                     let string = Self::read_string(self);
                     let value = Some(Rc::new(String::from(string)));
@@ -239,6 +250,7 @@ impl Lexer {
                 || ch == '!'
                 || ch == ','
                 || ch == ']'
+                || ch == '^'
                 || Self::is_number(Some(ch))
         } else {
             false

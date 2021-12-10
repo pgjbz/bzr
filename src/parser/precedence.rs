@@ -40,7 +40,13 @@ pub(super) fn get_precedence(token: &Token) -> Precedence {
             Precedence::LessGreater
         }
         Token::Plus(_) | Token::Minus(_) => Precedence::Sum,
-        Token::Slash(_) | Token::Asterisk(_) => Precedence::Product,
+        Token::Slash(_)
+        | Token::Asterisk(_)
+        | Token::BitWiseAnd(_)
+        | Token::BitWiseOr(_)
+        | Token::ShiftLeft(_)
+        | Token::ShiftRight(_)
+        | Token::Xor(_) => Precedence::Product,
         Token::LParen(_) => Precedence::Call,
         Token::LSqBracket(_) => Precedence::Index,
         _ => Precedence::Lowest,

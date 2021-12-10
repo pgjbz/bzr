@@ -43,6 +43,11 @@ pub enum Token {
     Diff(Option<Location>),
     And(Option<Location>),
     Or(Option<Location>),
+    ShiftLeft(Option<Location>),
+    ShiftRight(Option<Location>),
+    BitWiseAnd(Option<Location>),
+    BitWiseOr(Option<Location>),
+    Xor(Option<Location>),
     Array(Option<Location>),
 }
 
@@ -104,13 +109,25 @@ impl Token {
             Self::And(_) => "&&".to_string(),
             Self::Assign(_) => "=".to_string(),
             Self::Array(_) => "array".to_string(),
+            Self::ShiftLeft(_) => "<<".to_string(),
+            Self::ShiftRight(_) => ">>".to_string(),
+            Self::Xor(_) => "^".to_string(),
+            Self::BitWiseAnd(_) => "&".to_string(),
+            Self::BitWiseOr(_) => "|".to_string(),
             _ => "unknown".to_string(),
         }
     }
 
     pub fn to_type(&self) -> Type {
         match self {
-            Self::Int(_) | Self::Plus(_) | Self::Minus(_) => Type::Int,
+            Self::Int(_)
+            | Self::Plus(_)
+            | Self::Minus(_)
+            | Self::BitWiseAnd(_)
+            | Self::BitWiseOr(_)
+            | Self::ShiftLeft(_)
+            | Self::ShiftRight(_)
+            | Self::Xor(_) => Type::Int,
             Self::Array(_) => Type::Array,
             Self::Bool(_)
             | Self::Lt(_)
@@ -354,6 +371,36 @@ impl Display for Token {
             Self::Array(pos) => match pos {
                 Some(pos) => {
                     format!("'array'in {}:{}:{}", pos.filename, pos.line, pos.position)
+                }
+                _ => "if".to_string(),
+            },
+            Self::ShiftLeft(pos) => match pos {
+                Some(pos) => {
+                    format!("'<<'in {}:{}:{}", pos.filename, pos.line, pos.position)
+                }
+                _ => "if".to_string(),
+            },
+            Self::ShiftRight(pos) => match pos {
+                Some(pos) => {
+                    format!("'>>'in {}:{}:{}", pos.filename, pos.line, pos.position)
+                }
+                _ => "if".to_string(),
+            },
+            Self::BitWiseAnd(pos) => match pos {
+                Some(pos) => {
+                    format!("'&'in {}:{}:{}", pos.filename, pos.line, pos.position)
+                }
+                _ => "if".to_string(),
+            },
+            Self::BitWiseOr(pos) => match pos {
+                Some(pos) => {
+                    format!("'|'in {}:{}:{}", pos.filename, pos.line, pos.position)
+                }
+                _ => "if".to_string(),
+            },
+            Self::Xor(pos) => match pos {
+                Some(pos) => {
+                    format!("'^'in {}:{}:{}", pos.filename, pos.line, pos.position)
                 }
                 _ => "if".to_string(),
             },
