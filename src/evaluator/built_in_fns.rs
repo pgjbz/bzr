@@ -148,7 +148,7 @@ pub fn is_error(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     ))
 }
 
-pub fn input(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+pub fn read(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     if !args.is_empty() {
         return Rc::new(Error::new(
             "invalid number of arguments, needs no arguments".to_string(),
@@ -157,4 +157,12 @@ pub fn input(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     let mut buffer = String::new();
     std::io::stdin().read_line(&mut buffer).unwrap();
     Rc::new(Str::new(buffer))
+}
+
+
+pub fn trim(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+    if args.len() != 1 {
+        return Rc::new(Error::new("invalid number of arguments, needs 1 arguments".to_string()));
+    }
+    Rc::new(Str::new(args[0].to_string().trim().to_string()))
 }

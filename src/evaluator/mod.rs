@@ -67,8 +67,12 @@ impl Evaluator {
             Rc::new(BuiltIn::new(built_in_fns::slice)),
         );
         build_in_fns.insert(
-            "input".to_string(),
-            Rc::new(BuiltIn::new(built_in_fns::input)),
+            "read".to_string(),
+            Rc::new(BuiltIn::new(built_in_fns::read)),
+        );
+        build_in_fns.insert(
+            "trim".to_string(),
+            Rc::new(BuiltIn::new(built_in_fns::trim)),
         );
         build_in_fns.insert(
             "is_error".to_string(),
@@ -439,7 +443,8 @@ impl Evaluator {
         if let Some(boolean) = right.as_any().downcast_ref::<Boolean>() {
             let mut val = boolean.val.borrow_mut();
             *val = !*val;
-        } if let Some(value) = right.as_any().downcast_ref::<Integer>() {
+        }
+        if let Some(value) = right.as_any().downcast_ref::<Integer>() {
             let mut val = value.val.borrow_mut();
             *val = !*val;
         } else {

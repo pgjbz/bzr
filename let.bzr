@@ -1,2 +1,2 @@
-let a = !2;
-putsln(a);
+let in = read();
+putsln("Palabra digitada ", trim(in));
