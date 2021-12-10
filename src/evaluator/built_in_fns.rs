@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::object::{integer::Integer, string::Str, Object, error::Error, array::Array};
+use crate::object::{array::Array, error::Error, integer::Integer, string::Str, Object};
 
 pub fn len(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     let mut len = 0;
@@ -8,11 +8,24 @@ pub fn len(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
         if let Some(string) = args[0].as_any().downcast_ref::<Str>() {
             len = string.val.len()
         } else if let Some(arr) = args[0].as_any().downcast_ref::<Array>() {
-            len = arr.elements.len()
+            len = arr.elements.borrow_mut().len()
         }
         Rc::new(Integer::new(len as i64))
     } else {
         Rc::new(Error::new("wrong number of arguments".to_string()))
+    }
+}
+
+pub fn append(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+    if args.len() < 2 {
+        Rc::new(Error::new("wrong number of arguments".to_string()))
+    } else if let Some(arr) = args[0].as_any().downcast_ref::<Array>() {
+        for element in args[1..].iter() {
+            arr.elements.borrow_mut().push(Rc::clone(element))
+        }
+        Rc::clone(&args[0])
+    } else {
+        Rc::new(Error::new("first argument must be array".to_string()))
     }
 }
 

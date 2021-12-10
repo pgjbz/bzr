@@ -405,7 +405,11 @@ fn test_eval_array() {
     let evaluated = test_eval(source);
     let evaluated = evaluated.as_any().downcast_ref::<Array>();
     assert!(evaluated.is_some(), "Not a array");
-    assert_eq!(evaluated.unwrap().elements.len(), 3, "Wrong size");
+    assert_eq!(
+        evaluated.unwrap().elements.borrow_mut().len(),
+        3,
+        "Wrong size"
+    );
 }
 
 #[test]

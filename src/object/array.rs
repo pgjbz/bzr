@@ -1,16 +1,18 @@
-use std::{any::Any, fmt::Display, rc::Rc};
+use std::{any::Any, cell::RefCell, fmt::Display, rc::Rc};
 
 use crate::ast::types::Type;
 
 use super::Object;
 
 pub struct Array {
-    pub elements: Vec<Rc<dyn Object>>,
+    pub elements: RefCell<Vec<Rc<dyn Object>>>,
 }
 
 impl Array {
     pub fn new(elements: Vec<Rc<dyn Object>>) -> Self {
-        Self { elements }
+        Self {
+            elements: RefCell::new(elements),
+        }
     }
 }
 
@@ -22,7 +24,7 @@ impl Object for Array {
     fn inspect(&self) -> String {
         let mut buffer = String::new();
         buffer.push('[');
-        for (idx, elem) in self.elements.iter().enumerate() {
+        for (idx, elem) in self.elements.borrow_mut().iter().enumerate() {
             if idx == 0 {
                 buffer.push_str(&elem.to_string())
             } else {

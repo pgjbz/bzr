@@ -54,6 +54,10 @@ impl Evaluator {
             "eputsln".to_string(),
             Rc::new(BuiltIn::new(built_in_fns::eputsln)),
         );
+        build_in_fns.insert(
+            "append".to_string(),
+            Rc::new(BuiltIn::new(built_in_fns::append)),
+        );
         Self { build_in_fns }
     }
 
@@ -226,11 +230,12 @@ impl Evaluator {
             .unwrap()
             .val
             .borrow_mut();
-        let max = array.elements.len() as i64 - 1;
+        let arr = array.elements.borrow_mut();
+        let max = arr.len() as i64 - 1;
         if index < 0 || index > max || max < 0 {
             return Some(Rc::new(Null));
         }
-        let element = array.elements.get(index as usize).unwrap();
+        let element = arr.get(index as usize).unwrap();
         Some(Rc::clone(element))
     }
 
