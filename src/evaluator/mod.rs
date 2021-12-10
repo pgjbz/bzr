@@ -61,7 +61,7 @@ impl Evaluator {
         build_in_fns.insert(
             "append".to_string(),
             Rc::new(BuiltIn::new(built_in_fns::append)),
-        );  
+        );
         build_in_fns.insert(
             "slice".to_string(),
             Rc::new(BuiltIn::new(built_in_fns::slice)),

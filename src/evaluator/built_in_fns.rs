@@ -1,6 +1,8 @@
 use std::rc::Rc;
 
-use crate::object::{array::Array, error::Error, integer::Integer, string::Str, Object, null::Null};
+use crate::object::{
+    array::Array, error::Error, integer::Integer, null::Null, string::Str, Object,
+};
 
 pub fn len(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     let mut len = 0;
@@ -103,13 +105,31 @@ pub fn to_int(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
 
 pub fn slice(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     if args.len() != 3 {
-        return Rc::new(Error::new("invalid number of arguments, must be have string/arr, start, end".to_string()));
+        return Rc::new(Error::new(
+            "invalid number of arguments, must be have string/arr, start, end".to_string(),
+        ));
     }
+    let start = if let Some(start) = args[1].as_any().downcast_ref::<Integer>() {
+        *start.val.borrow_mut() as usize
+    } else {
+        return Rc::new(Error::new(format!("invalid start {}", args[1])));
+    };
+
+    let end = if let Some(end) = args[2].as_any().downcast_ref::<Integer>() {
+        *end.val.borrow_mut() as usize
+    } else {
+        return Rc::new(Error::new(format!("invalid end {}", args[2])));
+    };
     if let Some(string) = args[0].as_any().downcast_ref::<Str>() {
-        let start = *args[1].as_any().downcast_ref::<Integer>().unwrap().val.borrow_mut() as usize;
-        let end = *args[2].as_any().downcast_ref::<Integer>().unwrap().val.borrow_mut() as usize;
         let slice = &string.val[start..end];
         Rc::new(Str::new(slice.to_string()))
+    } else if let Some(arr) = args[0].as_any().downcast_ref::<Array>() {
+        let arr_borrow: &[Rc<dyn Object>] = &arr.elements.borrow_mut()[start..end];
+        let mut elements = Vec::with_capacity(arr_borrow.len());
+        for item in arr_borrow.iter() {
+            elements.push(Rc::clone(item));
+        }
+        Rc::new(Array::new(elements))
     } else {
         Rc::new(Null)
     }
