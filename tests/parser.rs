@@ -188,12 +188,12 @@ fn test_parse_return_type() {
 fn test_program_to_string() {
     let token = Rc::new(Token::Let(None));
     let typ = Type::Int;
-    let identifier = Box::new(Identifier::new(
+    let identifier = Rc::new(Identifier::new(
         Rc::new("my_var".to_string()),
         Rc::new(Token::Ident(None, None)),
     ));
-    let expr: Box<dyn Expression> = Box::new(IntExpr::new(10, Rc::new(Token::Number(None, None))));
-    let statements: Vec<Box<dyn Statement>> = vec![Let::new(token, typ, identifier, expr)];
+    let expr: Rc<dyn Expression> = Rc::new(IntExpr::new(10, Rc::new(Token::Number(None, None))));
+    let statements: Vec<Rc<dyn Statement>> = vec![Let::new(token, typ, identifier, expr)];
     let program = Program::new(statements, vec![]);
     let program_str = program.to_string();
     assert_eq!("let my_var int = 10;", program_str);
@@ -324,6 +324,15 @@ fn test_function_literal_parsing() {
 }
 
 #[test]
+fn test_function_literal_parsing_with_type() {
+    let source = "fn sum(a int, b int) int { a + b; }".to_string();
+    let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
+    let parser = Parser::new(lexer);
+    let program = parser.parse_program();
+    assert_eq!(1, program.statements.len());
+}
+
+#[test]
 fn test_function_call_with_args_parsing() {
     let source = "sum (1, 2 * 3);".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
@@ -343,9 +352,11 @@ fn test_function_call_without_args_parsing() {
 
 #[test]
 fn test_if_while_expression() {
-    let source = "while x < y { x }".to_string();
+    let source = "let a array = [1,2,3]".to_string();
     let lexer = Lexer::new(Rc::new(source), Rc::new("foo.bzr".to_string()));
     let parser = Parser::new(lexer);
     let program = parser.parse_program();
+
     assert_eq!(1, program.statements.len());
+    assert_eq!(0, program.errors.len());
 }

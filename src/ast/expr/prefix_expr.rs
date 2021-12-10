@@ -11,7 +11,7 @@ use crate::{
 pub struct PrefixExpr {
     pub token: Rc<Token>,
     pub operator: String,
-    pub right: Option<Box<dyn Expression>>,
+    pub right: Option<Rc<dyn Expression>>,
     pub typ: Option<Type>,
 }
 

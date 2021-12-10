@@ -10,18 +10,20 @@ use crate::{
 
 pub struct IfExpr {
     pub token: Rc<Token>,
-    pub condition: Box<dyn Expression>,
-    pub consequence: Option<Box<BlockStatement>>,
-    pub alternative: Option<Box<BlockStatement>>,
+    pub condition: Rc<dyn Expression>,
+    pub consequence: Option<Rc<BlockStatement>>,
+    pub alternative: Option<Rc<BlockStatement>>,
+    pub el_if: Option<Rc<dyn Expression>>,
 }
 
 impl IfExpr {
-    pub fn new(token: Rc<Token>, condition: Box<dyn Expression>) -> Self {
+    pub fn new(token: Rc<Token>, condition: Rc<dyn Expression>) -> Self {
         Self {
             token,
             condition,
             consequence: None,
             alternative: None,
+            el_if: None,
         }
     }
 }
@@ -40,14 +42,14 @@ impl Display for IfExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buffer = String::new();
         buffer.push_str(&format!("{} ", self.literal()));
-        buffer.push_str(&format!("{} ", self.condition.to_string()));
+        buffer.push_str(&format!("{} ", self.condition));
         buffer.push_str(&if let Some(ref consequence) = self.consequence {
             consequence.to_string()
         } else {
             "".to_string()
         });
         if let Some(ref alternative) = self.alternative {
-            buffer.push_str(&format!(" else {}", alternative.to_string()))
+            buffer.push_str(&format!(" else {}", alternative))
         };
         write!(f, "{}", buffer)
     }

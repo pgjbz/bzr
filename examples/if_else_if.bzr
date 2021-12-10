@@ -1,7 +1,7 @@
-if 10 >= 9 {
-    true
+if 10 <= 9 {
+    puts("banana");
 } else if 1 == 1 {
-    false
+    puts("in");
 } else {
-    true
+    puts("pijamas");
 }

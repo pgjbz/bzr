@@ -1,8 +1,0 @@
-let number int = 1345;
-let another_number = 1234;
-let new_number = 10 + 10;
-let text str = "txt";
-let another_text = "txt2";
-let boolean bool = false;
-let another_boolean = true;
-let new_boolean bool = 10 > 10

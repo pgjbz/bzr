@@ -1,0 +1,10 @@
+fn factorial(x int) int {
+    if x <= 1 {
+        ret 1;
+    } else {
+        ret x * factorial(x - 1);
+    }
+}
+
+let fact = factorial(4);
+puts("Fact = ", fact);

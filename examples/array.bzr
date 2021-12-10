@@ -1,0 +1,2 @@
+let arr array = [1, 3, 4, 5 * 5, true];
+putsln(arr[len(arr) - 1])

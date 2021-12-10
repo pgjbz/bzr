@@ -1,13 +1,13 @@
-use super::statement::Statement;
-use std::fmt::Display;
+use super::{expression::Node, statement::Statement};
+use std::{fmt::Display, rc::Rc};
 
 pub struct Program {
-    pub statements: Vec<Box<dyn Statement>>,
+    pub statements: Vec<Rc<dyn Statement>>,
     pub errors: Vec<String>,
 }
 
 impl Program {
-    pub fn new(statements: Vec<Box<dyn Statement>>, errors: Vec<String>) -> Box<Self> {
+    pub fn new(statements: Vec<Rc<dyn Statement>>, errors: Vec<String>) -> Box<Self> {
         Box::new(Self { statements, errors })
     }
 }
@@ -19,5 +19,19 @@ impl Display for Program {
             program.push_str(&stmt.to_string())
         }
         write!(f, "{}", program)
+    }
+}
+
+impl Node for Program {
+    fn literal(&self) -> Box<dyn Display> {
+        if let Some(stmt) = self.statements.first() {
+            Box::new(stmt.to_string())
+        } else {
+            Box::new(String::new())
+        }
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
     }
 }

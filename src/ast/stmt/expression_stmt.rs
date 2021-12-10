@@ -10,7 +10,7 @@ use crate::{
 };
 
 pub struct ExpressionStatement {
-    pub expression: Option<Box<dyn Expression>>,
+    pub expression: Option<Rc<dyn Expression>>,
     pub typ: Type,
     pub token: Rc<Token>,
 }
@@ -27,7 +27,7 @@ impl ExpressionStatement {
 
 impl Node for ExpressionStatement {
     fn literal(&self) -> Box<dyn std::fmt::Display> {
-        todo!()
+        Box::new(String::new())
     }
     fn as_any(&self) -> &dyn std::any::Any {
         self

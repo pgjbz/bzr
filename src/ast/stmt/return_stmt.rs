@@ -10,11 +10,11 @@ use crate::{
 
 pub struct Return {
     pub token: Rc<Token>,
-    pub return_value: Option<Box<dyn Expression>>,
+    pub return_value: Option<Rc<dyn Expression>>,
 }
 
 impl Return {
-    pub fn new(return_value: Option<Box<dyn Expression>>, token: Rc<Token>) -> Self {
+    pub fn new(return_value: Option<Rc<dyn Expression>>, token: Rc<Token>) -> Self {
         Self {
             return_value,
             token,

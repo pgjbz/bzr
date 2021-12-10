@@ -11,12 +11,12 @@ use crate::{
 
 pub struct WhileExpr {
     pub token: Rc<Token>,
-    pub condition: Box<dyn Expression>,
-    pub consequence: Option<Box<BlockStatement>>,
+    pub condition: Rc<dyn Expression>,
+    pub consequence: Option<Rc<BlockStatement>>,
 }
 
 impl WhileExpr {
-    pub fn new(token: Rc<Token>, condition: Box<dyn Expression>) -> Self {
+    pub fn new(token: Rc<Token>, condition: Rc<dyn Expression>) -> Self {
         Self {
             token,
             condition,
@@ -39,7 +39,7 @@ impl Display for WhileExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buffer = String::new();
         buffer.push_str(&format!("{} ", self.literal()));
-        buffer.push_str(&format!("{} ", self.condition.to_string()));
+        buffer.push_str(&format!("{} ", self.condition));
         buffer.push_str(&if let Some(ref consequence) = self.consequence {
             consequence.to_string()
         } else {
