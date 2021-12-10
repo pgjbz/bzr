@@ -1,8 +1,0 @@
-var number int = 1345;
-var another_number = 1234;
-var new_number = 10 + 10;
-var text str = "txt";
-var another_text = "txt2";
-var boolean bool = false;
-var another_boolean = true;
-var new_boolean bool = 10 > 10

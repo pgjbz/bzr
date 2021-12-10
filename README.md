@@ -1,6 +1,6 @@
 # Bzr lang
 
-A simple interpreted lang based on [Monkey Lang](https://monkeylang.org/) implementation
+A simple interpreted lang based on [Monkey Lang](https://monkeylang.org/) implementation, this lang is make only for learn more about Rust and interpreters and improve my english.
 
 ### Rust version to write this code:
 
@@ -77,3 +77,50 @@ fn factorial(x int) int {
 let fact = factorial(4);
 puts("Fact = ", fact);
 ```
+
+## while
+
+```bzr
+let i int = 0;
+while i < 10 {
+    putsln("i = ", i);
+    i = i + 1;
+}
+```
+
+## Replace
+
+For now only suports array
+
+replace(array, pos, new_value);
+
+## Len
+
+Return the length of array or string
+
+len("banana") returns 6
+
+## Slice
+
+Create a slice of array or string
+
+slice(array/string, start, end);
+
+## read
+
+Read input for user
+
+## is_erro
+
+Check if is error
+
+```bzr
+let a = to_int("aaa");
+if is_error(a) {
+    putsln("Error");
+}
+```
+
+## to_int and to_str
+
+Parse to int or str

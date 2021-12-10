@@ -88,6 +88,7 @@ fn test_bang_operator_boolean() {
     tests.push(("!!true".to_string(), true));
 
     for (source, expected) in tests {
+        println!("{}", source);
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Boolean>().unwrap();
         let value = *evaluated.val.borrow_mut();
