@@ -1,2 +1,2 @@
-let a = 7 ^ 5;
+let a = !2;
 putsln(a);

@@ -439,6 +439,9 @@ impl Evaluator {
         if let Some(boolean) = right.as_any().downcast_ref::<Boolean>() {
             let mut val = boolean.val.borrow_mut();
             *val = !*val;
+        } if let Some(value) = right.as_any().downcast_ref::<Integer>() {
+            let mut val = value.val.borrow_mut();
+            *val = !*val;
         } else {
             return Some(Rc::new(Error::new(format!(
                 "invalid expression '!{}'",
