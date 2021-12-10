@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::object::{
-    array::Array, error::Error, integer::Integer, null::Null, string::Str, Object,
+    array::Array, boolean::Boolean, error::Error, integer::Integer, null::Null, string::Str, Object,
 };
 
 pub fn len(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
@@ -91,7 +91,9 @@ pub fn to_str(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
 
 pub fn to_int(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     if args.len() != 1 {
-        return Rc::new(Error::new("invalid number of arguments".to_string()));
+        return Rc::new(Error::new(
+            "invalid number of arguments, needs 1 arguments".to_string(),
+        ));
     }
     let buffer = args[0].to_string();
     match buffer.trim().parse() {
@@ -133,4 +135,26 @@ pub fn slice(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
     } else {
         Rc::new(Null)
     }
+}
+
+pub fn is_error(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+    if args.len() != 1 {
+        return Rc::new(Error::new(
+            "invalid number of arguments, needs 1 argument".to_string(),
+        ));
+    }
+    Rc::new(Boolean::new(
+        args[0].as_any().downcast_ref::<Error>().is_some(),
+    ))
+}
+
+pub fn input(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+    if !args.is_empty() {
+        return Rc::new(Error::new(
+            "invalid number of arguments, needs no arguments".to_string(),
+        ));
+    }
+    let mut buffer = String::new();
+    std::io::stdin().read_line(&mut buffer).unwrap();
+    Rc::new(Str::new(buffer))
 }

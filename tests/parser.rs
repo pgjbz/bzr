@@ -1,7 +1,5 @@
 use bzr::ast::{
-    expr::if_expr::IfExpr,
-    expression::Expression,
-    stmt::expression_stmt::ExpressionStatement,
+    expr::if_expr::IfExpr, expression::Expression, stmt::expression_stmt::ExpressionStatement,
 };
 use std::rc::Rc;
 

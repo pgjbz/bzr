@@ -66,6 +66,14 @@ impl Evaluator {
             "slice".to_string(),
             Rc::new(BuiltIn::new(built_in_fns::slice)),
         );
+        build_in_fns.insert(
+            "input".to_string(),
+            Rc::new(BuiltIn::new(built_in_fns::input)),
+        );
+        build_in_fns.insert(
+            "is_error".to_string(),
+            Rc::new(BuiltIn::new(built_in_fns::is_error)),
+        );
         Self { build_in_fns }
     }
 

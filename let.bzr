@@ -1,6 +1,5 @@
-let texto = "abc";
-let sl = slice(texto, "a", 2);
-putsln("slice = ", sl);
-let arr = [1,2,3];
-let slice_arr = slice(arr, 0, 3);
-putsln("slice array = ", slice_arr);
+
+let error = is_error(to_int("abc"));
+if error {
+    putsln("banana");
+}
