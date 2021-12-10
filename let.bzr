@@ -1,5 +1,3 @@
-let a array = [1,2,3];
-putsln(a[0]);
-putsln("len ", len(a));
-append(a, "Teste");
-putsln("array = ", a);
+let string = "Banana";
+let char = string[len(string) - 1];
+putsln(char);

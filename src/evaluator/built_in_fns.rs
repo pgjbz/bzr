@@ -70,9 +70,26 @@ pub fn eputsln(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
 }
 
 pub fn to_str(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+    if args.is_empty() {
+        return Rc::new(Error::new("must have more than 0 arguments".to_string()));
+    }
     let mut buffer = String::new();
     for arg in args {
         buffer.push_str(&arg.to_string())
     }
     Rc::new(Str::new(buffer))
+}
+
+pub fn to_int(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
+    if args.len() != 1 {
+        return Rc::new(Error::new("invalid number of arguments".to_string()));
+    }
+    let buffer = args[0].to_string();
+    match buffer.trim().parse() {
+        Ok(val) => Rc::new(Integer::new(val)),
+        Err(_) => Rc::new(Error::new(format!(
+            "invalid value to parse int: {}",
+            args[0]
+        ))),
+    }
 }

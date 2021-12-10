@@ -39,6 +39,10 @@ impl Evaluator {
             Rc::new(BuiltIn::new(built_in_fns::to_str)),
         );
         build_in_fns.insert(
+            "to_int".to_string(),
+            Rc::new(BuiltIn::new(built_in_fns::to_int)),
+        );
+        build_in_fns.insert(
             "puts".to_string(),
             Rc::new(BuiltIn::new(built_in_fns::puts)),
         );
@@ -208,7 +212,9 @@ impl Evaluator {
         left: Rc<dyn Object>,
         index: Rc<dyn Object>,
     ) -> Option<Rc<dyn Object>> {
-        if left.get_type() == Type::Array && index.get_type() == Type::Int {
+        if (left.get_type() == Type::Array || left.get_type() == Type::String)
+            && index.get_type() == Type::Int
+        {
             self.eval_array_index_expr(left, index)
         } else {
             Some(Rc::new(Error::new(format!(
@@ -223,20 +229,34 @@ impl Evaluator {
         left: Rc<dyn Object>,
         index: Rc<dyn Object>,
     ) -> Option<Rc<dyn Object>> {
-        let array = left.as_any().downcast_ref::<Array>().unwrap();
         let index = *index
             .as_any()
             .downcast_ref::<Integer>()
             .unwrap()
             .val
             .borrow_mut();
-        let arr = array.elements.borrow_mut();
-        let max = arr.len() as i64 - 1;
-        if index < 0 || index > max || max < 0 {
-            return Some(Rc::new(Null));
+        if let Some(array) = left.as_any().downcast_ref::<Array>() {
+            let arr = array.elements.borrow_mut();
+            let max = arr.len() as i64 - 1;
+            if index < 0 || index > max || max < 0 {
+                return Some(Rc::new(Null));
+            }
+            let element = arr.get(index as usize).unwrap();
+            Some(Rc::clone(element))
+        } else if let Some(string) = left.as_any().downcast_ref::<Str>() {
+            let max = string.val.len() as i64 - 1;
+            if index < 0 || index > max || max < 0 {
+                return Some(Rc::new(Null));
+            }
+            let ch = string.val.chars().nth(index as usize).unwrap();
+            Some(Rc::new(Str::new(ch.to_string())))
+        } else {
+            Some(Rc::new(Error::new(format!(
+                "index operation not suported: {}[{}]",
+                left.get_type(),
+                index
+            ))))
         }
-        let element = arr.get(index as usize).unwrap();
-        Some(Rc::clone(element))
     }
 
     fn apply_function(
