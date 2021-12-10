@@ -1,5 +1,5 @@
 use bzr::ast::{
-    expr::{if_expr::IfExpr, index_expr::IndexExpr},
+    expr::if_expr::IfExpr,
     expression::Expression,
     stmt::expression_stmt::ExpressionStatement,
 };
