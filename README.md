@@ -169,11 +169,11 @@ Name | Symbol | Example | Return |
 | shift left |  <<   |  1 << 2  |    4   |
 | shift rigt |  >>   |  4 >> 1  |    2   |
 | equals |   ==   |  5 == 5  |    true   |
-| not equals |   =!   |  5 =! 5  |    false   |
+| not equals |   !=   |  5 =! 5  |    false   |
 | greater than |   >   |  5 > 2  |    true   |
 | less than |   <   |  5 < 2  |    false   |
 | greater than equals |   >=   |  5 >= 2  |    true   |
-| less than equals |   <   |  2 <= 2  |    true   |
+| less than equals |   <=   |  2 <= 2  |    true   |
 | and |   &&   |  5 > 2 && true  |    true   |
 | or |   \|\|   |  5 < 2 \|\| true  |    true   |
 
