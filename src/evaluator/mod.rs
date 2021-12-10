@@ -6,8 +6,9 @@ use crate::{
     ast::{
         expr::{
             arr_expr::ArrayExpr, bool_expr::BoolExpr, call_expr::CallExpr,
-            function_expr::FunctionExpr, if_expr::IfExpr, infix_expr::InfixExpr, int_expr::IntExpr,
-            prefix_expr::PrefixExpr, str_expr::StrExpr, while_expr::WhileExpr,
+            function_expr::FunctionExpr, if_expr::IfExpr, index_expr::IndexExpr,
+            infix_expr::InfixExpr, int_expr::IntExpr, prefix_expr::PrefixExpr, str_expr::StrExpr,
+            while_expr::WhileExpr,
         },
         expression::{Expression, Node},
         identifier::Identifier,
@@ -159,6 +160,17 @@ impl Evaluator {
                     elems.push(elem.unwrap());
                 }
                 Some(Rc::new(Array::new(elems)))
+            } else if let Some(idx_expr) = node.as_any().downcast_ref::<IndexExpr>() {
+                let left = self.eval(Some(idx_expr.left.as_ref()), Rc::clone(&env));
+                eprintln!("array = {}", left.as_ref().unwrap());
+                if self.is_error(&left) {
+                    return left;
+                }
+                let idx = self.eval(Some(idx_expr.index.as_ref()), Rc::clone(&env));
+                if self.is_error(&idx) {
+                    return idx;
+                }
+                self.eval_index_expr(left.unwrap(), idx.unwrap())
             } else if let Some(function) = node.as_any().downcast_ref::<FunctionExpr>() {
                 let env = Rc::clone(&env);
                 let body = function.body.as_ref().map(Rc::clone);
@@ -186,6 +198,41 @@ impl Evaluator {
         } else {
             None
         }
+    }
+
+    fn eval_index_expr(
+        &self,
+        left: Rc<dyn Object>,
+        index: Rc<dyn Object>,
+    ) -> Option<Rc<dyn Object>> {
+        if left.get_type() == Type::Array && index.get_type() == Type::Int {
+            self.eval_array_index_expr(left, index)
+        } else {
+            Some(Rc::new(Error::new(format!(
+                "index operation not suported: {}",
+                left.get_type()
+            ))))
+        }
+    }
+
+    fn eval_array_index_expr(
+        &self,
+        left: Rc<dyn Object>,
+        index: Rc<dyn Object>,
+    ) -> Option<Rc<dyn Object>> {
+        let array = left.as_any().downcast_ref::<Array>().unwrap();
+        let index = *index
+            .as_any()
+            .downcast_ref::<Integer>()
+            .unwrap()
+            .val
+            .borrow_mut();
+        let max = array.elements.len() as i64 - 1;
+        if index < 0 || index > max || max < 0 {
+            return Some(Rc::new(Null));
+        }
+        let element = array.elements.get(index as usize).unwrap();
+        Some(Rc::clone(element))
     }
 
     fn apply_function(

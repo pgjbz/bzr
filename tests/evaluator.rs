@@ -1,7 +1,7 @@
 use std::{cell::RefCell, rc::Rc};
 
 use bzr::{
-    ast::{expr::index_expr::IndexExpr, expression::Node},
+    ast::expression::Node,
     evaluator::Evaluator,
     lexer::Lexer,
     object::{
@@ -406,4 +406,18 @@ fn test_eval_array() {
     let evaluated = evaluated.as_any().downcast_ref::<Array>();
     assert!(evaluated.is_some(), "Not a array");
     assert_eq!(evaluated.unwrap().elements.len(), 3, "Wrong size");
+}
+
+#[test]
+fn test_array_index() {
+    let mut tests: Vec<(String, i64)> = Vec::new();
+    tests.push(("let a = [1, 2, 3]; a[0]".to_string(), 1));
+    tests.push(("let a = [1, 2 * 2, 3 + 3]; a[1]".to_string(), 4));
+
+    for (source, expected) in tests {
+        let evaluated = test_eval(source);
+        let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
+        let value = *evaluated.val.borrow_mut();
+        assert_eq!(expected, value)
+    }
 }

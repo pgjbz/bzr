@@ -443,8 +443,9 @@ impl Parser {
     ) -> Result<Rc<dyn Expression>, ParseError> {
         let current_token = Rc::clone(&parser.current_token);
         parser.next_token();
+        parser.next_token();
         let idx_expr = parser.parse_expression(Precedence::Lowest)?;
-        // parser.expected_peek(Token::RSqBracket(None))?; //TODO: check why this broke code
+        parser.expected_peek(Token::RSqBracket(None))?;
         Ok(Rc::new(IndexExpr::new(current_token, left, idx_expr)))
     }
 

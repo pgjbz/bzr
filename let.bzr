@@ -1,2 +1,2 @@
 let a array = [1,2,3];
-puts([1, 2, 3]);
+puts(a[0]);
