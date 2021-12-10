@@ -124,3 +124,18 @@ if is_error(a) {
 ## to_int and to_str
 
 Parse to int or str
+
+
+# Build
+
+To build this lang clone this repo with
+
+```git clone url.git``` 
+
+And enter the directory with `cd bzr` and enter command ```cargo build --release`
+
+## Use
+
+Execute the bin with
+
+./target/release/bzr filename.bzr
