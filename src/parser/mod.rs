@@ -170,25 +170,14 @@ impl Parser {
             self.next_token();
         }
         if is_let {
-            Ok(Let::new(
-                current_token,
-                expression.get_type(),
-                identifier,
-                expression,
-            ))
+            Ok(Let::new(expression.get_type(), identifier, expression))
         } else {
-            Ok(Var::new(
-                current_token,
-                expression.get_type(),
-                identifier,
-                expression,
-            ))
+            Ok(Var::new(expression.get_type(), identifier, expression))
         }
     }
 
     fn parse_return(&mut self) -> Result<Rc<dyn Statement>, ParseError> {
-        let current_token = Rc::clone(&self.current_token);
-        let mut ret = Return::new(None, current_token);
+        let mut ret = Return::new(None);
         self.next_token();
         ret.return_value = Some(self.parse_expression(Precedence::Lowest)?);
         self.next_token();
@@ -196,8 +185,7 @@ impl Parser {
     }
 
     fn parse_expression_statement(&mut self) -> Result<Rc<dyn Statement>, ParseError> {
-        let current_token = Rc::clone(&self.current_token);
-        let mut stmt = ExpressionStatement::new(Type::Unknown, Rc::clone(&current_token));
+        let mut stmt = ExpressionStatement::new(Type::Unknown);
         stmt.expression = match self.parse_expression(Precedence::Lowest) {
             Ok(expr) => Some(expr),
             Err(e) => match e {
@@ -245,7 +233,6 @@ impl Parser {
     }
 
     fn create_identifier(&mut self, skip_type: bool) -> Result<Rc<dyn Expression>, ParseError> {
-        let current_token = Rc::clone(&self.current_token);
         let identifier_value = match self.current_token.as_ref() {
             Token::Ident(Some(ident), _) => Rc::clone(ident),
             tok => {
@@ -253,7 +240,7 @@ impl Parser {
                 return Err(ParseError::Message(msg));
             }
         };
-        let mut identifier_expr = Identifier::new(identifier_value, current_token);
+        let mut identifier_expr = Identifier::new(identifier_value);
         if self.has_type() {
             let typ = self.peek_token.to_type();
             if skip_type {
@@ -265,20 +252,18 @@ impl Parser {
     }
 
     fn parse_number_literal(parser: &mut Self) -> Result<Rc<dyn Expression>, ParseError> {
-        let current_token = Rc::clone(&parser.current_token);
         let number = match parser.current_token.as_ref() {
             Token::Number(Some(val), _) => val.trim().parse()?,
             _ => {
-                let msg = format!("fail on parse value: {}", current_token);
+                let msg = format!("fail on parse value: {}", parser.current_token);
                 return Err(ParseError::Message(msg));
             }
         };
-        let int_expr = IntExpr::new(number, current_token);
+        let int_expr = IntExpr::new(number);
         Ok(Rc::new(int_expr))
     }
 
     fn parse_bool_literal(parser: &mut Self) -> Result<Rc<dyn Expression>, ParseError> {
-        let current_token = Rc::clone(&parser.current_token);
         let boolean = match parser.current_token.as_ref() {
             Token::True(_) => true,
             Token::False(_) => false,
@@ -287,15 +272,14 @@ impl Parser {
                 return Err(ParseError::Message(msg));
             }
         };
-        let bool_expr = BoolExpr::new(boolean, current_token);
+        let bool_expr = BoolExpr::new(boolean);
         Ok(Rc::new(bool_expr))
     }
 
     fn parse_function_literal(parser: &mut Self) -> Result<Rc<dyn Expression>, ParseError> {
-        let current_token = Rc::clone(&parser.current_token);
         parser.next_token();
         let identifier = Self::parse_identifier(parser)?;
-        let mut function_expr = FunctionExpr::new(current_token, identifier);
+        let mut function_expr = FunctionExpr::new(identifier);
         parser.expected_peek(Token::LParen(None))?;
         function_expr.parameters = parser.parse_function_parameters()?;
         if parser.has_type() {
@@ -336,8 +320,7 @@ impl Parser {
     }
 
     fn parse_prefix_expression(parser: &mut Self) -> Result<Rc<dyn Expression>, ParseError> {
-        let current_token = Rc::clone(&parser.current_token);
-        let mut prefix_expr = PrefixExpr::new(Rc::clone(&current_token), current_token.literal());
+        let mut prefix_expr = PrefixExpr::new(parser.current_token.literal());
         prefix_expr.set_type(parser.current_token.to_type());
         parser.next_token();
 
@@ -353,7 +336,6 @@ impl Parser {
     }
 
     fn parse_string_literal(parser: &mut Self) -> Result<Rc<dyn Expression>, ParseError> {
-        let current_token = Rc::clone(&parser.current_token);
         let string = match parser.current_token.as_ref() {
             Token::String(val, _) => val.as_ref().unwrap().as_ref(),
             tok => {
@@ -361,13 +343,11 @@ impl Parser {
                 return Err(ParseError::Message(msg));
             }
         };
-        let string_expr = StrExpr::new(string.to_string(), current_token);
+        let string_expr = StrExpr::new(string.to_string());
         Ok(Rc::new(string_expr))
     }
 
     fn parse_if_expression(parser: &mut Self) -> Result<Rc<dyn Expression>, ParseError> {
-        let current_token = Rc::clone(&parser.current_token);
-
         parser.next_token();
 
         let expr = parser.parse_expression(Precedence::Lowest)?;
@@ -376,7 +356,7 @@ impl Parser {
 
         let consequence_block = parser.parse_block_statement();
 
-        let mut if_expr = IfExpr::new(current_token, expr);
+        let mut if_expr = IfExpr::new(expr);
         if_expr.consequence = consequence_block;
 
         if parser.peek_token_is(&Token::Else(None)) {
@@ -397,18 +377,17 @@ impl Parser {
     }
 
     fn parse_while_expression(parser: &mut Self) -> Result<Rc<dyn Expression>, ParseError> {
-        let current_token = Rc::clone(&parser.current_token);
         parser.next_token();
         let expr = parser.parse_expression(Precedence::Lowest)?;
         parser.expected_peek(Token::LBrace(None))?;
         let consequence_block = parser.parse_block_statement();
-        let mut while_expr = WhileExpr::new(current_token, expr);
+        let mut while_expr = WhileExpr::new(expr);
         while_expr.consequence = consequence_block;
         Ok(Rc::new(while_expr))
     }
 
     fn parse_block_statement(&mut self) -> Option<Rc<BlockStatement>> {
-        let mut block_stmt = BlockStatement::new(Rc::clone(&self.current_token));
+        let mut block_stmt = BlockStatement::new();
 
         while !self.current_token_is(Token::Rbrace(None))
             && !self.current_token_is(Token::EOF(None))
@@ -428,9 +407,8 @@ impl Parser {
         left: Rc<dyn Expression>,
     ) -> Result<Rc<dyn Expression>, ParseError> {
         parser.next_token();
-        let current_token = Rc::clone(&parser.current_token);
         let precedence = precedence::get_precedence(parser.current_token.as_ref());
-        let mut infix_expr = InfixExpr::new(current_token, parser.current_token.literal());
+        let mut infix_expr = InfixExpr::new(parser.current_token.literal());
         infix_expr.left = Some(left);
         let typ = parser.current_token.to_type();
         infix_expr.set_type(typ);
@@ -447,19 +425,18 @@ impl Parser {
         parser: &mut Self,
         left: Rc<dyn Expression>,
     ) -> Result<Rc<dyn Expression>, ParseError> {
-        let current_token = Rc::clone(&parser.current_token);
         parser.next_token();
         parser.next_token();
         let idx_expr = parser.parse_expression(Precedence::Lowest)?;
         parser.expected_peek(Token::RSqBracket(None))?;
-        Ok(Rc::new(IndexExpr::new(current_token, left, idx_expr)))
+        Ok(Rc::new(IndexExpr::new(left, idx_expr)))
     }
 
     fn parse_call_expression(
         parser: &mut Self,
         function: Rc<dyn Expression>,
     ) -> Result<Rc<dyn Expression>, ParseError> {
-        let mut call_expr = CallExpr::new(Rc::clone(&parser.current_token), function);
+        let mut call_expr = CallExpr::new(function);
         parser.next_token();
         call_expr.arguments = parser.parse_expr_list(Token::RParen(None))?;
         Ok(Rc::new(call_expr))
@@ -482,9 +459,8 @@ impl Parser {
     }
 
     fn parse_array(parser: &mut Self) -> Result<Rc<dyn Expression>, ParseError> {
-        let current_token = Rc::clone(&parser.current_token);
         let exprs = parser.parse_expr_list(Token::RSqBracket(None))?;
-        let array_expr = ArrayExpr::new(exprs, current_token);
+        let array_expr = ArrayExpr::new(exprs);
         Ok(Rc::new(array_expr))
     }
 

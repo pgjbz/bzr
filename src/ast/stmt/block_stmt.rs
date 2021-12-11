@@ -1,19 +1,14 @@
 use std::{fmt::Display, rc::Rc};
 
-use crate::{
-    ast::{expression::Node, statement::Statement},
-    lexer::token::Token,
-};
+use crate::ast::{expression::Node, statement::Statement};
 
 pub struct BlockStatement {
-    pub token: Rc<Token>,
     pub statements: Vec<Rc<dyn Statement>>,
 }
 
 impl BlockStatement {
-    pub fn new(token: Rc<Token>) -> Self {
+    pub fn new() -> Self {
         Self {
-            token,
             statements: Vec::with_capacity(10),
         }
     }
@@ -24,10 +19,6 @@ impl BlockStatement {
 }
 
 impl Node for BlockStatement {
-    fn literal(&self) -> Box<dyn std::fmt::Display> {
-        Box::new(self.token.literal())
-    }
-
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
@@ -40,5 +31,11 @@ impl Display for BlockStatement {
             buffer.push_str(&stmt.to_string())
         }
         write!(f, "{}", buffer)
+    }
+}
+
+impl Default for BlockStatement {
+    fn default() -> Self {
+        Self::new()
     }
 }

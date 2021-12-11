@@ -1,20 +1,15 @@
 use std::{fmt::Display, rc::Rc};
 
-use crate::{
-    ast::expression::{Expression, Node},
-    lexer::token::Token,
-};
+use crate::ast::expression::{Expression, Node};
 
 pub struct CallExpr {
-    pub token: Rc<Token>,
     pub function: Rc<dyn Expression>,
     pub arguments: Vec<Rc<dyn Expression>>,
 }
 
 impl CallExpr {
-    pub fn new(token: Rc<Token>, function: Rc<dyn Expression>) -> Self {
+    pub fn new(function: Rc<dyn Expression>) -> Self {
         Self {
-            token,
             function,
             arguments: vec![],
         }
@@ -22,20 +17,12 @@ impl CallExpr {
 }
 
 impl Node for CallExpr {
-    fn literal(&self) -> Box<dyn std::fmt::Display> {
-        Box::new("(")
-    }
-
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
 }
 
 impl Expression for CallExpr {
-    fn expression(&self) {
-        todo!()
-    }
-
     fn get_type(&self) -> crate::ast::types::Type {
         self.function.get_type()
     }

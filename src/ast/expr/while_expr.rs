@@ -1,24 +1,19 @@
 use std::{fmt::Display, rc::Rc};
 
-use crate::{
-    ast::{
-        expression::{Expression, Node},
-        stmt::block_stmt::BlockStatement,
-        types::Type,
-    },
-    lexer::token::Token,
+use crate::ast::{
+    expression::{Expression, Node},
+    stmt::block_stmt::BlockStatement,
+    types::Type,
 };
 
 pub struct WhileExpr {
-    pub token: Rc<Token>,
     pub condition: Rc<dyn Expression>,
     pub consequence: Option<Rc<BlockStatement>>,
 }
 
 impl WhileExpr {
-    pub fn new(token: Rc<Token>, condition: Rc<dyn Expression>) -> Self {
+    pub fn new(condition: Rc<dyn Expression>) -> Self {
         Self {
-            token,
             condition,
             consequence: None,
         }
@@ -26,10 +21,6 @@ impl WhileExpr {
 }
 
 impl Node for WhileExpr {
-    fn literal(&self) -> Box<dyn std::fmt::Display> {
-        Box::new("while".to_string())
-    }
-
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
@@ -38,7 +29,7 @@ impl Node for WhileExpr {
 impl Display for WhileExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buffer = String::new();
-        buffer.push_str(&format!("{} ", self.literal()));
+        buffer.push_str("while ");
         buffer.push_str(&format!("{} ", self.condition));
         buffer.push_str(&if let Some(ref consequence) = self.consequence {
             consequence.to_string()
@@ -50,10 +41,6 @@ impl Display for WhileExpr {
 }
 
 impl Expression for WhileExpr {
-    fn expression(&self) {
-        todo!()
-    }
-
     fn get_type(&self) -> Type {
         Type::Expression
     }

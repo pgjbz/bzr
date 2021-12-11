@@ -1,16 +1,12 @@
 use std::{fmt::Display, rc::Rc};
 
-use crate::{
-    ast::{
-        expression::{Expression, Node},
-        stmt::block_stmt::BlockStatement,
-        types::Type,
-    },
-    lexer::token::Token,
+use crate::ast::{
+    expression::{Expression, Node},
+    stmt::block_stmt::BlockStatement,
+    types::Type,
 };
 
 pub struct FunctionExpr {
-    pub token: Rc<Token>,
     pub parameters: Vec<Rc<dyn Expression>>,
     pub name: Rc<dyn Expression>,
     pub body: Option<Rc<BlockStatement>>,
@@ -18,9 +14,8 @@ pub struct FunctionExpr {
 }
 
 impl FunctionExpr {
-    pub fn new(token: Rc<Token>, name: Rc<dyn Expression>) -> Self {
+    pub fn new(name: Rc<dyn Expression>) -> Self {
         Self {
-            token,
             parameters: vec![],
             body: None,
             name,
@@ -30,10 +25,6 @@ impl FunctionExpr {
 }
 
 impl Node for FunctionExpr {
-    fn literal(&self) -> Box<dyn std::fmt::Display> {
-        Box::new("fn".to_string())
-    }
-
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
@@ -64,10 +55,6 @@ impl Display for FunctionExpr {
 }
 
 impl Expression for FunctionExpr {
-    fn expression(&self) {
-        todo!()
-    }
-
     fn get_type(&self) -> Type {
         Type::Function
     }

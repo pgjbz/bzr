@@ -1,24 +1,19 @@
 use std::{fmt::Display, rc::Rc};
 
-use crate::{
-    ast::{
-        expression::{Expression, Node},
-        types::Type,
-    },
-    lexer::token::Token,
+use crate::ast::{
+    expression::{Expression, Node},
+    types::Type,
 };
 
 pub struct PrefixExpr {
-    pub token: Rc<Token>,
     pub operator: String,
     pub right: Option<Rc<dyn Expression>>,
     pub typ: Option<Type>,
 }
 
 impl PrefixExpr {
-    pub fn new(token: Rc<Token>, operator: String) -> Self {
+    pub fn new(operator: String) -> Self {
         Self {
-            token,
             operator,
             right: None,
             typ: None,
@@ -27,10 +22,6 @@ impl PrefixExpr {
 }
 
 impl Node for PrefixExpr {
-    fn literal(&self) -> Box<dyn std::fmt::Display> {
-        Box::new(self.token.to_string())
-    }
-
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
@@ -53,10 +44,6 @@ impl Display for PrefixExpr {
 }
 
 impl Expression for PrefixExpr {
-    fn expression(&self) {
-        todo!()
-    }
-
     fn get_type(&self) -> Type {
         Type::Prefix
     }

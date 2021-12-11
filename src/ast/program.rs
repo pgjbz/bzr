@@ -23,14 +23,6 @@ impl Display for Program {
 }
 
 impl Node for Program {
-    fn literal(&self) -> Box<dyn Display> {
-        if let Some(stmt) = self.statements.first() {
-            Box::new(stmt.to_string())
-        } else {
-            Box::new(String::new())
-        }
-    }
-
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }

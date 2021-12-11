@@ -1,15 +1,11 @@
 use std::{fmt::Display, rc::Rc};
 
-use crate::{
-    ast::{
-        expression::{Expression, Node},
-        types::Type,
-    },
-    lexer::token::Token,
+use crate::ast::{
+    expression::{Expression, Node},
+    types::Type,
 };
 
 pub struct InfixExpr {
-    pub token: Rc<Token>,
     pub operator: String,
     pub left: Option<Rc<dyn Expression>>,
     pub right: Option<Rc<dyn Expression>>,
@@ -17,9 +13,8 @@ pub struct InfixExpr {
 }
 
 impl InfixExpr {
-    pub fn new(token: Rc<Token>, operator: String) -> Self {
+    pub fn new(operator: String) -> Self {
         Self {
-            token,
             operator,
             right: None,
             left: None,
@@ -29,10 +24,6 @@ impl InfixExpr {
 }
 
 impl Node for InfixExpr {
-    fn literal(&self) -> Box<dyn std::fmt::Display> {
-        Box::new(self.token.to_string())
-    }
-
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
@@ -59,10 +50,6 @@ impl Display for InfixExpr {
 }
 
 impl Expression for InfixExpr {
-    fn expression(&self) {
-        todo!()
-    }
-
     fn get_type(&self) -> Type {
         if let Some(typ) = self.typ {
             typ

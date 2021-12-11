@@ -1,21 +1,16 @@
+use crate::ast::expression::Expression;
 use crate::ast::node::Node;
 use crate::ast::types::Type;
-use crate::{ast::expression::Expression, lexer::token::Token};
 use std::{fmt::Display, rc::Rc};
 
 pub struct Identifier {
-    pub token: Rc<Token>,
     pub value: Rc<String>,
     pub typ: Option<Type>,
 }
 
 impl Identifier {
-    pub fn new(value: Rc<String>, token: Rc<Token>) -> Self {
-        Self {
-            value,
-            token,
-            typ: None,
-        }
+    pub fn new(value: Rc<String>) -> Self {
+        Self { value, typ: None }
     }
 }
 
@@ -26,19 +21,12 @@ impl Display for Identifier {
 }
 
 impl Node for Identifier {
-    fn literal(&self) -> std::boxed::Box<dyn Display> {
-        Box::new("identifier".to_string())
-    }
-
     fn as_any(&self) -> &dyn std::any::Any {
         self
     }
 }
 
 impl Expression for Identifier {
-    fn expression(&self) {
-        todo!()
-    }
     fn get_type(&self) -> Type {
         Type::Unknown
     }
