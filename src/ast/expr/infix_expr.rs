@@ -29,6 +29,20 @@ impl Node for InfixExpr {
     }
 }
 
+impl Expression for InfixExpr {
+    fn get_type(&self) -> Type {
+        if let Some(typ) = self.typ {
+            typ
+        } else {
+            Type::Unknown
+        }
+    }
+
+    fn set_type(&mut self, typ: Type) {
+        self.typ = Some(typ)
+    }
+}
+
 impl Display for InfixExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut prefix = String::new();
@@ -49,16 +63,3 @@ impl Display for InfixExpr {
     }
 }
 
-impl Expression for InfixExpr {
-    fn get_type(&self) -> Type {
-        if let Some(typ) = self.typ {
-            typ
-        } else {
-            Type::Unknown
-        }
-    }
-
-    fn set_type(&mut self, typ: Type) {
-        self.typ = Some(typ)
-    }
-}

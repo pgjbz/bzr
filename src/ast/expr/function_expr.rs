@@ -30,6 +30,12 @@ impl Node for FunctionExpr {
     }
 }
 
+impl Expression for FunctionExpr {
+    fn get_type(&self) -> Type {
+        Type::Function
+    }
+}
+
 impl Display for FunctionExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buffer = String::new();
@@ -54,8 +60,3 @@ impl Display for FunctionExpr {
     }
 }
 
-impl Expression for FunctionExpr {
-    fn get_type(&self) -> Type {
-        Type::Function
-    }
-}

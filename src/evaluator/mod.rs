@@ -227,132 +227,6 @@ impl Evaluator {
         }
     }
 
-    fn eval_index_expr(
-        &self,
-        left: Rc<dyn Object>,
-        index: Rc<dyn Object>,
-    ) -> Option<Rc<dyn Object>> {
-        if (left.get_type() == Type::Array || left.get_type() == Type::String)
-            && index.get_type() == Type::Int
-        {
-            self.eval_array_index_expr(left, index)
-        } else {
-            Some(Rc::new(Error::new(format!(
-                "index operation not suported: {}",
-                left.get_type()
-            ))))
-        }
-    }
-
-    fn eval_array_index_expr(
-        &self,
-        left: Rc<dyn Object>,
-        index: Rc<dyn Object>,
-    ) -> Option<Rc<dyn Object>> {
-        let index = index.as_any().downcast_ref::<Integer>().unwrap().val;
-        if let Some(array) = left.as_any().downcast_ref::<Array>() {
-            let arr = array.elements.borrow_mut();
-            let max = arr.len() as i64 - 1;
-            if index < 0 || index > max || max < 0 {
-                return Some(Rc::new(Null));
-            }
-            let element = arr.get(index as usize).unwrap();
-            Some(Rc::clone(element))
-        } else if let Some(string) = left.as_any().downcast_ref::<Str>() {
-            let max = string.val.len() as i64 - 1;
-            if index < 0 || index > max || max < 0 {
-                return Some(Rc::new(Null));
-            }
-            let ch = string.val.chars().nth(index as usize).unwrap();
-            Some(Rc::new(Str::new(ch.to_string())))
-        } else {
-            Some(Rc::new(Error::new(format!(
-                "index operation not suported: {}[{}]",
-                left.get_type(),
-                index
-            ))))
-        }
-    }
-
-    fn apply_function(
-        &self,
-        function: Rc<dyn Object>,
-        args: Vec<Option<Rc<dyn Object>>>,
-    ) -> Option<Rc<dyn Object>> {
-        if let Some(function) = function.as_any().downcast_ref::<Function>() {
-            let new_env = self.create_function_environment(function, &args);
-            let evaluated = self.eval(
-                Some(function.body.as_ref().unwrap().as_ref()),
-                Rc::clone(&new_env),
-            );
-            if self.is_error(&evaluated) {
-                return evaluated;
-            }
-            self.extract_ret_val(evaluated)
-        } else if let Some(built_in) = function.as_any().downcast_ref::<BuiltIn>() {
-            let mut arguments = Vec::with_capacity(5);
-            for arg in args {
-                arguments.push(arg.unwrap());
-            }
-            let func = built_in.function;
-            Some(func(&arguments))
-        } else {
-            Some(Rc::new(Error::new(format!(
-                "not a function {}",
-                function.get_type()
-            ))))
-        }
-    }
-
-    fn extract_ret_val(&self, evaluated: Option<Rc<dyn Object>>) -> Option<Rc<dyn Object>> {
-        if let Some(ret) = evaluated.as_ref().unwrap().as_any().downcast_ref::<Ret>() {
-            Some(Rc::clone(&ret.val))
-        } else {
-            evaluated
-        }
-    }
-
-    fn create_function_environment(
-        &self,
-        function: &Function,
-        args: &[Option<Rc<dyn Object>>],
-    ) -> Rc<RefCell<Environment>> {
-        let env = Rc::new(RefCell::new(Environment::new(Some(Rc::clone(
-            &function.env,
-        )))));
-        for (idx, arg) in args.iter().enumerate() {
-            env.borrow_mut().set(
-                function.parameters.get(idx).unwrap().to_string(),
-                Rc::clone(arg.as_ref().unwrap()),
-            )
-        }
-        env
-    }
-
-    fn eval_expressions(
-        &self,
-        args: &[Rc<dyn Expression>],
-        env: Rc<RefCell<Environment>>,
-    ) -> Vec<Option<Rc<dyn Object>>> {
-        let mut evaluated_args = Vec::new();
-        for arg in args {
-            let evaluated = self.eval(Some(arg.as_ref()), Rc::clone(&env));
-            if self.is_error(&evaluated) {
-                return vec![evaluated];
-            }
-            evaluated_args.push(evaluated)
-        }
-        evaluated_args
-    }
-
-    fn eval_prefix_expr(&self, right: Rc<dyn Object>, operator: &str) -> Option<Rc<dyn Object>> {
-        match operator {
-            "!" => self.eval_bang_operator(right),
-            "-" => self.eval_minus_prefix_operator(right),
-            _ => Some(Rc::new(Error::new(format!("invalid expression {}", right)))),
-        }
-    }
-
     fn eval_infix_expr(
         &self,
         left: Rc<dyn Object>,
@@ -439,52 +313,6 @@ impl Evaluator {
         }
     }
 
-    fn eval_bang_operator(&self, right: Rc<dyn Object>) -> Option<Rc<dyn Object>> {
-        if let Some(boolean) = right.as_any().downcast_ref::<Boolean>() {
-            Some(Rc::new(Boolean::new(!boolean.val)))
-        } else if let Some(value) = right.as_any().downcast_ref::<Integer>() {
-            Some(Rc::new(Integer::new(!value.val)))
-        } else {
-            Some(Rc::new(Error::new(format!(
-                "invalid expression '!{}'",
-                right
-            ))))
-        }
-    }
-
-    fn eval_minus_prefix_operator(&self, right: Rc<dyn Object>) -> Option<Rc<dyn Object>> {
-        if let Some(integer) = right.as_any().downcast_ref::<Integer>() {
-            Some(Rc::new(Integer::new(-integer.val)))
-        } else {
-            Some(Rc::new(Error::new(format!(
-                "invalid expression '-{}'",
-                right
-            ))))
-        }
-    }
-
-    fn eval_statements(
-        &self,
-        stmts: &[Rc<dyn Statement>],
-        env: Rc<RefCell<Environment>>,
-    ) -> Rc<dyn Object> {
-        let mut result = None;
-        for stmt in stmts.iter() {
-            result = self.eval(Some(stmt.as_ref()), Rc::clone(&env));
-            if let Some(ref res) = result {
-                if let Some(ret) = res.as_any().downcast_ref::<Ret>() {
-                    let return_value = Rc::clone(&ret.val);
-                    return return_value;
-                }
-            }
-        }
-        if let Some(result) = result {
-            result
-        } else {
-            process::exit(1)
-        }
-    }
-
     fn eval_if_expression(
         &self,
         if_expr: &IfExpr,
@@ -555,6 +383,28 @@ impl Evaluator {
         obj
     }
 
+    fn eval_statements(
+        &self,
+        stmts: &[Rc<dyn Statement>],
+        env: Rc<RefCell<Environment>>,
+    ) -> Rc<dyn Object> {
+        let mut result = None;
+        for stmt in stmts.iter() {
+            result = self.eval(Some(stmt.as_ref()), Rc::clone(&env));
+            if let Some(ref res) = result {
+                if let Some(ret) = res.as_any().downcast_ref::<Ret>() {
+                    let return_value = Rc::clone(&ret.val);
+                    return return_value;
+                }
+            }
+        }
+        if let Some(result) = result {
+            result
+        } else {
+            process::exit(1)
+        }
+    }
+
     fn eval_ret_stmt(&self, ret: &Return, env: Rc<RefCell<Environment>>) -> Option<Rc<dyn Object>> {
         match &ret.return_value {
             Some(expr) => {
@@ -567,10 +417,6 @@ impl Evaluator {
             }
             None => None,
         }
-    }
-
-    fn is_error(&self, to_check: &Option<Rc<dyn Object>>) -> bool {
-        matches!(to_check, Some(check) if check.get_type() == Type::Error)
     }
 
     fn eval_identifier(
@@ -593,6 +439,163 @@ impl Evaluator {
             }
         }
     }
+
+    fn eval_index_expr(
+        &self,
+        left: Rc<dyn Object>,
+        index: Rc<dyn Object>,
+    ) -> Option<Rc<dyn Object>> {
+        if (left.get_type() == Type::Array || left.get_type() == Type::String)
+            && index.get_type() == Type::Int
+        {
+            self.eval_array_index_expr(left, index)
+        } else {
+            Some(Rc::new(Error::new(format!(
+                "index operation not suported: {}",
+                left.get_type()
+            ))))
+        }
+    }
+
+    fn eval_array_index_expr(
+        &self,
+        left: Rc<dyn Object>,
+        index: Rc<dyn Object>,
+    ) -> Option<Rc<dyn Object>> {
+        let index = index.as_any().downcast_ref::<Integer>().unwrap().val;
+        if let Some(array) = left.as_any().downcast_ref::<Array>() {
+            let arr = array.elements.borrow_mut();
+            let max = arr.len() as i64 - 1;
+            if index < 0 || index > max || max < 0 {
+                return Some(Rc::new(Null));
+            }
+            let element = arr.get(index as usize).unwrap();
+            Some(Rc::clone(element))
+        } else if let Some(string) = left.as_any().downcast_ref::<Str>() {
+            let max = string.val.len() as i64 - 1;
+            if index < 0 || index > max || max < 0 {
+                return Some(Rc::new(Null));
+            }
+            let ch = string.val.chars().nth(index as usize).unwrap();
+            Some(Rc::new(Str::new(ch.to_string())))
+        } else {
+            Some(Rc::new(Error::new(format!(
+                "index operation not suported: {}[{}]",
+                left.get_type(),
+                index
+            ))))
+        }
+    }
+
+    fn eval_prefix_expr(&self, right: Rc<dyn Object>, operator: &str) -> Option<Rc<dyn Object>> {
+        match operator {
+            "!" => self.eval_bang_operator(right),
+            "-" => self.eval_minus_prefix_operator(right),
+            _ => Some(Rc::new(Error::new(format!("invalid expression {}", right)))),
+        }
+    }
+
+    
+
+    fn eval_bang_operator(&self, right: Rc<dyn Object>) -> Option<Rc<dyn Object>> {
+        if let Some(boolean) = right.as_any().downcast_ref::<Boolean>() {
+            Some(Rc::new(Boolean::new(!boolean.val)))
+        } else if let Some(value) = right.as_any().downcast_ref::<Integer>() {
+            Some(Rc::new(Integer::new(!value.val)))
+        } else {
+            Some(Rc::new(Error::new(format!(
+                "invalid expression '!{}'",
+                right
+            ))))
+        }
+    }
+
+    fn eval_minus_prefix_operator(&self, right: Rc<dyn Object>) -> Option<Rc<dyn Object>> {
+        if let Some(integer) = right.as_any().downcast_ref::<Integer>() {
+            Some(Rc::new(Integer::new(-integer.val)))
+        } else {
+            Some(Rc::new(Error::new(format!(
+                "invalid expression '-{}'",
+                right
+            ))))
+        }
+    }
+
+    fn is_error(&self, to_check: &Option<Rc<dyn Object>>) -> bool {
+        matches!(to_check, Some(check) if check.get_type() == Type::Error)
+    }
+
+    fn apply_function(
+        &self,
+        function: Rc<dyn Object>,
+        args: Vec<Option<Rc<dyn Object>>>,
+    ) -> Option<Rc<dyn Object>> {
+        if let Some(function) = function.as_any().downcast_ref::<Function>() {
+            let new_env = self.create_function_environment(function, &args);
+            let evaluated = self.eval(
+                Some(function.body.as_ref().unwrap().as_ref()),
+                Rc::clone(&new_env),
+            );
+            if self.is_error(&evaluated) {
+                return evaluated;
+            }
+            self.extract_ret_val(evaluated)
+        } else if let Some(built_in) = function.as_any().downcast_ref::<BuiltIn>() {
+            let mut arguments = Vec::with_capacity(5);
+            for arg in args {
+                arguments.push(arg.unwrap());
+            }
+            let func = built_in.function;
+            Some(func(&arguments))
+        } else {
+            Some(Rc::new(Error::new(format!(
+                "not a function {}",
+                function.get_type()
+            ))))
+        }
+    }
+
+    fn extract_ret_val(&self, evaluated: Option<Rc<dyn Object>>) -> Option<Rc<dyn Object>> {
+        if let Some(ret) = evaluated.as_ref().unwrap().as_any().downcast_ref::<Ret>() {
+            Some(Rc::clone(&ret.val))
+        } else {
+            evaluated
+        }
+    }
+
+    fn create_function_environment(
+        &self,
+        function: &Function,
+        args: &[Option<Rc<dyn Object>>],
+    ) -> Rc<RefCell<Environment>> {
+        let env = Rc::new(RefCell::new(Environment::new(Some(Rc::clone(
+            &function.env,
+        )))));
+        for (idx, arg) in args.iter().enumerate() {
+            env.borrow_mut().set(
+                function.parameters.get(idx).unwrap().to_string(),
+                Rc::clone(arg.as_ref().unwrap()),
+            )
+        }
+        env
+    }
+
+    fn eval_expressions(
+        &self,
+        args: &[Rc<dyn Expression>],
+        env: Rc<RefCell<Environment>>,
+    ) -> Vec<Option<Rc<dyn Object>>> {
+        let mut evaluated_args = Vec::new();
+        for arg in args {
+            let evaluated = self.eval(Some(arg.as_ref()), Rc::clone(&env));
+            if self.is_error(&evaluated) {
+                return vec![evaluated];
+            }
+            evaluated_args.push(evaluated)
+        }
+        evaluated_args
+    }
+
 }
 
 impl Default for Evaluator {

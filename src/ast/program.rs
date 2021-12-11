@@ -12,6 +12,12 @@ impl Program {
     }
 }
 
+impl Node for Program {
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
 impl Display for Program {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
         let mut program = String::new();
@@ -19,11 +25,5 @@ impl Display for Program {
             program.push_str(&stmt.to_string())
         }
         write!(f, "{}", program)
-    }
-}
-
-impl Node for Program {
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
     }
 }

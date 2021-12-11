@@ -9,19 +9,6 @@ pub struct Let {
     pub value: Rc<dyn Expression>,
 }
 
-impl Display for Let {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut stmt = String::new();
-        stmt.push_str("let ");
-        stmt.push_str(&format!("{} ", self.name));
-        stmt.push_str(&format!("{} ", self.typ));
-        stmt.push_str("= ");
-        stmt.push_str(&self.value.to_string());
-        stmt.push(';');
-        write!(f, "{}", stmt)
-    }
-}
-
 impl Let {
     pub fn new(typ: Type, name: Rc<dyn Expression>, value: Rc<dyn Expression>) -> Rc<Self> {
         Rc::new(Self { typ, name, value })
@@ -35,3 +22,16 @@ impl Node for Let {
 }
 
 impl Statement for Let {}
+
+impl Display for Let {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut stmt = String::new();
+        stmt.push_str("let ");
+        stmt.push_str(&format!("{} ", self.name));
+        stmt.push_str(&format!("{} ", self.typ));
+        stmt.push_str("= ");
+        stmt.push_str(&self.value.to_string());
+        stmt.push(';');
+        write!(f, "{}", stmt)
+    }
+}

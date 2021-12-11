@@ -27,6 +27,16 @@ impl Node for PrefixExpr {
     }
 }
 
+impl Expression for PrefixExpr {
+    fn get_type(&self) -> Type {
+        Type::Prefix
+    }
+
+    fn set_type(&mut self, typ: Type) {
+        self.typ = Some(typ)
+    }
+}
+
 impl Display for PrefixExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut prefix = String::new();
@@ -43,12 +53,3 @@ impl Display for PrefixExpr {
     }
 }
 
-impl Expression for PrefixExpr {
-    fn get_type(&self) -> Type {
-        Type::Prefix
-    }
-
-    fn set_type(&mut self, typ: Type) {
-        self.typ = Some(typ)
-    }
-}

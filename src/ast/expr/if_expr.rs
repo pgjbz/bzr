@@ -29,6 +29,12 @@ impl Node for IfExpr {
     }
 }
 
+impl Expression for IfExpr {
+    fn get_type(&self) -> crate::ast::types::Type {
+        crate::ast::types::Type::Expression
+    }
+}
+
 impl Display for IfExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buffer = String::new();
@@ -43,11 +49,5 @@ impl Display for IfExpr {
             buffer.push_str(&format!(" else {}", alternative))
         };
         write!(f, "{}", buffer)
-    }
-}
-
-impl Expression for IfExpr {
-    fn get_type(&self) -> crate::ast::types::Type {
-        crate::ast::types::Type::Expression
     }
 }

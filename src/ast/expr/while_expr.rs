@@ -26,6 +26,12 @@ impl Node for WhileExpr {
     }
 }
 
+impl Expression for WhileExpr {
+    fn get_type(&self) -> Type {
+        Type::Expression
+    }
+}
+
 impl Display for WhileExpr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut buffer = String::new();
@@ -40,8 +46,3 @@ impl Display for WhileExpr {
     }
 }
 
-impl Expression for WhileExpr {
-    fn get_type(&self) -> Type {
-        Type::Expression
-    }
-}
