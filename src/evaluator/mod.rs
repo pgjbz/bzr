@@ -249,12 +249,7 @@ impl Evaluator {
         left: Rc<dyn Object>,
         index: Rc<dyn Object>,
     ) -> Option<Rc<dyn Object>> {
-        let index = *index
-            .as_any()
-            .downcast_ref::<Integer>()
-            .unwrap()
-            .val
-            .borrow_mut();
+        let index = index.as_any().downcast_ref::<Integer>().unwrap().val;
         if let Some(array) = left.as_any().downcast_ref::<Array>() {
             let arr = array.elements.borrow_mut();
             let max = arr.len() as i64 - 1;
@@ -373,8 +368,8 @@ impl Evaluator {
         }
         if let Some(left) = left.as_any().downcast_ref::<Integer>() {
             if let Some(right) = right.as_any().downcast_ref::<Integer>() {
-                let left = *left.val.borrow();
-                let right = *right.val.borrow();
+                let left = left.val;
+                let right = right.val;
 
                 match operator {
                     "%" => Some(Rc::new(Integer::new(left % right))),
@@ -403,8 +398,8 @@ impl Evaluator {
             }
         } else if let Some(left) = left.as_any().downcast_ref::<Boolean>() {
             if let Some(right) = right.as_any().downcast_ref::<Boolean>() {
-                let left = *left.val.borrow();
-                let right = *right.val.borrow();
+                let left = left.val;
+                let right = right.val;
                 match operator {
                     "!=" => Some(Rc::new(Boolean::new(left != right))),
                     "==" => Some(Rc::new(Boolean::new(left == right))),
@@ -446,31 +441,26 @@ impl Evaluator {
 
     fn eval_bang_operator(&self, right: Rc<dyn Object>) -> Option<Rc<dyn Object>> {
         if let Some(boolean) = right.as_any().downcast_ref::<Boolean>() {
-            let mut val = boolean.val.borrow_mut();
-            *val = !*val;
+            Some(Rc::new(Boolean::new(!boolean.val)))
         } else if let Some(value) = right.as_any().downcast_ref::<Integer>() {
-            let mut val = value.val.borrow_mut();
-            *val = !*val;
+            Some(Rc::new(Integer::new(!value.val)))
         } else {
-            return Some(Rc::new(Error::new(format!(
+            Some(Rc::new(Error::new(format!(
                 "invalid expression '!{}'",
                 right
-            ))));
+            ))))
         }
-        Some(right)
     }
 
     fn eval_minus_prefix_operator(&self, right: Rc<dyn Object>) -> Option<Rc<dyn Object>> {
         if let Some(integer) = right.as_any().downcast_ref::<Integer>() {
-            let mut val = integer.val.borrow_mut();
-            *val = !*val;
+            Some(Rc::new(Integer::new(-integer.val)))
         } else {
-            return Some(Rc::new(Error::new(format!(
+            Some(Rc::new(Error::new(format!(
                 "invalid expression '-{}'",
                 right
-            ))));
+            ))))
         }
-        Some(right)
     }
 
     fn eval_statements(
@@ -508,7 +498,7 @@ impl Evaluator {
             Some(condition) => match condition.as_any().downcast_ref::<Boolean>() {
                 Some(condition) => {
                     let new_env = Rc::new(RefCell::new(Environment::new(Some(Rc::clone(&env)))));
-                    if *condition.val.borrow_mut() {
+                    if condition.val {
                         if let Some(ref consequence) = if_expr.consequence {
                             self.eval(Some(consequence.as_ref()), Rc::clone(&new_env))
                         } else {
@@ -545,7 +535,7 @@ impl Evaluator {
                     Some(condition) => {
                         let new_env =
                             Rc::new(RefCell::new(Environment::new(Some(Rc::clone(&env)))));
-                        if *condition.val.borrow_mut() {
+                        if condition.val {
                             let ret = self.eval(
                                 Some(while_expr.consequence.as_ref().unwrap().as_ref()),
                                 Rc::clone(&env),

@@ -1,18 +1,16 @@
-use std::{any::Any, cell::RefCell, fmt::Display};
+use std::{any::Any, fmt::Display};
 
 use crate::ast::types::Type;
 
 use super::Object;
 
 pub struct Integer {
-    pub val: RefCell<i64>,
+    pub val: i64,
 }
 
 impl Integer {
     pub fn new(val: i64) -> Self {
-        Self {
-            val: RefCell::new(val),
-        }
+        Self { val }
     }
 }
 
@@ -22,7 +20,7 @@ impl Object for Integer {
     }
 
     fn inspect(&self) -> String {
-        self.val.take().to_string()
+        self.to_string()
     }
 
     fn as_any(&self) -> &dyn Any {
@@ -32,6 +30,6 @@ impl Object for Integer {
 
 impl Display for Integer {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.val.borrow_mut())
+        write!(f, "{}", self.val)
     }
 }

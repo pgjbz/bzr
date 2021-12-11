@@ -20,7 +20,7 @@ fn test_eval_integer() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -36,7 +36,7 @@ fn test_eval_integer_minus_operator() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -50,7 +50,7 @@ fn test_eval_boolean() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Boolean>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -91,7 +91,7 @@ fn test_bang_operator_boolean() {
         println!("{}", source);
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Boolean>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -109,7 +109,7 @@ fn test_eval_infix_number_expr() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -143,7 +143,7 @@ fn test_eval_infix_bool_expr() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Boolean>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -168,7 +168,7 @@ fn test_eval_if_expr() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -184,7 +184,7 @@ fn test_eval_return_expr() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -240,7 +240,7 @@ fn test_let_statement() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -262,7 +262,7 @@ fn test_var_statement() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -297,7 +297,7 @@ fn test_function_apply() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -335,7 +335,7 @@ fn test_factorial() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -360,7 +360,7 @@ fn test_closure() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -382,7 +382,7 @@ fn test_built_in() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -395,7 +395,7 @@ fn test_set_value() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }
@@ -422,7 +422,7 @@ fn test_array_index() {
     for (source, expected) in tests {
         let evaluated = test_eval(source);
         let evaluated = evaluated.as_any().downcast_ref::<Integer>().unwrap();
-        let value = *evaluated.val.borrow_mut();
+        let value = evaluated.val;
         assert_eq!(expected, value)
     }
 }

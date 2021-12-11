@@ -112,13 +112,13 @@ pub fn slice(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
         ));
     }
     let start = if let Some(start) = args[1].as_any().downcast_ref::<Integer>() {
-        *start.val.borrow_mut() as usize
+        start.val as usize
     } else {
         return Rc::new(Error::new(format!("invalid start {}", args[1])));
     };
 
     let end = if let Some(end) = args[2].as_any().downcast_ref::<Integer>() {
-        *end.val.borrow_mut() as usize
+        end.val as usize
     } else {
         return Rc::new(Error::new(format!("invalid end {}", args[2])));
     };
@@ -177,7 +177,7 @@ pub fn replace(args: &[Rc<dyn Object>]) -> Rc<dyn Object> {
         let mut elements = arr.elements.borrow_mut();
         let max = elements.len() - 1;
         let pos = if let Some(val) = args[1].as_any().downcast_ref::<Integer>() {
-            *val.val.borrow_mut() as usize
+            val.val as usize
         } else {
             return Rc::new(Error::new(format!("invalid array index {}", args[1])));
         };
