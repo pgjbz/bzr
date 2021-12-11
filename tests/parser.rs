@@ -8,7 +8,7 @@ use bzr::{
         expr::int_expr::IntExpr, identifier::Identifier, program::Program, statement::Statement,
         stmt::let_stmt::Let, types::Type,
     },
-    lexer::{token::Token, Lexer},
+    lexer::Lexer,
     parser::Parser,
 };
 
